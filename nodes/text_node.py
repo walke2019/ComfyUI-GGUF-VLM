@@ -395,6 +395,12 @@ class TextGenerationNode:
             if final_output.lower().startswith("assistant:"):
                 final_output = final_output[10:].strip()  # 移除 "Assistant:" (10个字符)
             
+            # 合并多段输出为单段（如果系统提示词要求单段输出）
+            if system_prompt_text and 'single' in system_prompt_text.lower() and 'paragraph' in system_prompt_text.lower():
+                # 移除多余的换行，保持单段格式
+                lines = [line.strip() for line in final_output.split('\n') if line.strip()]
+                final_output = ' '.join(lines)
+            
             if enable_thinking and thinking:
                 print(f"💭 Thinking process extracted ({len(thinking)} chars)")
             
