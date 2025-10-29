@@ -57,7 +57,23 @@ class TextModelLoader:
         
         # 过滤本地模型：只显示文本生成类型的模型
         local_models = []
+        
+        # 视觉模型关键词列表（用于排除）
+        vision_keywords = [
+            'llava', 'vision', 'vl', 'multimodal', 'mm', 
+            'clip', 'qwen-vl', 'qwen2-vl', 'minicpm-v',
+            'phi-3-vision', 'internvl', 'cogvlm'
+        ]
+        
         for model_file in all_local_models:
+            # 检查文件名是否包含视觉模型关键词
+            model_lower = model_file.lower()
+            is_vision_model = any(keyword in model_lower for keyword in vision_keywords)
+            
+            if is_vision_model:
+                continue  # 跳过视觉模型
+            
+            # 检查 registry 中的模型信息
             model_info = registry.find_model_by_filename(model_file)
             # 如果找到模型信息且是文本生成类型，或者找不到信息（未知模型，保留）
             if model_info is None or model_info.get('business_type') == 'text_generation':
