@@ -1,0 +1,17 @@
+[project]
+name = "comfyui-qwen2_5-vl-gguf"
+description = "ComfyUI nodes for running GGUF quantized Qwen2.5-VL models using llama.cpp"
+version = "1.0.0"
+license = {text = "MIT"}
+dependencies = [
+    "llama-cpp-python>=0.2.0",
+    "Pillow>=9.0.0",
+    "numpy>=1.20.0"
+]
+
+[project.urls]
+Repository = "https://github.com/yourusername/ComfyUI-qwenVL"
+
+[tool.comfy]
+DisplayName = "Qwen2.5-VL GGUF Nodes"
+

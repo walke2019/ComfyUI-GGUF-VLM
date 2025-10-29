@@ -1,0 +1,176 @@
+"""
+Model Loader - 负责加载和管理 GGUF 模型
+"""
+
+import os
+from pathlib import Path
+from typing import List, Dict, Optional, Tuple
+import folder_paths
+
+
+class ModelLoader:
+    """GGUF 模型加载器"""
+    
+    def __init__(self, model_dirs: List[str] = None):
+        """
+        初始化模型加载器
+        
+        Args:
+            model_dirs: 模型目录列表，如果为 None 则使用默认目录
+        """
+        if model_dirs is None:
+            self.model_dirs = self._get_default_model_dirs()
+        else:
+            self.model_dirs = model_dirs
+    
+    def _get_default_model_dirs(self) -> List[str]:
+        """获取默认模型目录"""
+        dirs = []
+        
+        # ComfyUI text_encoders 目录
+        text_encoders_dir = os.path.join(folder_paths.models_dir, "text_encoders")
+        os.makedirs(text_encoders_dir, exist_ok=True)
+        dirs.append(text_encoders_dir)
+        
+        # 兼容旧版 VLM_GGUF 目录
+        vlm_gguf_dir = os.path.join(folder_paths.models_dir, "VLM_GGUF")
+        os.makedirs(vlm_gguf_dir, exist_ok=True)
+        dirs.append(vlm_gguf_dir)
+        
+        # 从 folder_paths 获取额外配置的目录
+        try:
+            configured = folder_paths.get_folder_paths("text_encoders")
+            if configured:
+                dirs.extend(configured)
+        except Exception as e:
+            print(f"⚠️  Could not get folder_paths for text_encoders: {e}")
+        
+        # 去重
+        unique_dirs = []
+        seen = set()
+        for path in dirs:
+            if path not in seen:
+                unique_dirs.append(path)
+                seen.add(path)
+        
+        return unique_dirs
+    
+    def scan_models(self, log_paths: bool = False) -> Dict[str, str]:
+        """
+        扫描所有模型目录，查找 GGUF 文件
+        
+        Args:
+            log_paths: 是否打印扫描路径
+        
+        Returns:
+            {filename: full_path} 字典
+        """
+        if log_paths:
+            print("🔍 Scanning for GGUF models in:")
+            for path in self.model_dirs:
+                print(f"   - {path} (exists: {os.path.exists(path)})")
+        
+        models = {}
+        
+        for base_dir in self.model_dirs:
+            if not os.path.exists(base_dir):
+                continue
+            
+            for root, _, files in os.walk(base_dir):
+                for file in files:
+                    if file.lower().endswith(".gguf"):
+                        full_path = os.path.join(root, file)
+                        
+                        # 如果文件名已存在，保留第一个找到的
+                        if file not in models:
+                            models[file] = full_path
+        
+        return models
+    
+    def find_model(self, filename: str) -> Optional[str]:
+        """
+        查找指定的模型文件
+        
+        Args:
+            filename: 模型文件名
+        
+        Returns:
+            模型完整路径，未找到返回 None
+        """
+        models = self.scan_models()
+        return models.get(filename)
+    
+    def find_mmproj(self, model_filename: str, mmproj_name: str) -> Optional[str]:
+        """
+        查找模型对应的 mmproj 文件
+        
+        Args:
+            model_filename: 模型文件名
+            mmproj_name: mmproj 文件名
+        
+        Returns:
+            mmproj 完整路径，未找到返回 None
+        """
+        # 首先在模型所在目录查找
+        model_path = self.find_model(model_filename)
+        if model_path:
+            model_dir = os.path.dirname(model_path)
+            mmproj_path = os.path.join(model_dir, mmproj_name)
+            if os.path.exists(mmproj_path):
+                return mmproj_path
+        
+        # 在所有模型目录中查找
+        for base_dir in self.model_dirs:
+            if not os.path.exists(base_dir):
+                continue
+            
+            for root, _, files in os.walk(base_dir):
+                if mmproj_name in files:
+                    return os.path.join(root, mmproj_name)
+        
+        return None
+    
+    def get_model_info(self, filename: str) -> Optional[Dict]:
+        """
+        获取模型文件信息
+        
+        Args:
+            filename: 模型文件名
+        
+        Returns:
+            模型信息字典
+        """
+        model_path = self.find_model(filename)
+        if not model_path:
+            return None
+        
+        try:
+            stat = os.stat(model_path)
+            return {
+                'filename': filename,
+                'path': model_path,
+                'size': stat.st_size,
+                'mtime': stat.st_mtime,
+                'exists': True
+            }
+        except OSError:
+            return None
+    
+    def list_models(self, pattern: str = None) -> List[str]:
+        """
+        列出所有模型文件名
+        
+        Args:
+            pattern: 可选的过滤模式（不区分大小写）
+        
+        Returns:
+            模型文件名列表
+        """
+        models = self.scan_models()
+        filenames = list(models.keys())
+        
+        if pattern:
+            pattern_lower = pattern.lower()
+            filenames = [f for f in filenames if pattern_lower in f.lower()]
+        
+        return sorted(filenames)

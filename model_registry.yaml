@@ -1,0 +1,636 @@
+vision_language_models:
+  qwen2.5-vl:
+    series_name: Qwen2.5-VL
+    description: Qwen 2.5 视觉语言模型（支持图像和视频理解）
+    business_type: video_analysis
+    models:
+    - model_name: Qwen2.5-VL-3B-Instruct
+      repo: unsloth/Qwen2.5-VL-3B-Instruct-GGUF
+      mmproj: mmproj-F16.gguf
+      description: 3B 轻量级视觉语言模型，支持图像和长视频理解
+      capabilities:
+      - image
+      - video
+      - multilingual
+      - ocr
+      variants:
+      - name: Q4_K_M
+        file: Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf
+        size: 1.80GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen2.5-VL-3B-Instruct-Q8_0.gguf
+        size: 3.06GB
+        recommended: false
+    - model_name: Qwen2.5-VL-7B-Instruct
+      repo: unsloth/Qwen2.5-VL-7B-Instruct-GGUF
+      mmproj: mmproj-F16.gguf
+      description: 7B 旗舰视觉语言模型，支持图像和超长视频（1小时+）理解
+      capabilities:
+      - image
+      - video
+      - multilingual
+      - ocr
+      - agent
+      variants:
+      - name: Q4_K_M
+        file: Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf
+        size: 4.36GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen2.5-VL-7B-Instruct-Q8_0.gguf
+        size: 7.54GB
+        recommended: false
+    - model_name: Qwen2.5-VL-7B-NSFW-Caption-V4
+      repo: mradermacher/Qwen2.5-VL-7B-NSFW-Caption-V4-GGUF
+      mmproj: Qwen2.5-VL-7B-NSFW-Caption-V4.mmproj-f16.gguf
+      description: 专门用于图像和视频描述的 NSFW 版本
+      capabilities:
+      - image
+      - video
+      - nsfw
+      - caption
+      variants:
+      - name: Q4_K_M
+        file: Qwen2.5-VL-7B-NSFW-Caption-V4.Q4_K_M.gguf
+        size: 4.36GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen2.5-VL-7B-NSFW-Caption-V4.Q8_0.gguf
+        size: 7.55GB
+        recommended: false
+  qwen2-vl:
+    series_name: Qwen2-VL
+    description: Qwen 2.0 视觉语言模型（中英文优秀）
+    business_type: image_analysis
+    models:
+    - model_name: Qwen2-VL-2B-Instruct
+      repo: bartowski/Qwen2-VL-2B-Instruct-GGUF
+      mmproj: mmproj-Qwen2-VL-2B-Instruct-f32.gguf
+      description: 2B 轻量级视觉语言模型
+      variants:
+      - name: Q4_K_M
+        file: Qwen2-VL-2B-Instruct-Q4_K_M.gguf
+        size: 0.92GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen2-VL-2B-Instruct-Q8_0.gguf
+        size: 1.53GB
+        recommended: false
+    - model_name: Qwen2-VL-7B-Instruct
+      repo: bartowski/Qwen2-VL-7B-Instruct-GGUF
+      mmproj: mmproj-Qwen2-VL-7B-Instruct-f32.gguf
+      description: 7B 平衡性能视觉语言模型
+      variants:
+      - name: Q4_K_M
+        file: Qwen2-VL-7B-Instruct-Q4_K_M.gguf
+        size: 4.36GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen2-VL-7B-Instruct-Q8_0.gguf
+        size: 7.54GB
+        recommended: false
+  qwen3-vl:
+    series_name: Qwen3-VL
+    description: Qwen 3.0 视觉语言模型
+    business_type: image_analysis
+    models:
+    - model_name: Qwen3-VL-8B-Thinking
+      repo: NexaAI/Qwen3-VL-8B-Thinking-GGUF
+      mmproj: mmproj.F16.gguf
+      description: 具有思维链能力的视觉模型
+      variants:
+      - name: Q4_K
+        file: Qwen3-VL-8B-Thinking.Q4_K.gguf
+        size: 4.29GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen3-VL-8B-Thinking.Q8_0.gguf
+        size: 8.11GB
+        recommended: false
+  qwen2.5-vl-nsfw:
+    series_name: Qwen2.5-VL NSFW
+    description: Qwen 2.5-VL NSFW 图像描述模型（未审核）
+    business_type: image_analysis
+    models:
+    - model_name: Qwen2.5-VL-7B-NSFW-Caption-V3
+      repo: bartowski/thesby_Qwen2.5-VL-7B-NSFW-Caption-V3-GGUF
+      mmproj: mmproj-thesby_Qwen2.5-VL-7B-NSFW-Caption-V3-f16.gguf
+      description: 专业 NSFW 图像描述模型 V3
+      capabilities:
+      - image
+      - nsfw
+      - caption
+      variants:
+      - name: Q4_K_M
+        file: thesby_Qwen2.5-VL-7B-NSFW-Caption-V3-Q4_K_M.gguf
+        size: 4.36GB
+        recommended: true
+      - name: Q8_0
+        file: thesby_Qwen2.5-VL-7B-NSFW-Caption-V3-Q8_0.gguf
+        size: 7.54GB
+        recommended: false
+  minicpm-v:
+    series_name: MiniCPM-V
+    description: MiniCPM-V 高性能视觉语言模型（中英文优秀）
+    business_type: image_analysis
+    models:
+    - model_name: MiniCPM-V-4.5
+      repo: openbmb/MiniCPM-V-4_5-gguf
+      mmproj: mmproj-model-f16.gguf
+      description: GPT-4o 级别性能，8B 参数，支持图像和视频
+      capabilities:
+      - image
+      - video
+      - multilingual
+      - ocr
+      variants:
+      - name: Q4_K_M
+        file: ggml-model-Q4_K_M.gguf
+        size: 4.68GB
+        recommended: true
+      - name: Q5_K_M
+        file: ggml-model-Q5_K_M.gguf
+        size: 5.45GB
+        recommended: false
+      - name: Q8_0
+        file: ggml-model-Q8_0.gguf
+        size: 8.11GB
+        recommended: false
+  nemo-florence-vl:
+    series_name: Nemo Florence VL
+    description: Nemo Florence 视觉语言模型（GGUF 格式）
+    business_type: image_analysis
+    models:
+    - model_name: Nemo_Florence_VL
+      repo: mradermacher/Nemo_Florence_VL-GGUF
+      mmproj: 不需要
+      description: 基于 Mistral Nemo 和 Florence-2 的视觉语言模型
+      capabilities:
+      - image
+      - text
+      variants:
+      - name: Q4_K_M
+        file: Nemo_Florence_VL.Q4_K_M.gguf
+        size: 6.96GB
+        recommended: true
+      - name: Q5_K_M
+        file: Nemo_Florence_VL.Q5_K_M.gguf
+        size: 8.13GB
+        recommended: false
+      - name: Q8_0
+        file: Nemo_Florence_VL.Q8_0.gguf
+        size: 12.13GB
+        recommended: false
+  joycaption:
+    series_name: JoyCaption
+    description: JoyCaption 专业图像描述生成模型
+    business_type: image_analysis
+    models:
+    - model_name: JoyCaption-Beta-One
+      repo: mradermacher/llama-joycaption-beta-one-hf-llava-GGUF
+      mmproj_repo: concedo/llama-joycaption-beta-one-hf-llava-mmproj-gguf
+      mmproj: llama-joycaption-beta-one-llava-mmproj-model-f16.gguf
+      description: 高质量图像描述生成，适合训练数据标注
+      note: mmproj 文件在单独的仓库中
+      capabilities:
+      - image
+      - caption
+      - detailed_description
+      variants:
+      - name: Q4_K_M
+        file: llama-joycaption-beta-one-hf-llava.Q4_K_M.gguf
+        size: 4.58GB
+        recommended: true
+      - name: Q8_0
+        file: llama-joycaption-beta-one-hf-llava.Q8_0.gguf
+        size: 7.95GB
+        recommended: false
+text_generation_models:
+  qwen3:
+    series_name: Qwen3
+    description: Qwen 3.0 最新一代文本模型，支持思维模式切换
+    business_type: text_generation
+    models:
+    - model_name: Qwen3-1.7B
+      repo: unsloth/Qwen3-1.7B-GGUF
+      description: 1.7B 超轻量模型，支持 128K 上下文
+      capabilities:
+      - thinking_mode
+      - reasoning
+      - analysis
+      - summarization
+      - multilingual
+      variants:
+      - name: Q4_K_M
+        file: Qwen3-1.7B-Q4_K_M.gguf
+        size: 1.03GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen3-1.7B-Q8_0.gguf
+        size: 1.71GB
+        recommended: false
+    - model_name: Qwen3-8B
+      repo: Qwen/Qwen3-8B-GGUF
+      description: 8B 旗舰模型，强大的推理和分析能力
+      capabilities:
+      - thinking_mode
+      - reasoning
+      - analysis
+      - summarization
+      - agent
+      - multilingual
+      - 100+_languages
+      note: 支持思维/非思维模式切换，优秀的文本分析和总结能力
+      variants:
+      - name: Q4_K_M
+        file: Qwen3-8B-Q4_K_M.gguf
+        size: 4.68GB
+        recommended: true
+      - name: Q5_K_M
+        file: Qwen3-8B-Q5_K_M.gguf
+        size: 5.45GB
+        recommended: false
+      - name: Q8_0
+        file: Qwen3-8B-Q8_0.gguf
+        size: 8.11GB
+        recommended: false
+  qwen2.5:
+    series_name: Qwen2.5
+    description: Qwen 2.5 高质量文本生成模型（HuggingFace 高评分）
+    business_type: text_generation
+    models:
+  llama3:
+    series_name: Llama 3
+    description: Meta Llama 3 文本生成模型
+    business_type: text_generation
+    models:
+    - model_name: Llama-3-8B-Instruct
+      repo: QuantFactory/Meta-Llama-3-8B-Instruct-GGUF
+      variants:
+      - name: Q4_K_M
+        file: Meta-Llama-3-8B-Instruct.Q4_K_M.gguf
+        size: 4.58GB
+        recommended: true
+      - name: Q8_0
+        file: Meta-Llama-3-8B-Instruct.Q8_0.gguf
+        size: 7.95GB
+        recommended: false
+  llama3.1:
+    series_name: Llama 3.1
+    description: Meta Llama 3.1 文本生成模型（改进版）
+    business_type: text_generation
+    models:
+    - model_name: Llama-3.1-8B-Instruct
+      repo: bartowski/Meta-Llama-3.1-8B-Instruct-GGUF
+      variants:
+      - name: Q4_K_M
+        file: Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf
+        size: 4.58GB
+        recommended: true
+      - name: Q8_0
+        file: Meta-Llama-3.1-8B-Instruct-Q8_0.gguf
+        size: 7.95GB
+        recommended: false
+  llama3.2:
+    series_name: Llama 3.2
+    description: Meta Llama 3.2 轻量级文本模型
+    business_type: text_generation
+    models:
+    - model_name: Llama-3.2-1B-Instruct
+      repo: bartowski/Llama-3.2-1B-Instruct-GGUF
+      variants:
+      - name: Q4_K_M
+        file: Llama-3.2-1B-Instruct-Q4_K_M.gguf
+        size: 0.75GB
+        recommended: true
+      - name: Q8_0
+        file: Llama-3.2-1B-Instruct-Q8_0.gguf
+        size: 1.23GB
+        recommended: false
+    - model_name: Llama-3.2-3B-Instruct
+      repo: bartowski/Llama-3.2-3B-Instruct-GGUF
+      variants:
+      - name: Q4_K_M
+        file: Llama-3.2-3B-Instruct-Q4_K_M.gguf
+        size: 1.88GB
+        recommended: true
+      - name: Q8_0
+        file: Llama-3.2-3B-Instruct-Q8_0.gguf
+        size: 3.19GB
+        recommended: false
+  mistral:
+    series_name: Mistral
+    description: Mistral AI 高性能文本模型
+    business_type: text_generation
+    models:
+    - model_name: Mistral-7B-Instruct-v0.3
+      repo: MaziyarPanahi/Mistral-7B-Instruct-v0.3-GGUF
+      variants:
+      - name: Q4_K_M
+        file: Mistral-7B-Instruct-v0.3.Q4_K_M.gguf
+        size: 4.07GB
+        recommended: true
+      - name: Q8_0
+        file: Mistral-7B-Instruct-v0.3.Q8_0.gguf
+        size: 7.17GB
+        recommended: false
+    - model_name: Mistral-Nemo-Instruct-2407
+      repo: bartowski/Mistral-Nemo-Instruct-2407-GGUF
+      description: Mistral 12B 模型，128K 上下文
+      variants:
+      - name: Q4_K_M
+        file: Mistral-Nemo-Instruct-2407-Q4_K_M.gguf
+        size: 6.96GB
+        recommended: true
+      - name: Q8_0
+        file: Mistral-Nemo-Instruct-2407-Q8_0.gguf
+        size: 12.13GB
+        recommended: false
+  gemma2:
+    series_name: Gemma 2
+    description: Google Gemma 2 高质量文本生成模型
+    business_type: text_generation
+    models:
+    - model_name: Gemma-2-2B-Instruct
+      repo: bartowski/gemma-2-2b-it-GGUF
+      description: 2B 轻量级模型，快速响应
+      variants:
+      - name: Q4_K_M
+        file: gemma-2-2b-it-Q4_K_M.gguf
+        size: 1.59GB
+        recommended: true
+      - name: Q8_0
+        file: gemma-2-2b-it-Q8_0.gguf
+        size: 2.59GB
+        recommended: false
+    - model_name: Gemma-2-9B-Instruct
+      repo: bartowski/gemma-2-9b-it-GGUF
+      description: 9B 平衡性能模型
+      variants:
+      - name: Q4_K_M
+        file: gemma-2-9b-it-Q4_K_M.gguf
+        size: 5.37GB
+        recommended: true
+      - name: Q8_0
+        file: gemma-2-9b-it-Q8_0.gguf
+        size: 9.15GB
+        recommended: false
+  gemma3:
+    series_name: Gemma 3
+    description: Google Gemma 3 最新一代文本生成模型（破限制版本）
+    business_type: text_generation
+    models:
+    - model_name: Gemma-3-4B-Instruct-Abliterated-V2
+      repo: mlabonne/gemma-3-4b-it-abliterated-v2-GGUF
+      description: 4B 破限制模型，无审查
+      capabilities:
+      - text_generation
+      - abliterated
+      - uncensored
+      variants:
+      - name: Q4_K_M
+        file: gemma-3-4b-it-abliterated-v2.q4_k_m.gguf
+        size: 2.32GB
+        recommended: true
+      - name: Q8_0
+        file: gemma-3-4b-it-abliterated-v2.q8_0.gguf
+        size: 3.85GB
+        recommended: false
+    - model_name: Gemma-3-12B-Instruct-Abliterated-V2
+      repo: mlabonne/gemma-3-12b-it-abliterated-v2-GGUF
+      description: 12B 破限制模型，强大的生成能力
+      capabilities:
+      - text_generation
+      - abliterated
+      - uncensored
+      variants:
+      - name: Q4_K_M
+        file: gemma-3-12b-it-abliterated-v2.q4_k_m.gguf
+        size: 6.80GB
+        recommended: true
+      - name: Q8_0
+        file: gemma-3-12b-it-abliterated-v2.q8_0.gguf
+        size: 11.65GB
+        recommended: false
+  deepseek:
+    series_name: DeepSeek
+    description: DeepSeek 高性能代码和推理模型（HuggingFace 高评分）
+    business_type: text_generation
+    models:
+    - model_name: DeepSeek-R1-Distill-Qwen-7B
+      repo: bartowski/DeepSeek-R1-Distill-Qwen-7B-GGUF
+      description: R1 推理模型蒸馏版，强大的逻辑推理能力
+      variants:
+      - name: Q4_K_M
+        file: DeepSeek-R1-Distill-Qwen-7B-Q4_K_M.gguf
+        size: 4.36GB
+        recommended: true
+      - name: Q8_0
+        file: DeepSeek-R1-Distill-Qwen-7B-Q8_0.gguf
+        size: 7.54GB
+        recommended: false
+  nsfw-roleplay:
+    series_name: NSFW Roleplay
+    description: 专业角色扮演和成人内容生成模型（无审查/破限制）
+    business_type: text_generation
+    models:
+    - model_name: SEX_ROLEPLAY_V3-1B
+      repo: mradermacher/SEX_ROLEPLAY_V3-3.2-1B-GGUF
+      description: 1B 超轻量 NSFW 角色扮演，专为成人内容设计
+      capabilities:
+      - roleplay
+      - adult_content
+      - uncensored
+      variants:
+      - name: Q4_K_M
+        file: SEX_ROLEPLAY_V3-3.2-1B.Q4_K_M.gguf
+        size: 0.89GB
+        recommended: true
+      - name: Q8_0
+        file: SEX_ROLEPLAY_V3-3.2-1B.Q8_0.gguf
+        size: 1.49GB
+        recommended: false
+    - model_name: L3-8B-Stheno-v3.2
+      repo: bartowski/L3-8B-Stheno-v3.2-GGUF
+      description: 8B Stheno v3.2，顶级 NSFW 角色扮演和创意写作
+      capabilities:
+      - roleplay
+      - creative_writing
+      - adult_content
+      - uncensored
+      variants:
+      - name: Q4_K_M
+        file: L3-8B-Stheno-v3.2-Q4_K_M.gguf
+        size: 4.58GB
+        recommended: true
+      - name: Q8_0
+        file: L3-8B-Stheno-v3.2-Q8_0.gguf
+        size: 7.95GB
+        recommended: false
+    - model_name: Llama-3.1-8B-Stheno-v3.4
+      repo: bartowski/Llama-3.1-8B-Stheno-v3.4-GGUF
+      description: 8B Stheno v3.4 最新版，改进的 NSFW 性能
+      capabilities:
+      - roleplay
+      - creative_writing
+      - adult_content
+      - uncensored
+      variants:
+      - name: Q4_K_M
+        file: Llama-3.1-8B-Stheno-v3.4-Q4_K_M.gguf
+        size: 4.58GB
+        recommended: true
+      - name: Q8_0
+        file: Llama-3.1-8B-Stheno-v3.4-Q8_0.gguf
+        size: 7.95GB
+        recommended: false
+    - model_name: Daredevil-8B-abliterated
+      repo: mradermacher/Daredevil-8B-abliterated-GGUF
+      description: 8B 破限制模型，完全无审查
+      capabilities:
+      - roleplay
+      - adult_content
+      - abliterated
+      - uncensored
+      variants:
+      - name: Q4_K_M
+        file: Daredevil-8B-abliterated.Q4_K_M.gguf
+        size: 4.58GB
+        recommended: true
+      - name: Q8_0
+        file: Daredevil-8B-abliterated.Q8_0.gguf
+        size: 7.95GB
+        recommended: false
+    - model_name: Ministral-8B-Instruct-Abliterated
+      repo: mradermacher/ministral-8B-Instruct-2410-abliterated-GGUF
+      description: 8B 破限制 Ministral，适合角色扮演
+      capabilities:
+      - roleplay
+      - adult_content
+      - abliterated
+      variants:
+      - name: Q4_K_M
+        file: ministral-8B-Instruct-2410-abliterated.Q4_K_M.gguf
+        size: 4.68GB
+        recommended: true
+      - name: Q8_0
+        file: ministral-8B-Instruct-2410-abliterated.Q8_0.gguf
+        size: 8.11GB
+        recommended: false
+    - model_name: Qwen3-8B-NSFW-JP
+      repo: mradermacher/Qwen3-8B-NSFW-JP-GGUF
+      description: 8B Qwen3 日语 NSFW 模型，支持日文成人内容
+      capabilities:
+      - roleplay
+      - adult_content
+      - uncensored
+      - japanese
+      variants:
+      - name: Q4_K_M
+        file: Qwen3-8B-NSFW-JP.Q4_K_M.gguf
+        size: 4.68GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen3-8B-NSFW-JP.Q8_0.gguf
+        size: 8.11GB
+        recommended: false
+    - model_name: Llama-3.1-8B-Lexi-Uncensored-V2
+      repo: mradermacher/llama-3.1-8B-lexi-uncensored-v2-instruct-GGUF
+      description: 8B Lexi V2 无审查，专为 NSFW 设计
+      capabilities:
+      - roleplay
+      - adult_content
+      - uncensored
+      variants:
+      - name: Q4_K_M
+        file: llama-3.1-8B-lexi-uncensored-v2-instruct.Q4_K_M.gguf
+        size: 4.58GB
+        recommended: true
+      - name: Q8_0
+        file: llama-3.1-8B-lexi-uncensored-v2-instruct.Q8_0.gguf
+        size: 7.95GB
+        recommended: false
+    - model_name: Rocinante-12B-v1.1
+      repo: bartowski/Rocinante-12B-v1.1-GGUF
+      description: 12B 顶级角色扮演模型，极致创意
+      capabilities:
+      - roleplay
+      - creative_writing
+      - adult_content
+      variants:
+      - name: Q4_K_M
+        file: Rocinante-12B-v1.1-Q4_K_M.gguf
+        size: 6.96GB
+        recommended: true
+      - name: Q8_0
+        file: Rocinante-12B-v1.1-Q8_0.gguf
+        size: 12.13GB
+        recommended: false
+    - model_name: Fimbulvetr-Kuro-Lotus-10.7B
+      repo: bartowski/Fimbulvetr-Kuro-Lotus-10.7B-GGUF
+      description: 10.7B 创意写作和角色扮演
+      capabilities:
+      - roleplay
+      - creative_writing
+      - adult_content
+      variants:
+      - name: Q4_K_M
+        file: Fimbulvetr-Kuro-Lotus-10.7B-Q4_K_M.gguf
+        size: 6.02GB
+        recommended: true
+      - name: Q8_0
+        file: Fimbulvetr-Kuro-Lotus-10.7B-Q8_0.gguf
+        size: 10.62GB
+        recommended: false
+video_analysis_models:
+  qwen2-vl-video:
+    series_name: Qwen2-VL
+    description: Qwen 2 视频理解模型
+    business_type: video_analysis
+    models:
+    - model_name: Qwen2-VL-7B-Instruct-Abliterated
+      repo: mradermacher/Qwen2-VL-7B-Instruct-abliterated-GGUF
+      mmproj: Qwen2-VL-7B-Instruct-abliterated.mmproj-f16.gguf
+      description: 支持图像和视频理解（破限制版本）
+      capabilities:
+      - video
+      - image
+      - abliterated
+      variants:
+      - name: Q4_K_M
+        file: Qwen2-VL-7B-Instruct-abliterated.Q4_K_M.gguf
+        size: 4.36GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen2-VL-7B-Instruct-abliterated.Q8_0.gguf
+        size: 7.54GB
+        recommended: false
+matching_rules:
+  patterns:
+  - pattern: qwen2.5-vl-3b
+    series: qwen2.5-vl
+    model: Qwen2.5-VL-3B-Instruct
+  - pattern: qwen2.5-vl-7b.*nsfw
+    series: qwen2.5-vl
+    model: Qwen2.5-VL-7B-NSFW-Caption-V4
+  - pattern: qwen2.5-vl-7b
+    series: qwen2.5-vl
+    model: Qwen2.5-VL-7B-Instruct
+  - pattern: qwen3-vl-8b
+    series: qwen3-vl
+    model: Qwen3-VL-8B-Thinking
+  - pattern: qwen2-vl-7b
+    series: qwen2-vl-video
+    model: Qwen2-VL-7B-Instruct
+metadata:
+  version: 1.0.0
+  last_updated: '2025-10-20'
+  supported_business_types:
+  - image_analysis
+  - text_generation
+  - video_analysis
+  recommendations:
+    beginner: Qwen2.5-VL-3B-Instruct (Q4_K_M)
+    balanced: Qwen2.5-VL-7B-Instruct (Q4_K_M)
+    quality: Qwen3-VL-8B-Thinking (Q8_0)
