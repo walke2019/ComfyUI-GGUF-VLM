@@ -105,6 +105,15 @@ except Exception as e:
     NEXA_NODES = {}
     NEXA_DISPLAY = {}
 
+# 导入统一文本节点（新增）
+try:
+    from .nodes.unified_text_node import NODE_CLASS_MAPPINGS as UNIFIED_NODES, NODE_DISPLAY_NAME_MAPPINGS as UNIFIED_DISPLAY
+    print("✅ Unified text nodes loaded")
+except Exception as e:
+    print(f"⚠️  Unified text nodes load failed: {e}")
+    UNIFIED_NODES = {}
+    UNIFIED_DISPLAY = {}
+
 # 合并所有节点映射
 NODE_CLASS_MAPPINGS = {
     **LEGACY_NODES,          # 旧版节点（向后兼容）
@@ -115,6 +124,7 @@ NODE_CLASS_MAPPINGS = {
     **MULTI_IMAGE_NODES,     # 多图像分析节点
     **PROMPT_NODES,          # 系统提示词配置节点
     **NEXA_NODES,            # Nexa SDK 节点（新增）
+    **UNIFIED_NODES,         # 统一文本节点（新增）
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
@@ -126,6 +136,7 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **MULTI_IMAGE_DISPLAY,
     **PROMPT_DISPLAY,
     **NEXA_DISPLAY,
+    **UNIFIED_DISPLAY,
 }
 
 print(f"📦 ComfyUI-GGUF-VisionLM (Enhanced) loaded: {len(NODE_CLASS_MAPPINGS)} nodes available")
