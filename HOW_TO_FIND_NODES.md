@@ -20,7 +20,7 @@
 ### 方法 2: 通过分类查找
 
 1. 右键点击空白处
-2. 导航到：`🤖 GGUF-LLM` → `Text`
+2. 导航到：`🤖 GGUF-Fusion` → `Text`
 3. 找到：
    - 🔷 Unified Text Model Selector
    - 🔷 Unified Text Generation
@@ -137,7 +137,7 @@ curl -s http://127.0.0.1:18188/object_info | grep -i unified
    - `Ollama` ❌ (节点名称中没有)
 
 3. **分类路径**：
-   - `🤖 GGUF-LLM` → `Text`
+   - `🤖 GGUF-Fusion` → `Text`
 
 ## 🎬 快速开始示例
 
@@ -179,7 +179,7 @@ A: 节点名称是 "Unified Text"，不包含 "Ollama"。请搜索 "Unified" 或
 
 ### Q: 节点在哪个分类下？
 
-A: `🤖 GGUF-LLM` → `Text` 分类
+A: `🤖 GGUF-Fusion` → `Text` 分类
 
 ### Q: 如何确认节点已加载？
 

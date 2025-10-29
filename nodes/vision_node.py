@@ -126,7 +126,7 @@ class VisionModelLoader:
     RETURN_TYPES = ("VISION_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-LLM/Vision"
+    CATEGORY = "🤖 GGUF-Fusion/Vision"
     
     def load_model(self, model, n_ctx=8192, device="Auto", mmproj_file=""):
         """加载视觉语言模型"""
@@ -408,7 +408,7 @@ class VisionLanguageNode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("context",)
     FUNCTION = "describe_image"
-    CATEGORY = "🤖 GGUF-LLM/Vision"
+    CATEGORY = "🤖 GGUF-Fusion/Vision"
     OUTPUT_NODE = True
     
     def describe_image(self, model, prompt, max_tokens=512, 

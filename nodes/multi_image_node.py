@@ -87,7 +87,7 @@ class MultiImageAnalysis:
     RETURN_TYPES = TEXT_OUTPUT["types"]
     RETURN_NAMES = TEXT_OUTPUT["names"]
     FUNCTION = "analyze_images"
-    CATEGORY = "🤖 GGUF-LLM/Multi-Image"
+    CATEGORY = "🤖 GGUF-Fusion/Multi-Image"
     OUTPUT_NODE = True
     
     def analyze_images(
@@ -270,7 +270,7 @@ class MultiImageComparison:
     RETURN_TYPES = TEXT_OUTPUT["types"]
     RETURN_NAMES = TEXT_OUTPUT["names"]
     FUNCTION = "compare_images"
-    CATEGORY = "🤖 GGUF-LLM/Multi-Image"
+    CATEGORY = "🤖 GGUF-Fusion/Multi-Image"
     OUTPUT_NODE = True
     
     # 预设提示词

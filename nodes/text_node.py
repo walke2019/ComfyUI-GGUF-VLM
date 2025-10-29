@@ -119,7 +119,7 @@ class TextModelLoader:
     RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-LLM/Text"
+    CATEGORY = "🤖 GGUF-Fusion/Text"
     
     def load_model(self, model, n_ctx=8192, device="Auto", system_prompt=""):
         """加载文本模型"""
@@ -265,7 +265,7 @@ class TextGenerationNode:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("context", "thinking")
     FUNCTION = "generate"
-    CATEGORY = "🤖 GGUF-LLM/Text"
+    CATEGORY = "🤖 GGUF-Fusion/Text"
     OUTPUT_NODE = True
     
     @staticmethod
