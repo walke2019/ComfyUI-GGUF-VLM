@@ -18,25 +18,17 @@ except:
 from ..core.inference.nexa_engine import get_nexa_engine
 
 
-# 预设模型列表
-# 本地 GGUF 文件（用于 Local 模式）
-LOCAL_GGUF_MODELS = [
-    "Huihui-Qwen3-4B-Instruct-2507-abliterated.Q8_0.gguf",
-    "mlabonne_Qwen3-8B-abliterated-Q8_0.gguf",
-    "Qwen2.5-VL-7B-Abliterated-Caption-it.Q8_0.gguf",
-]
-
-# Nexa SDK 远程模型（用于 Remote 模式）
-REMOTE_NEXA_MODELS = [
+# Nexa SDK 预设模型列表
+# 格式: author/model-name:quant
+# 使用前需要先运行: nexa pull <model-name>
+PRESET_MODELS = [
+    "Custom (输入自定义模型 ID)",
     "DavidAU/Qwen3-8B-64k-Josiefied-Uncensored-HORROR-Max-GGUF:Q6_K",
     "mradermacher/Huihui-Qwen3-4B-Thinking-2507-abliterated-GGUF:Q8_0",
     "prithivMLmods/Qwen3-4B-2507-abliterated-GGUF:Q8_0",
     "mradermacher/Qwen3-4B-Thinking-2507-Uncensored-Fixed-GGUF:Q8_0",
     "mradermacher/Qwen3-Short-Story-Instruct-Uncensored-262K-ctx-4B-GGUF:Q8_0",
 ]
-
-# 统一的预设列表（向后兼容）
-PRESET_MODELS = ["Custom (输入自定义模型)"] + LOCAL_GGUF_MODELS + REMOTE_NEXA_MODELS
 
 # HuggingFace URL 到模型 ID 的映射
 HUGGINGFACE_URL_MAPPING = {
@@ -233,11 +225,11 @@ class NexaTextGeneration:
                 "custom_model": ("STRING", {
                     "default": "",
                     "multiline": False,
-                    "tooltip": "自定义模型（模型 ID、HuggingFace URL 或本地文件名）"
+                    "tooltip": "自定义模型 ID（格式: author/model:quant）"
                 }),
                 "auto_download": ("BOOLEAN", {
                     "default": True,
-                    "tooltip": "自动下载模型（如果模型不存在）"
+                    "tooltip": "自动下载模型（使用 nexa pull）"
                 }),
                 "prompt": ("STRING", {
                     "default": "Hello, how are you?",
@@ -393,59 +385,11 @@ class NexaTextGeneration:
             print(f"🔍 Checking model availability...")
             engine.ensure_model_available(model, auto_download=True)
         
-        # 处理模型路径
-        if model_source == "Local (GGUF File)":
-            # 本地模型：直接使用 llama-cpp-python（Nexa SDK 不支持本地路径）
-            if not model.endswith('.gguf'):
-                model = f"{model}.gguf"
-            
-            # 检查文件是否存在
-            model_path = engine.get_model_path(model)
-            if not os.path.exists(model_path):
-                error_msg = f"❌ Local model not found: {model_path}"
-                print(error_msg)
-                print(f"   Available models in {models_dir}:")
-                for m in engine.get_local_models():
-                    print(f"      - {m}")
-                return (error_msg, "", "")
-            
-            print(f"📁 Using local GGUF file (llama-cpp-python): {model_path}")
-            
-            # 使用 llama-cpp-python 直接加载
-            from llama_cpp import Llama
-            from ..core.inference_engine import InferenceEngine
-            
-            local_engine = InferenceEngine()
-            
-            # 加载模型
-            if not local_engine.load_model(model_path, n_ctx=8192, n_gpu_layers=-1):
-                return ("Failed to load model", "", "")
-            
-            # 构建提示词
-            prompt_text = f"System: {system_prompt}\n\nUser: {prompt}\n\nAssistant:"
-            
-            # 生成
-            raw_output = local_engine.generate_text(
-                model_path=model_path,
-                prompt=prompt_text,
-                max_tokens=max_tokens,
-                temperature=temperature,
-                top_p=top_p,
-                top_k=top_k,
-                repeat_penalty=repetition_penalty
-            )
-            
-            # 提取思考内容
-            final_output, thinking = self._extract_thinking(raw_output, enable_thinking)
-            final_output = final_output.strip()
-            
-            print(f"   ✅ Generated {len(final_output)} characters")
-            
-            return (final_output, thinking, f"Local GGUF: {model}")
-        else:
-            # 远程模型：直接使用模型 ID
-            model_id = model
-            print(f"🌐 Using remote model: {model_id}")
+        # Nexa SDK 只支持通过 'nexa pull' 下载的模型
+        # 模型格式: author/model-name:quant
+        model_id = model
+        print(f"🌐 Using Nexa SDK model: {model_id}")
+        print(f"💡 Make sure you've run: nexa pull {model_id}")
         
         # 处理思考控制
         if not enable_thinking and system_prompt:
