@@ -31,7 +31,7 @@ class SystemPromptConfig:
                     ["custom"] + preset_options,
                     {
                         "default": preset_options[0],
-                        "tooltip": "选择预设的系统提示词或使用自定义"
+                        "tooltip": "🤖 选择预设的系统提示词或使用自定义"
                     }
                 ),
                 "custom_prompt": (
@@ -39,7 +39,7 @@ class SystemPromptConfig:
                     {
                         "default": "",
                         "multiline": True,
-                        "tooltip": "当选择 'custom' 时使用的自定义系统提示词"
+                        "tooltip": "🤖 当选择 'custom' 时使用的自定义系统提示词"
                     }
                 ),
             },
@@ -48,7 +48,7 @@ class SystemPromptConfig:
                     "BOOLEAN",
                     {
                         "default": True,
-                        "tooltip": "是否启用系统提示词"
+                        "tooltip": "🤖 是否启用系统提示词"
                     }
                 ),
             }
@@ -57,7 +57,7 @@ class SystemPromptConfig:
     RETURN_TYPES = ("STRING", "BOOLEAN")
     RETURN_NAMES = ("system_prompt", "enabled")
     FUNCTION = "configure"
-    CATEGORY = "GGUF-VisionLM/Config"
+    CATEGORY = "🤖 GGUF-LLM/Config"
     
     def configure(self, preset, custom_prompt, enable_system_prompt=True):
         """
@@ -110,5 +110,5 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "SystemPromptConfig": "🔧 System Prompt Config",
+    "SystemPromptConfig": "🤖 System Prompt Config",
 }

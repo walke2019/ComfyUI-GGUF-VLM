@@ -101,24 +101,24 @@ class VisionModelLoader:
             "required": {
                 "model": (categorized_models, {
                     "default": categorized_models[0] if categorized_models else "No models found",
-                    "tooltip": "选择视觉语言模型（按类型分组）"
+                    "tooltip": "🤖 选择视觉语言模型（按类型分组）"
                 }),
                 "n_ctx": ("INT", {
                     "default": 8192,
                     "min": 512,
                     "max": 32768,
                     "step": 512,
-                    "tooltip": "上下文窗口大小"
+                    "tooltip": "🤖 上下文窗口大小"
                 }),
                 "device": (["Auto", "GPU", "CPU"], {
-                    "default": "Auto",
-                    "tooltip": "运行设备 (Auto=自动检测, GPU=全部GPU, CPU=仅CPU)"
+                    "default": "🤖 Auto",
+                    "tooltip": "🤖 运行设备 (Auto=自动检测, GPU=全部GPU, CPU=仅CPU)"
                 }),
             },
             "optional": {
                 "mmproj_file": ("STRING", {
                     "default": "",
-                    "tooltip": "手动指定 mmproj 文件（可选）"
+                    "tooltip": "🤖 手动指定 mmproj 文件（可选）"
                 }),
             }
         }
@@ -126,7 +126,7 @@ class VisionModelLoader:
     RETURN_TYPES = ("VISION_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "GGUF-VisionLM/Vision"
+    CATEGORY = "🤖 GGUF-LLM/Vision"
     
     def load_model(self, model, n_ctx=8192, device="Auto", mmproj_file=""):
         """加载视觉语言模型"""
@@ -348,59 +348,59 @@ class VisionLanguageNode:
         return {
             "required": {
                 "model": ("VISION_MODEL", {
-                    "tooltip": "视觉语言模型配置"
+                    "tooltip": "🤖 视觉语言模型配置"
                 }),
                 "prompt": ("STRING", {
-                    "default": "Describe this image in detail.",
+                    "default": "🤖 Describe this image in detail.",
                     "multiline": True,
-                    "tooltip": "用户提示词"
+                    "tooltip": "🤖 用户提示词"
                 }),
                 "max_tokens": ("INT", {
                     "default": 512,
                     "min": 1,
                     "max": 4096,
                     "step": 1,
-                    "tooltip": "最大生成 token 数"
+                    "tooltip": "🤖 最大生成 token 数"
                 }),
                 "temperature": ("FLOAT", {
                     "default": 0.7,
                     "min": 0.0,
                     "max": 2.0,
                     "step": 0.1,
-                    "tooltip": "温度参数"
+                    "tooltip": "🤖 温度参数"
                 }),
                 "top_p": ("FLOAT", {
                     "default": 0.9,
                     "min": 0.0,
                     "max": 1.0,
                     "step": 0.05,
-                    "tooltip": "Top-p 采样"
+                    "tooltip": "🤖 Top-p 采样"
                 }),
                 "top_k": ("INT", {
                     "default": 40,
                     "min": 0,
                     "max": 100,
                     "step": 1,
-                    "tooltip": "Top-k 采样"
+                    "tooltip": "🤖 Top-k 采样"
                 }),
                 "seed": ("INT", {
                     "default": 0,
                     "min": 0,
                     "max": 0xFFFFFFFFFFFFFFFF,
-                    "tooltip": "随机种子"
+                    "tooltip": "🤖 随机种子"
                 }),
             },
             "optional": {
                 "image": ("IMAGE", {
-                    "tooltip": "输入图像（与视频二选一）"
+                    "tooltip": "🤖 输入图像（与视频二选一）"
                 }),
                 "video": ("IMAGE", {
-                    "tooltip": "输入视频帧序列（与图像二选一）"
+                    "tooltip": "🤖 输入视频帧序列（与图像二选一）"
                 }),
                 "system_prompt": ("STRING", {
-                    "default": "You are a helpful assistant that describes images and videos accurately and in detail.",
+                    "default": "🤖 You are a helpful assistant that describes images and videos accurately and in detail.",
                     "multiline": True,
-                    "tooltip": "系统提示词（可自定义模型行为）"
+                    "tooltip": "🤖 系统提示词（可自定义模型行为）"
                 }),
             }
         }
@@ -408,7 +408,7 @@ class VisionLanguageNode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("context",)
     FUNCTION = "describe_image"
-    CATEGORY = "GGUF-VisionLM/Vision"
+    CATEGORY = "🤖 GGUF-LLM/Vision"
     OUTPUT_NODE = True
     
     def describe_image(self, model, prompt, max_tokens=512, 
@@ -472,13 +472,13 @@ class VisionLanguageNode:
             # 添加图像/视频帧
             for img_path in image_paths:
                 content.append({
-                    "type": "image_url",
+                    "type": "🤖 image_url",
                     "image_url": {"url": f"file://{img_path}"}
                 })
             
             # 添加用户提示词
             content.append({
-                "type": "text",
+                "type": "🤖 text",
                 "text": prompt
             })
             
@@ -582,6 +582,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "VisionModelLoader": "👁️ Vision Model Loader",
-    "VisionLanguageNode": "🖼️ Vision Language Generation",
+    "VisionModelLoader": "🤖 Vision Model Loader",
+    "VisionLanguageNode": "🤖 Vision Language Generation",
 }

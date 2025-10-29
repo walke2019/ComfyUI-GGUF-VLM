@@ -32,17 +32,13 @@ PRESET_MODELS = [
 
 # HuggingFace URL 到模型 ID 的映射
 HUGGINGFACE_URL_MAPPING = {
-    "https://huggingface.co/prithivMLmods/Qwen3-4B-2507-abliterated-GGUF/blob/main/Qwen3-4B-Instruct-2507-abliterated-GGUF/Qwen3-4B-Instruct-2507-abliterated.Q8_0.gguf": 
-        "prithivMLmods/Qwen3-4B-2507-abliterated-GGUF:Q8_0",
+    "https://huggingface.co/prithivMLmods/Qwen3-4B-2507-abliterated-GGUF/blob/main/Qwen3-4B-Instruct-2507-abliterated-GGUF/Qwen3-4B-Instruct-2507-abliterated.Q8_0.gguf": "🤖 prithivMLmods/Qwen3-4B-2507-abliterated-GGUF:Q8_0",
     
-    "https://huggingface.co/mradermacher/Qwen3-4B-Thinking-2507-Uncensored-Fixed-GGUF/resolve/main/Qwen3-4B-Thinking-2507-Uncensored-Fixed.Q8_0.gguf":
-        "mradermacher/Qwen3-4B-Thinking-2507-Uncensored-Fixed-GGUF:Q8_0",
+    "https://huggingface.co/mradermacher/Qwen3-4B-Thinking-2507-Uncensored-Fixed-GGUF/resolve/main/Qwen3-4B-Thinking-2507-Uncensored-Fixed.Q8_0.gguf": "🤖 mradermacher/Qwen3-4B-Thinking-2507-Uncensored-Fixed-GGUF:Q8_0",
     
-    "https://huggingface.co/mradermacher/Qwen3-Short-Story-Instruct-Uncensored-262K-ctx-4B-GGUF/blob/main/Qwen3-Short-Story-Instruct-Uncensored-262K-ctx-4B.Q8_0.gguf":
-        "mradermacher/Qwen3-Short-Story-Instruct-Uncensored-262K-ctx-4B-GGUF:Q8_0",
+    "https://huggingface.co/mradermacher/Qwen3-Short-Story-Instruct-Uncensored-262K-ctx-4B-GGUF/blob/main/Qwen3-Short-Story-Instruct-Uncensored-262K-ctx-4B.Q8_0.gguf": "🤖 mradermacher/Qwen3-Short-Story-Instruct-Uncensored-262K-ctx-4B-GGUF:Q8_0",
     
-    "https://huggingface.co/Triangle104/Josiefied-Qwen3-4B-abliterated-v2-Q8_0-GGUF/blob/main/josiefied-qwen3-4b-abliterated-v2-q8_0.gguf":
-        "Triangle104/Josiefied-Qwen3-4B-abliterated-v2-Q8_0-GGUF",
+    "https://huggingface.co/Triangle104/Josiefied-Qwen3-4B-abliterated-v2-Q8_0-GGUF/blob/main/josiefied-qwen3-4b-abliterated-v2-q8_0.gguf": "🤖 Triangle104/Josiefied-Qwen3-4B-abliterated-v2-Q8_0-GGUF",
 }
 
 
@@ -95,19 +91,19 @@ class NexaModelSelector:
         return {
             "required": {
                 "base_url": ("STRING", {
-                    "default": "http://127.0.0.1:11434",
-                    "tooltip": "Nexa SDK 服务地址"
+                    "default": "🤖 http://127.0.0.1:11434",
+                    "tooltip": "🤖 Nexa SDK 服务地址"
                 }),
                 "refresh_models": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "刷新模型列表"
+                    "tooltip": "🤖 刷新模型列表"
                 }),
             },
             "optional": {
                 "system_prompt": ("STRING", {
                     "default": "",
                     "multiline": True,
-                    "tooltip": "系统提示词（可选）"
+                    "tooltip": "🤖 系统提示词（可选）"
                 }),
             }
         }
@@ -115,7 +111,7 @@ class NexaModelSelector:
     RETURN_TYPES = ("NEXA_MODEL",)
     RETURN_NAMES = ("model_config",)
     FUNCTION = "select_model"
-    CATEGORY = "GGUF-VisionLM/Nexa"
+    CATEGORY = "🤖 GGUF-LLM/Nexa"
     OUTPUT_NODE = True
     
     def select_model(
@@ -140,7 +136,7 @@ class NexaModelSelector:
             config = {
                 "base_url": base_url,
                 "system_prompt": system_prompt,
-                "engine_type": "nexa",
+                "engine_type": "🤖 nexa",
                 "service_available": False
             }
             return (config,)
@@ -161,7 +157,7 @@ class NexaModelSelector:
         config = {
             "base_url": base_url,
             "system_prompt": system_prompt,
-            "engine_type": "nexa",
+            "engine_type": "🤖 nexa",
             "service_available": True,
             "available_models": available_models
         }
@@ -199,64 +195,64 @@ class NexaTextGeneration:
         return {
             "required": {
                 "model_config": ("NEXA_MODEL", {
-                    "tooltip": "Nexa 模型配置（来自 Model Selector）"
+                    "tooltip": "🤖 Nexa 模型配置（来自 Model Selector）"
                 }),
                 "preset_model": (all_models, {
                     "default": all_models[0],
-                    "tooltip": "可用模型列表（顶部为已下载模型）"
+                    "tooltip": "🤖 可用模型列表（顶部为已下载模型）"
                 }),
                 "custom_model": ("STRING", {
                     "default": "",
                     "multiline": False,
-                    "tooltip": "自定义模型 ID（格式: author/model:quant）"
+                    "tooltip": "🤖 自定义模型 ID（格式: author/model:quant）"
                 }),
                 "auto_download": ("BOOLEAN", {
                     "default": True,
-                    "tooltip": "自动下载模型（使用 nexa pull）"
+                    "tooltip": "🤖 自动下载模型（使用 nexa pull）"
                 }),
                 "max_tokens": ("INT", {
                     "default": 512,
                     "min": 1,
                     "max": 8192,
                     "step": 1,
-                    "tooltip": "最大生成 token 数"
+                    "tooltip": "🤖 最大生成 token 数"
                 }),
                 "temperature": ("FLOAT", {
                     "default": 0.7,
                     "min": 0.0,
                     "max": 2.0,
                     "step": 0.1,
-                    "tooltip": "温度参数（越高越随机）"
+                    "tooltip": "🤖 温度参数（越高越随机）"
                 }),
                 "top_p": ("FLOAT", {
                     "default": 0.9,
                     "min": 0.0,
                     "max": 1.0,
                     "step": 0.05,
-                    "tooltip": "Top-p 采样"
+                    "tooltip": "🤖 Top-p 采样"
                 }),
                 "top_k": ("INT", {
                     "default": 40,
                     "min": 0,
                     "max": 100,
                     "step": 1,
-                    "tooltip": "Top-k 采样（0 表示禁用）"
+                    "tooltip": "🤖 Top-k 采样（0 表示禁用）"
                 }),
                 "repetition_penalty": ("FLOAT", {
                     "default": 1.1,
                     "min": 1.0,
                     "max": 2.0,
                     "step": 0.1,
-                    "tooltip": "重复惩罚"
+                    "tooltip": "🤖 重复惩罚"
                 }),
                 "enable_thinking": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "启用思考模式（支持 DeepSeek-R1, Qwen3-Thinking 等模型）"
+                    "tooltip": "🤖 启用思考模式（支持 DeepSeek-R1, Qwen3-Thinking 等模型）"
                 }),
                 "prompt": ("STRING", {
-                    "default": "Hello, how are you?",
+                    "default": "🤖 Hello, how are you?",
                     "multiline": True,
-                    "tooltip": "输入提示词"
+                    "tooltip": "🤖 输入提示词"
                 }),
             }
         }
@@ -264,7 +260,7 @@ class NexaTextGeneration:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("context", "thinking")
     FUNCTION = "generate"
-    CATEGORY = "GGUF-VisionLM/Nexa"
+    CATEGORY = "🤖 GGUF-LLM/Nexa"
     OUTPUT_NODE = True
     
     @staticmethod
@@ -455,16 +451,16 @@ class NexaServiceStatus:
         return {
             "required": {
                 "base_url": ("STRING", {
-                    "default": "http://127.0.0.1:11434",
-                    "tooltip": "Nexa SDK 服务地址（可配置）"
+                    "default": "🤖 http://127.0.0.1:11434",
+                    "tooltip": "🤖 Nexa SDK 服务地址（可配置）"
                 }),
                 "models_dir": ("STRING", {
                     "default": default_models_dir,
-                    "tooltip": "本地模型目录"
+                    "tooltip": "🤖 本地模型目录"
                 }),
                 "refresh": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "刷新模型列表"
+                    "tooltip": "🤖 刷新模型列表"
                 }),
             }
         }
@@ -472,7 +468,7 @@ class NexaServiceStatus:
     RETURN_TYPES = ("STRING", "STRING", "STRING")
     RETURN_NAMES = ("status", "remote_models", "local_models")
     FUNCTION = "check_status"
-    CATEGORY = "GGUF-VisionLM/Nexa"
+    CATEGORY = "🤖 GGUF-LLM/Nexa"
     OUTPUT_NODE = True
     
     def check_status(self, base_url: str, models_dir: str, refresh: bool = False):
@@ -526,7 +522,7 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "NexaModelSelector": "🔷 Nexa Model Selector",
-    "NexaTextGeneration": "🔷 Nexa Text Generation",
-    "NexaServiceStatus": "🔷 Nexa Service Status",
+    "NexaModelSelector": "🤖 Nexa Model Selector",
+    "NexaTextGeneration": "🤖 Nexa Text Generation",
+    "NexaServiceStatus": "🤖 Nexa Service Status",
 }

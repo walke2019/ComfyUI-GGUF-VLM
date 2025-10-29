@@ -60,7 +60,7 @@ class MultiImageAnalysis:
                             "min": 128,
                             "max": 256000,
                             "step": 1,
-                            "tooltip": "最大生成 token 数"
+                            "tooltip": "🤖 最大生成 token 数"
                         }
                     ),
                 },
@@ -78,7 +78,7 @@ class MultiImageAnalysis:
                     {
                         "default": "",
                         "multiline": True,
-                        "tooltip": "系统提示词（可选）"
+                        "tooltip": "🤖 系统提示词（可选）"
                     }
                 ),
             }
@@ -87,7 +87,7 @@ class MultiImageAnalysis:
     RETURN_TYPES = TEXT_OUTPUT["types"]
     RETURN_NAMES = TEXT_OUTPUT["names"]
     FUNCTION = "analyze_images"
-    CATEGORY = "GGUF-VisionLM/Multi-Image"
+    CATEGORY = "🤖 GGUF-LLM/Multi-Image"
     OUTPUT_NODE = True
     
     def analyze_images(
@@ -144,14 +144,14 @@ class MultiImageAnalysis:
         # 添加所有图像
         for temp_path in temp_paths:
             user_content.append({
-                "type": "image",
+                "type": "🤖 image",
                 "image": str(temp_path)
             })
         
         # 添加系统提示词（如果有）作为文本前缀
         if system_prompt and system_prompt.strip():
             user_content.append({
-                "type": "text",
+                "type": "🤖 text",
                 "text": f"{system_prompt.strip()}\n\n{prompt}"
             })
         else:
@@ -162,12 +162,12 @@ class MultiImageAnalysis:
                 "differences, patterns, and relationships between the images."
             )
             user_content.append({
-                "type": "text",
+                "type": "🤖 text",
                 "text": f"{default_prompt}\n\n{prompt}"
             })
         
         messages.append({
-            "role": "user",
+            "role": "🤖 user",
             "content": user_content
         })
         
@@ -230,8 +230,8 @@ class MultiImageComparison:
                         "custom - 自定义",
                     ],
                     {
-                        "default": "similarities - 找出相似之处",
-                        "tooltip": "对比类型"
+                        "default": "🤖 similarities - 找出相似之处",
+                        "tooltip": "🤖 对比类型"
                     }
                 ),
                 "custom_prompt": (
@@ -239,7 +239,7 @@ class MultiImageComparison:
                     {
                         "default": "",
                         "multiline": True,
-                        "tooltip": "自定义提示词（当选择 custom 时使用）"
+                        "tooltip": "🤖 自定义提示词（当选择 custom 时使用）"
                     }
                 ),
                 **TEMPERATURE_INPUT,
@@ -251,7 +251,7 @@ class MultiImageComparison:
                             "min": 128,
                             "max": 256000,
                             "step": 1,
-                            "tooltip": "最大生成 token 数"
+                            "tooltip": "🤖 最大生成 token 数"
                         }
                     ),
                 },
@@ -270,18 +270,18 @@ class MultiImageComparison:
     RETURN_TYPES = TEXT_OUTPUT["types"]
     RETURN_NAMES = TEXT_OUTPUT["names"]
     FUNCTION = "compare_images"
-    CATEGORY = "GGUF-VisionLM/Multi-Image"
+    CATEGORY = "🤖 GGUF-LLM/Multi-Image"
     OUTPUT_NODE = True
     
     # 预设提示词
     COMPARISON_PROMPTS = {
-        "similarities": "Identify and describe the similarities between these images. Focus on common elements, themes, colors, compositions, and subjects.",
-        "differences": "Identify and describe the differences between these images. Focus on what makes each image unique.",
-        "changes": "Analyze the changes across these images. Describe what has changed from one image to the next.",
-        "relationships": "Analyze the relationships between these images. How do they relate to each other? What story do they tell together?",
-        "sequence": "Analyze these images as a sequence. Describe the progression or timeline they represent.",
-        "quality": "Compare the quality of these images. Analyze aspects like resolution, clarity, composition, lighting, and technical execution.",
-        "style": "Compare the artistic style of these images. Analyze the visual style, artistic techniques, and aesthetic choices.",
+        "similarities": "🤖 Identify and describe the similarities between these images. Focus on common elements, themes, colors, compositions, and subjects.",
+        "differences": "🤖 Identify and describe the differences between these images. Focus on what makes each image unique.",
+        "changes": "🤖 Analyze the changes across these images. Describe what has changed from one image to the next.",
+        "relationships": "🤖 Analyze the relationships between these images. How do they relate to each other? What story do they tell together?",
+        "sequence": "🤖 Analyze these images as a sequence. Describe the progression or timeline they represent.",
+        "quality": "🤖 Compare the quality of these images. Analyze aspects like resolution, clarity, composition, lighting, and technical execution.",
+        "style": "🤖 Compare the artistic style of these images. Analyze the visual style, artistic techniques, and aesthetic choices.",
     }
     
     def compare_images(
@@ -339,6 +339,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "MultiImageAnalysis": "🖼️ Multi-Image Analysis",
-    "MultiImageComparison": "🔍 Multi-Image Comparison",
+    "MultiImageAnalysis": "🤖 Multi-Image Analysis",
+    "MultiImageComparison": "🤖 Multi-Image Comparison",
 }

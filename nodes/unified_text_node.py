@@ -35,54 +35,54 @@ class UnifiedTextModelSelector:
         return {
             "required": {
                 "mode": (["Local (GGUF)", "Remote (API)"], {
-                    "default": "Local (GGUF)",
-                    "tooltip": "模型运行模式：本地 GGUF 文件或远程 API 服务"
+                    "default": "🤖 Local (GGUF)",
+                    "tooltip": "🤖 模型运行模式：本地 GGUF 文件或远程 API 服务"
                 }),
             },
             "optional": {
                 # Local 模式参数
                 "local_model": (text_models if text_models else ["No models found"], {
                     "default": text_models[0] if text_models else "No models found",
-                    "tooltip": "本地 GGUF 模型文件"
+                    "tooltip": "🤖 本地 GGUF 模型文件"
                 }),
                 "n_ctx": ("INT", {
                     "default": 8192,
                     "min": 512,
                     "max": 128000,
                     "step": 512,
-                    "tooltip": "上下文窗口大小"
+                    "tooltip": "🤖 上下文窗口大小"
                 }),
                 "n_gpu_layers": ("INT", {
                     "default": -1,
                     "min": -1,
                     "max": 100,
                     "step": 1,
-                    "tooltip": "GPU 层数（-1 表示全部）"
+                    "tooltip": "🤖 GPU 层数（-1 表示全部）"
                 }),
                 # Remote 模式参数
                 "base_url": ("STRING", {
-                    "default": "http://127.0.0.1:11434",
+                    "default": "🤖 http://127.0.0.1:11434",
                     "multiline": False,
-                    "tooltip": "API 服务地址"
+                    "tooltip": "🤖 API 服务地址"
                 }),
                 "api_type": (["Ollama", "Nexa SDK", "OpenAI Compatible"], {
-                    "default": "Ollama",
-                    "tooltip": "API 类型"
+                    "default": "🤖 Ollama",
+                    "tooltip": "🤖 API 类型"
                 }),
                 "remote_model": ("STRING", {
                     "default": "",
                     "multiline": False,
-                    "tooltip": "远程模型名称（留空则自动获取）"
+                    "tooltip": "🤖 远程模型名称（留空则自动获取）"
                 }),
                 "refresh_models": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "刷新远程模型列表"
+                    "tooltip": "🤖 刷新远程模型列表"
                 }),
                 # 通用参数
                 "system_prompt": ("STRING", {
                     "default": "",
                     "multiline": True,
-                    "tooltip": "系统提示词（可选）"
+                    "tooltip": "🤖 系统提示词（可选）"
                 }),
             }
         }
@@ -90,7 +90,7 @@ class UnifiedTextModelSelector:
     RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model_config",)
     FUNCTION = "select_model"
-    CATEGORY = "GGUF-VisionLM/Text"
+    CATEGORY = "🤖 GGUF-LLM/Text"
     OUTPUT_NODE = True
     
     def select_model(
@@ -129,7 +129,7 @@ class UnifiedTextModelSelector:
                 return ({"error": error_msg},)
             
             config = {
-                "mode": "local",
+                "mode": "🤖 local",
                 "model_path": model_path,
                 "model_name": local_model,
                 "n_ctx": n_ctx,
@@ -145,9 +145,9 @@ class UnifiedTextModelSelector:
         else:
             # 远程 API 模式
             api_type_map = {
-                "Ollama": "ollama",
-                "Nexa SDK": "nexa",
-                "OpenAI Compatible": "openai"
+                "Ollama": "🤖 ollama",
+                "Nexa SDK": "🤖 nexa",
+                "OpenAI Compatible": "🤖 openai"
             }
             api_type_key = api_type_map.get(api_type, "ollama")
             
@@ -161,7 +161,7 @@ class UnifiedTextModelSelector:
                 print(f"   Please make sure the service is running.")
                 
                 config = {
-                    "mode": "remote",
+                    "mode": "🤖 remote",
                     "base_url": base_url,
                     "api_type": api_type_key,
                     "service_available": False,
@@ -190,7 +190,7 @@ class UnifiedTextModelSelector:
                 selected_model = ""
             
             config = {
-                "mode": "remote",
+                "mode": "🤖 remote",
                 "base_url": base_url,
                 "api_type": api_type_key,
                 "model_name": selected_model,
@@ -226,51 +226,51 @@ class UnifiedTextGeneration:
         return {
             "required": {
                 "model_config": ("TEXT_MODEL", {
-                    "tooltip": "模型配置（来自 Model Selector）"
+                    "tooltip": "🤖 模型配置（来自 Model Selector）"
                 }),
                 "max_tokens": ("INT", {
                     "default": 256,
                     "min": 1,
                     "max": 8192,
                     "step": 1,
-                    "tooltip": "最大生成 token 数"
+                    "tooltip": "🤖 最大生成 token 数"
                 }),
                 "temperature": ("FLOAT", {
                     "default": 0.7,
                     "min": 0.0,
                     "max": 2.0,
                     "step": 0.1,
-                    "tooltip": "温度参数（越高越随机）"
+                    "tooltip": "🤖 温度参数（越高越随机）"
                 }),
                 "top_p": ("FLOAT", {
                     "default": 0.9,
                     "min": 0.0,
                     "max": 1.0,
                     "step": 0.05,
-                    "tooltip": "Top-p 采样"
+                    "tooltip": "🤖 Top-p 采样"
                 }),
                 "top_k": ("INT", {
                     "default": 40,
                     "min": 0,
                     "max": 100,
                     "step": 1,
-                    "tooltip": "Top-k 采样"
+                    "tooltip": "🤖 Top-k 采样"
                 }),
                 "repetition_penalty": ("FLOAT", {
                     "default": 1.1,
                     "min": 1.0,
                     "max": 2.0,
                     "step": 0.1,
-                    "tooltip": "重复惩罚"
+                    "tooltip": "🤖 重复惩罚"
                 }),
                 "enable_thinking": ("BOOLEAN", {
                     "default": False,
-                    "tooltip": "启用思考模式（支持 DeepSeek-R1, Qwen3-Thinking 等模型）"
+                    "tooltip": "🤖 启用思考模式（支持 DeepSeek-R1, Qwen3-Thinking 等模型）"
                 }),
                 "prompt": ("STRING", {
-                    "default": "Hello, how are you?",
+                    "default": "🤖 Hello, how are you?",
                     "multiline": True,
-                    "tooltip": "输入提示词"
+                    "tooltip": "🤖 输入提示词"
                 }),
             },
         }
@@ -278,7 +278,7 @@ class UnifiedTextGeneration:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("context", "thinking")
     FUNCTION = "generate"
-    CATEGORY = "GGUF-VisionLM/Text"
+    CATEGORY = "🤖 GGUF-LLM/Text"
     OUTPUT_NODE = True
     
     @staticmethod
@@ -520,6 +520,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "UnifiedTextModelSelector": "🔷 Unified Text Model Selector",
-    "UnifiedTextGeneration": "🔷 Unified Text Generation",
+    "UnifiedTextModelSelector": "🤖 Unified Text Model Selector",
+    "UnifiedTextGeneration": "🤖 Unified Text Generation",
 }

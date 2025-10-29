@@ -88,8 +88,8 @@ class VisionModelLoaderTransformers:
                             "Qwen3-VL-8B-Thinking"
                         ],
                         {
-                            "default": "Huihui-Qwen3-VL-4B-Instruct-abliterated",
-                            "tooltip": "选择 Qwen3-VL 模型"
+                            "default": "🤖 Huihui-Qwen3-VL-4B-Instruct-abliterated",
+                            "tooltip": "🤖 选择 Qwen3-VL 模型"
                         }
                     ),
                 },
@@ -103,7 +103,7 @@ class VisionModelLoaderTransformers:
     RETURN_TYPES = TRANSFORMERS_MODEL_OUTPUT["types"]
     RETURN_NAMES = TRANSFORMERS_MODEL_OUTPUT["names"]
     FUNCTION = "load_model"
-    CATEGORY = "GGUF-VisionLM/Transformers"
+    CATEGORY = "🤖 GGUF-LLM/Transformers"
     
     def load_model(
         self,
@@ -168,7 +168,7 @@ class VisionLanguageNodeTransformers:
                             "min": 128,
                             "max": 256000,
                             "step": 1,
-                            "tooltip": "最大生成 token 数（Qwen3-VL 推荐: 16384）"
+                            "tooltip": "🤖 最大生成 token 数（Qwen3-VL 推荐: 16384）"
                         }
                     ),
                 },
@@ -185,7 +185,7 @@ class VisionLanguageNodeTransformers:
     RETURN_TYPES = TEXT_OUTPUT["types"]
     RETURN_NAMES = TEXT_OUTPUT["names"]
     FUNCTION = "generate"
-    CATEGORY = "GGUF-VisionLM/Transformers"
+    CATEGORY = "🤖 GGUF-LLM/Transformers"
     OUTPUT_NODE = True
     
     def generate(
@@ -227,7 +227,7 @@ class VisionLanguageNodeTransformers:
         
         if temp_path:
             user_content.append({
-                "type": "image",
+                "type": "🤖 image",
                 "image": str(temp_path)
             })
         
@@ -240,12 +240,12 @@ class VisionLanguageNodeTransformers:
             final_text = f"{default_prompt}\n\n{prompt}"
         
         user_content.append({
-            "type": "text",
+            "type": "🤖 text",
             "text": final_text
         })
         
         messages.append({
-            "role": "user",
+            "role": "🤖 user",
             "content": user_content
         })
         
@@ -288,5 +288,5 @@ NODE_CLASS_MAPPINGS = {
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "VisionModelLoaderTransformers": "🤖 Vision Model Loader (Transformers)",
-    "VisionLanguageNodeTransformers": "💬 Vision Language (Transformers)",
+    "VisionLanguageNodeTransformers": "🤖 Vision Language (Transformers)",
 }
