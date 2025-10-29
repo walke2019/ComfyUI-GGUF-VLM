@@ -92,30 +92,11 @@ class NexaModelSelector:
     
     @classmethod
     def INPUT_TYPES(cls):
-        # 默认 API 端点
-        default_base_url = "http://127.0.0.1:11434"
-        
-        # 获取 LLM 模型目录
-        if HAS_PATH_CONFIG:
-            default_models_dir = PathConfig.get_llm_models_path()
-        else:
-            import folder_paths
-            default_models_dir = os.path.join(folder_paths.models_dir, "LLM", "GGUF")
-            os.makedirs(default_models_dir, exist_ok=True)
-        
         return {
             "required": {
                 "base_url": ("STRING", {
-                    "default": default_base_url,
-                    "tooltip": "Nexa SDK 服务地址（可配置）"
-                }),
-                "models_dir": ("STRING", {
-                    "default": default_models_dir,
-                    "tooltip": "本地模型目录（GGUF 文件存放位置）"
-                }),
-                "model_source": (["Remote (Nexa Service)", "Local (GGUF File)"], {
-                    "default": "Remote (Nexa Service)",
-                    "tooltip": "模型来源：远程服务或本地文件"
+                    "default": "http://127.0.0.1:11434",
+                    "tooltip": "Nexa SDK 服务地址"
                 }),
                 "refresh_models": ("BOOLEAN", {
                     "default": False,
@@ -140,15 +121,13 @@ class NexaModelSelector:
     def select_model(
         self, 
         base_url: str, 
-        models_dir: str,
-        model_source: str,
         refresh_models: bool = False,
         system_prompt: str = ""
     ):
         """选择模型并返回配置"""
         
         # 创建或获取引擎
-        engine = get_nexa_engine(base_url, models_dir)
+        engine = get_nexa_engine(base_url)
         
         # 检查服务是否可用
         is_available = engine.is_service_available()
@@ -156,54 +135,40 @@ class NexaModelSelector:
         if not is_available:
             error_msg = f"⚠️  Nexa SDK service is not available at {base_url}"
             print(error_msg)
-            print("   Please make sure the service is running.")
+            print("   Please make sure 'nexa serve' is running.")
             
-            # 即使服务不可用，也返回配置（用于本地模型）
             config = {
                 "base_url": base_url,
-                "models_dir": models_dir,
-                "model_source": model_source,
                 "system_prompt": system_prompt,
                 "engine_type": "nexa",
                 "service_available": False
             }
             return (config, error_msg)
         
-        # 获取可用模型
-        available_models_list = []
-        
-        if model_source == "Remote (Nexa Service)":
-            # 远程模型
-            remote_models = engine.get_available_models(force_refresh=refresh_models)
-            available_models_list.extend([f"[Remote] {m}" for m in remote_models])
-        else:
-            # 本地模型
-            local_models = engine.get_local_models()
-            available_models_list.extend([f"[Local] {m}" for m in local_models])
+        # 从 Nexa SDK 服务获取可用模型
+        available_models = engine.get_available_models(force_refresh=refresh_models)
         
         # 格式化输出
-        if available_models_list:
-            models_text = "\n".join(available_models_list)
-            print(f"✅ Found {len(available_models_list)} models")
+        if available_models:
+            models_text = "\n".join(available_models)
+            print(f"✅ Found {len(available_models)} models")
+            print(f"💡 Tip: Use 'nexa pull <model>' to download more models")
         else:
-            models_text = "⚠️  No models found"
+            models_text = "⚠️  No models found. Run: nexa pull <model-name>"
             print(models_text)
         
         # 创建配置
         config = {
             "base_url": base_url,
-            "models_dir": models_dir,
-            "model_source": model_source,
             "system_prompt": system_prompt,
             "engine_type": "nexa",
             "service_available": True,
-            "available_models": available_models_list
+            "available_models": available_models
         }
         
         print(f"✅ Nexa SDK configured")
         print(f"   Service URL: {base_url}")
-        print(f"   Models Dir: {models_dir}")
-        print(f"   Source: {model_source}")
+        print(f"   Available models: {len(available_models)}")
         
         return (config, models_text)
 
@@ -364,12 +329,10 @@ class NexaTextGeneration:
         
         # 获取配置
         base_url = model_config.get('base_url', 'http://127.0.0.1:11434')
-        models_dir = model_config.get('models_dir', '/workspace/ComfyUI/models/LLM')
-        model_source = model_config.get('model_source', 'Remote (Nexa Service)')
         system_prompt = model_config.get('system_prompt', '')
         
         # 获取引擎
-        engine = get_nexa_engine(base_url, models_dir)
+        engine = get_nexa_engine(base_url)
         
         # 检查服务是否可用
         if not engine.is_service_available():
@@ -391,7 +354,7 @@ class NexaTextGeneration:
             print(f"📋 Using preset model: {model}")
         
         # 如果启用自动下载，确保模型可用
-        if auto_download and model_source == "Remote (Nexa Service)":
+        if auto_download:
             print(f"🔍 Checking model availability...")
             engine.ensure_model_available(model, auto_download=True)
         
@@ -421,7 +384,6 @@ class NexaTextGeneration:
         
         print(f"🤖 Generating text with Nexa SDK...")
         print(f"   Model: {model_id}")
-        print(f"   Source: {model_source}")
         print(f"   Auto-download: {'✅ Enabled' if auto_download else '❌ Disabled'}")
         print(f"   Messages: {len(messages)} messages")
         if not enable_thinking:
