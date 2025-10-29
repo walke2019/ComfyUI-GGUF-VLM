@@ -323,25 +323,53 @@ class TextGenerationNode:
     
     def generate(self, model, prompt, max_tokens=512, temperature=0.7, top_p=0.9, top_k=40, repeat_penalty=1.1, enable_thinking=False, conversation_history=""):
         """生成文本"""
+        print("\n" + "="*80)
+        print(" ComfyUI Text Generation - 开始生成")
+        print("="*80)
+        
         engine = self._get_engine()
         
         model_path = model['model_path']
         
+        # 打印模型信息
+        print(f"\n 模型信息:")
+        print(f"  - 路径: {model_path}")
+        print(f"  - 名称: {model.get('model_name', 'Unknown')}")
+        
+        # 打印生成参数
+        print(f"\n  生成参数:")
+        print(f"  - max_tokens: {max_tokens}")
+        print(f"  - temperature: {temperature}")
+        print(f"  - top_p: {top_p}")
+        print(f"  - top_k: {top_k}")
+        print(f"  - repeat_penalty: {repeat_penalty}")
+        print(f"  - enable_thinking: {enable_thinking}")
+        
         # 加载模型（如果未加载）
         if not engine.is_model_loaded(model_path):
-            print(f" Loading model into memory...")
+            print(f"\n 加载模型中...")
             success = engine.load_model(
                 model_path=model_path,
                 n_ctx=model.get('n_ctx', 8192),
                 n_gpu_layers=model.get('n_gpu_layers', -1),
                 verbose=model.get('verbose', False)
             )
-            
             if not success:
                 raise RuntimeError(f"Failed to load model: {model_path}")
+            print(f" 模型加载成功")
+        else:
+            print(f"\n 模型已加载（复用）")
         
         # 处理系统提示词和思考控制
         system_prompt_text = model.get('system_prompt', '')
+        
+        print(f"\n📝 系统提示词:")
+        if system_prompt_text:
+            preview = system_prompt_text[:200].replace('\n', ' ')
+            print(f"  - 长度: {len(system_prompt_text)} 字符")
+            print(f"  - 预览: {preview}...")
+        else:
+            print(f"  - 无系统提示词")
         
         # 如果禁用思考，添加 no_think 到系统提示词
         if not enable_thinking:
@@ -349,9 +377,11 @@ class TextGenerationNode:
                 # 检查是否已经有 no_think
                 if 'no_think' not in system_prompt_text.lower():
                     system_prompt_text = f"{system_prompt_text} no_think"
+                    print(f"  - 已添加 /no_think")
             else:
                 # 如果没有系统提示词但禁用思考，创建一个
                 system_prompt_text = "no_think"
+                print(f"  - 创建 no_think 提示词")
         
         # 构建完整提示词
         full_prompt_parts = []
@@ -370,10 +400,18 @@ class TextGenerationNode:
         
         full_prompt = "\n\n".join(full_prompt_parts)
         
-        print(f"🤖 Generating text...")
-        print(f"📝 Prompt preview: {full_prompt[:150]}...")
+        print(f"\n💬 用户输入:")
+        print(f"  - 长度: {len(prompt)} 字符")
+        print(f"  - 预览: {prompt[:100].replace(chr(10), ' ')}...")
+        
+        print(f"\n📋 完整 Prompt:")
+        print(f"  - 总长度: {len(full_prompt)} 字符")
+        print(f"  - 格式: System + User + Assistant")
+        print(f"  - 预览: {full_prompt[:150].replace(chr(10), ' ')}...")
+        
+        print(f"\n🤖 开始生成...")
         if not enable_thinking:
-            print(f"🚫 Thinking disabled (no_think in system prompt)")
+            print(f"  - Thinking 模式: 禁用")
         
         # 生成文本
         try:
@@ -387,24 +425,45 @@ class TextGenerationNode:
                 repeat_penalty=repeat_penalty
             )
             
+            print(f"\n📤 原始输出:")
+            print(f"  - 长度: {len(raw_output)} 字符")
+            print(f"  - 预览: {raw_output[:200].replace(chr(10), ' ')}...")
+            
             # 提取思考内容
             final_output, thinking = self._extract_thinking(raw_output, enable_thinking)
+            
+            print(f"\n🔍 提取 <think> 标签:")
+            if thinking:
+                print(f"  - 找到 thinking 内容: {len(thinking)} 字符")
+            else:
+                print(f"  - 无 <think> 标签")
             
             # 清理输出：移除 "Assistant:" 前缀和多余空白
             final_output = final_output.strip()
             if final_output.lower().startswith("assistant:"):
                 final_output = final_output[10:].strip()  # 移除 "Assistant:" (10个字符)
+                print(f"  - 移除了 'Assistant:' 前缀")
             
             # 合并多段输出为单段（如果系统提示词要求单段输出）
+            original_lines = len([l for l in final_output.split('\n') if l.strip()])
             if system_prompt_text and 'single' in system_prompt_text.lower() and 'paragraph' in system_prompt_text.lower():
                 # 移除多余的换行，保持单段格式
                 lines = [line.strip() for line in final_output.split('\n') if line.strip()]
                 final_output = ' '.join(lines)
+                print(f"\n🔧 段落合并:")
+                print(f"  - 原始段落数: {original_lines}")
+                print(f"  - 合并后: 1 段")
+            else:
+                print(f"\n📄 输出格式:")
+                print(f"  - 段落数: {original_lines}")
             
             if enable_thinking and thinking:
-                print(f"💭 Thinking process extracted ({len(thinking)} chars)")
+                print(f"\n💭 Thinking 内容: {len(thinking)} 字符")
             
-            print(f"✅ Generated {len(final_output)} characters")
+            print(f"\n✅ 生成完成!")
+            print(f"  - 最终输出: {len(final_output)} 字符")
+            print(f"  - 预览: {final_output[:200].replace(chr(10), ' ')}...")
+            print("="*80)
             
             return (final_output, thinking)
         
