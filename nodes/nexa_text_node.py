@@ -21,8 +21,8 @@ from ..core.inference.nexa_engine import get_nexa_engine
 # 预设模型列表
 PRESET_MODELS = [
     "Custom (输入自定义模型)",
-    "huihui-ai/Qwen3-4B-abliterated:Q8_0",
-    "huihui-ai/Qwen3-8B-abliterated:Q8_0",
+    "Huihui-Qwen3-4B-Instruct-2507-abliterated.Q8_0.gguf",
+    "mlabonne_Qwen3-8B-abliterated-Q8_0.gguf",
     "mradermacher/Huihui-Qwen3-4B-Thinking-2507-abliterated-GGUF:Q8_0",
     "DavidAU/Qwen3-8B-64k-Josiefied-Uncensored-HORROR-Max-GGUF:Q6_K",
     "prithivMLmods/Qwen3-4B-2507-abliterated-GGUF:Q8_0",
