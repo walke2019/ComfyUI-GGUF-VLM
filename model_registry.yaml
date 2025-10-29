@@ -206,9 +206,42 @@ vision_language_models:
         file: llama-joycaption-beta-one-hf-llava.Q8_0.gguf
         size: 7.95GB
         recommended: false
-# 文本生成模型 - 简化版，只保留常用模型
+# 文本生成模型 - 简化版，只保留 Qwen3 系列
 # 如需更多模型，请直接将 .gguf 文件放到 /models/LLM/GGUF/ 目录
-text_generation_models: {}
+text_generation_models:
+  qwen3:
+    series_name: Qwen3
+    description: Qwen 3.0 最新一代文本模型，支持思维模式切换
+    business_type: text_generation
+    models:
+    - model_name: Qwen3-1.7B
+      repo: unsloth/Qwen3-1.7B-GGUF
+      description: 1.7B 超轻量模型，支持 128K 上下文
+      variants:
+      - name: Q4_K_M
+        file: Qwen3-1.7B-Q4_K_M.gguf
+        size: 1.03GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen3-1.7B-Q8_0.gguf
+        size: 1.71GB
+        recommended: false
+    - model_name: Qwen3-8B
+      repo: Qwen/Qwen3-8B-GGUF
+      description: 8B 旗舰模型，强大的推理和分析能力
+      variants:
+      - name: Q4_K_M
+        file: Qwen3-8B-Q4_K_M.gguf
+        size: 4.68GB
+        recommended: true
+      - name: Q5_K_M
+        file: Qwen3-8B-Q5_K_M.gguf
+        size: 5.45GB
+        recommended: false
+      - name: Q8_0
+        file: Qwen3-8B-Q8_0.gguf
+        size: 8.11GB
+        recommended: false
 video_analysis_models:
   qwen2-vl-video:
     series_name: Qwen2-VL
