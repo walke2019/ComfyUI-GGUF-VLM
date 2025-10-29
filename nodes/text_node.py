@@ -416,10 +416,8 @@ class TextGenerationNode:
         # 生成文本
         try:
             # 设置 stop 序列防止模型过度生成
-            stop_sequences = ["User:", "System:", "
-
-
-"]  # 防止多段输出
+            stop_sequences = ["User:", "System:", "\n\n\n"]
+            print(f"  - Stop 序列: {stop_sequences}")
             
             raw_output = engine.generate_text(
                 model_path=model_path,
