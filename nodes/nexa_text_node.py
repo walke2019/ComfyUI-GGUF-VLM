@@ -100,7 +100,7 @@ class NexaModelSelector:
         if HAS_PATH_CONFIG:
             default_models_dir = PathConfig.get_llm_models_path()
         else:
-            default_models_dir = "/workspace/ComfyUI/models/LLM"
+            default_models_dir = "/workspace/ComfyUI/models/LLM/GGUF"
         
         return {
             "required": {
@@ -507,7 +507,7 @@ class NexaServiceStatus:
         if HAS_PATH_CONFIG:
             default_models_dir = PathConfig.get_llm_models_path()
         else:
-            default_models_dir = "/workspace/ComfyUI/models/LLM"
+            default_models_dir = "/workspace/ComfyUI/models/LLM/GGUF"
         
         return {
             "required": {

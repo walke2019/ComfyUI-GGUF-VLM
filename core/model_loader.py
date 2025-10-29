@@ -46,15 +46,20 @@ class ModelLoader:
         """获取默认模型目录"""
         dirs = []
         
-        # ComfyUI text_encoders 目录
+        # LLM/GGUF 目录（主要目录）
+        llm_gguf_dir = os.path.join(folder_paths.models_dir, "LLM", "GGUF")
+        os.makedirs(llm_gguf_dir, exist_ok=True)
+        dirs.append(llm_gguf_dir)
+        
+        # ComfyUI text_encoders 目录（兼容）
         text_encoders_dir = os.path.join(folder_paths.models_dir, "text_encoders")
-        os.makedirs(text_encoders_dir, exist_ok=True)
-        dirs.append(text_encoders_dir)
+        if os.path.exists(text_encoders_dir):
+            dirs.append(text_encoders_dir)
         
         # 兼容旧版 VLM_GGUF 目录
         vlm_gguf_dir = os.path.join(folder_paths.models_dir, "VLM_GGUF")
-        os.makedirs(vlm_gguf_dir, exist_ok=True)
-        dirs.append(vlm_gguf_dir)
+        if os.path.exists(vlm_gguf_dir):
+            dirs.append(vlm_gguf_dir)
         
         # 从 folder_paths 获取额外配置的目录
         try:
