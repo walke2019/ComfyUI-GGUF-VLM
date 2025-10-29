@@ -267,25 +267,6 @@ text_generation_models:
         file: Huihui-Qwen3-4B-Instruct-2507-abliterated.Q8_0.gguf
         size: 4.0GB
         recommended: false
-    - model_name: Qwen3-14B-Abliterated
-      repo: bartowski/mlabonne_Qwen3-14B-abliterated-GGUF
-      description: 14B 顶级破限制模型，最强性能
-      capabilities:
-      - uncensored
-      - nsfw
-      - creative_writing
-      - roleplay
-      - reasoning
-      - advanced
-      variants:
-      - name: Q4_K_M
-        file: mlabonne_Qwen3-14B-abliterated-Q4_K_M.gguf
-        size: 8.0GB
-        recommended: true
-      - name: Q8_0
-        file: mlabonne_Qwen3-14B-abliterated-Q8_0.gguf
-        size: 14.0GB
-        recommended: false
 video_analysis_models:
   qwen2-vl-video:
     series_name: Qwen2-VL
