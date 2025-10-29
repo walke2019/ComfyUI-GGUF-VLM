@@ -283,13 +283,26 @@ class NexaInferenceEngine:
         Returns:
             API 响应
         """
-        # 如果是本地文件名（.gguf），转换为完整路径
-        if model.endswith('.gguf') and not os.path.isabs(model):
-            if self.models_dir:
-                model = self.get_model_path(model)
-                print(f"📁 Using local model: {model}")
+        # 处理模型路径
+        original_model = model
+        
+        # 如果是本地 GGUF 文件路径，需要特殊处理
+        if model.endswith('.gguf'):
+            if os.path.isabs(model):
+                # 绝对路径：Nexa SDK 不支持，需要提取模型名
+                model_filename = os.path.basename(model)
+                print(f"⚠️  Nexa SDK doesn't support absolute paths")
+                print(f"   Using filename: {model_filename}")
+                model = model_filename
+            elif not os.path.isabs(model):
+                # 相对路径/文件名：保持不变
+                if self.models_dir:
+                    full_path = self.get_model_path(model)
+                    print(f"📁 Local GGUF file: {full_path}")
+                    # 但发送给 API 时只用文件名
+                    model = os.path.basename(model)
         else:
-            # 确保模型可用（如果需要则加载）
+            # 远程模型：确保模型可用
             if auto_download:
                 if not self.ensure_model_available(model, auto_download=True):
                     raise RuntimeError(f"Failed to load model: {model}")
@@ -312,6 +325,12 @@ class NexaInferenceEngine:
         # 添加其他参数
         payload.update(kwargs)
         
+        # 打印调试信息
+        print(f"🔍 API Request:")
+        print(f"   Endpoint: {self.chat_endpoint}")
+        print(f"   Model: {payload['model']}")
+        print(f"   Messages: {len(payload['messages'])} messages")
+        
         try:
             response = requests.post(
                 self.chat_endpoint,
@@ -319,13 +338,27 @@ class NexaInferenceEngine:
                 headers={"Content-Type": "application/json"},
                 timeout=120  # 2分钟超时
             )
+            
+            # 如果请求失败，打印详细错误信息
+            if response.status_code != 200:
+                print(f"❌ API Error {response.status_code}:")
+                print(f"   Response: {response.text[:500]}")
+            
             response.raise_for_status()
             return response.json()
         
         except requests.exceptions.Timeout:
             raise RuntimeError("Request timeout. The model might be too slow or the service is overloaded.")
         except requests.exceptions.RequestException as e:
-            raise RuntimeError(f"API request failed: {e}")
+            error_msg = f"API request failed: {e}"
+            # 尝试获取响应内容
+            if hasattr(e, 'response') and e.response is not None:
+                try:
+                    error_detail = e.response.text
+                    error_msg += f"\nResponse: {error_detail[:500]}"
+                except:
+                    pass
+            raise RuntimeError(error_msg)
     
     def text_completion(
         self,
@@ -356,13 +389,26 @@ class NexaInferenceEngine:
         Returns:
             API 响应
         """
-        # 如果是本地文件名（.gguf），转换为完整路径
-        if model.endswith('.gguf') and not os.path.isabs(model):
-            if self.models_dir:
-                model = self.get_model_path(model)
-                print(f"📁 Using local model: {model}")
+        # 处理模型路径
+        original_model = model
+        
+        # 如果是本地 GGUF 文件路径，需要特殊处理
+        if model.endswith('.gguf'):
+            if os.path.isabs(model):
+                # 绝对路径：Nexa SDK 不支持，需要提取模型名
+                model_filename = os.path.basename(model)
+                print(f"⚠️  Nexa SDK doesn't support absolute paths")
+                print(f"   Using filename: {model_filename}")
+                model = model_filename
+            elif not os.path.isabs(model):
+                # 相对路径/文件名：保持不变
+                if self.models_dir:
+                    full_path = self.get_model_path(model)
+                    print(f"📁 Local GGUF file: {full_path}")
+                    # 但发送给 API 时只用文件名
+                    model = os.path.basename(model)
         else:
-            # 确保模型可用（如果需要则加载）
+            # 远程模型：确保模型可用
             if auto_download:
                 if not self.ensure_model_available(model, auto_download=True):
                     raise RuntimeError(f"Failed to load model: {model}")
