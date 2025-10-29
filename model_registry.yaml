@@ -1,46 +1,13 @@
+# 模型注册表 - 只保留 Abliterated/NSFW 版本
+# 所有模型均为无审查版本，支持 NSFW 内容
+
+# 视觉语言模型 - Abliterated 版本
 vision_language_models:
-  qwen2.5-vl:
-    series_name: Qwen2.5-VL
-    description: Qwen 2.5 视觉语言模型（支持图像和视频理解）
+  qwen2.5-vl-nsfw:
+    series_name: Qwen2.5-VL NSFW
+    description: Qwen 2.5 视觉语言模型 NSFW 版本
     business_type: video_analysis
     models:
-    - model_name: Qwen2.5-VL-3B-Instruct
-      repo: unsloth/Qwen2.5-VL-3B-Instruct-GGUF
-      mmproj: mmproj-F16.gguf
-      description: 3B 轻量级视觉语言模型，支持图像和长视频理解
-      capabilities:
-      - image
-      - video
-      - multilingual
-      - ocr
-      variants:
-      - name: Q4_K_M
-        file: Qwen2.5-VL-3B-Instruct-Q4_K_M.gguf
-        size: 1.80GB
-        recommended: true
-      - name: Q8_0
-        file: Qwen2.5-VL-3B-Instruct-Q8_0.gguf
-        size: 3.06GB
-        recommended: false
-    - model_name: Qwen2.5-VL-7B-Instruct
-      repo: unsloth/Qwen2.5-VL-7B-Instruct-GGUF
-      mmproj: mmproj-F16.gguf
-      description: 7B 旗舰视觉语言模型，支持图像和超长视频（1小时+）理解
-      capabilities:
-      - image
-      - video
-      - multilingual
-      - ocr
-      - agent
-      variants:
-      - name: Q4_K_M
-        file: Qwen2.5-VL-7B-Instruct-Q4_K_M.gguf
-        size: 4.36GB
-        recommended: true
-      - name: Q8_0
-        file: Qwen2.5-VL-7B-Instruct-Q8_0.gguf
-        size: 7.54GB
-        recommended: false
     - model_name: Qwen2.5-VL-7B-NSFW-Caption-V4
       repo: mradermacher/Qwen2.5-VL-7B-NSFW-Caption-V4-GGUF
       mmproj: Qwen2.5-VL-7B-NSFW-Caption-V4.mmproj-f16.gguf
@@ -59,159 +26,12 @@ vision_language_models:
         file: Qwen2.5-VL-7B-NSFW-Caption-V4.Q8_0.gguf
         size: 7.55GB
         recommended: false
-  qwen2-vl:
-    series_name: Qwen2-VL
-    description: Qwen 2.0 视觉语言模型（中英文优秀）
-    business_type: image_analysis
-    models:
-    - model_name: Qwen2-VL-2B-Instruct
-      repo: bartowski/Qwen2-VL-2B-Instruct-GGUF
-      mmproj: mmproj-Qwen2-VL-2B-Instruct-f32.gguf
-      description: 2B 轻量级视觉语言模型
-      variants:
-      - name: Q4_K_M
-        file: Qwen2-VL-2B-Instruct-Q4_K_M.gguf
-        size: 0.92GB
-        recommended: true
-      - name: Q8_0
-        file: Qwen2-VL-2B-Instruct-Q8_0.gguf
-        size: 1.53GB
-        recommended: false
-    - model_name: Qwen2-VL-7B-Instruct
-      repo: bartowski/Qwen2-VL-7B-Instruct-GGUF
-      mmproj: mmproj-Qwen2-VL-7B-Instruct-f32.gguf
-      description: 7B 平衡性能视觉语言模型
-      variants:
-      - name: Q4_K_M
-        file: Qwen2-VL-7B-Instruct-Q4_K_M.gguf
-        size: 4.36GB
-        recommended: true
-      - name: Q8_0
-        file: Qwen2-VL-7B-Instruct-Q8_0.gguf
-        size: 7.54GB
-        recommended: false
-  qwen3-vl:
-    series_name: Qwen3-VL
-    description: Qwen 3.0 视觉语言模型
-    business_type: image_analysis
-    models:
-    - model_name: Qwen3-VL-8B-Thinking
-      repo: NexaAI/Qwen3-VL-8B-Thinking-GGUF
-      mmproj: mmproj.F16.gguf
-      description: 具有思维链能力的视觉模型
-      variants:
-      - name: Q4_K
-        file: Qwen3-VL-8B-Thinking.Q4_K.gguf
-        size: 4.29GB
-        recommended: true
-      - name: Q8_0
-        file: Qwen3-VL-8B-Thinking.Q8_0.gguf
-        size: 8.11GB
-        recommended: false
-  qwen2.5-vl-nsfw:
-    series_name: Qwen2.5-VL NSFW
-    description: Qwen 2.5-VL NSFW 图像描述模型（未审核）
-    business_type: image_analysis
-    models:
-    - model_name: Qwen2.5-VL-7B-NSFW-Caption-V3
-      repo: bartowski/thesby_Qwen2.5-VL-7B-NSFW-Caption-V3-GGUF
-      mmproj: mmproj-thesby_Qwen2.5-VL-7B-NSFW-Caption-V3-f16.gguf
-      description: 专业 NSFW 图像描述模型 V3
-      capabilities:
-      - image
-      - nsfw
-      - caption
-      variants:
-      - name: Q4_K_M
-        file: thesby_Qwen2.5-VL-7B-NSFW-Caption-V3-Q4_K_M.gguf
-        size: 4.36GB
-        recommended: true
-      - name: Q8_0
-        file: thesby_Qwen2.5-VL-7B-NSFW-Caption-V3-Q8_0.gguf
-        size: 7.54GB
-        recommended: false
-  minicpm-v:
-    series_name: MiniCPM-V
-    description: MiniCPM-V 高性能视觉语言模型（中英文优秀）
-    business_type: image_analysis
-    models:
-    - model_name: MiniCPM-V-4.5
-      repo: openbmb/MiniCPM-V-4_5-gguf
-      mmproj: mmproj-model-f16.gguf
-      description: GPT-4o 级别性能，8B 参数，支持图像和视频
-      capabilities:
-      - image
-      - video
-      - multilingual
-      - ocr
-      variants:
-      - name: Q4_K_M
-        file: ggml-model-Q4_K_M.gguf
-        size: 4.68GB
-        recommended: true
-      - name: Q5_K_M
-        file: ggml-model-Q5_K_M.gguf
-        size: 5.45GB
-        recommended: false
-      - name: Q8_0
-        file: ggml-model-Q8_0.gguf
-        size: 8.11GB
-        recommended: false
-  nemo-florence-vl:
-    series_name: Nemo Florence VL
-    description: Nemo Florence 视觉语言模型（GGUF 格式）
-    business_type: image_analysis
-    models:
-    - model_name: Nemo_Florence_VL
-      repo: mradermacher/Nemo_Florence_VL-GGUF
-      mmproj: 不需要
-      description: 基于 Mistral Nemo 和 Florence-2 的视觉语言模型
-      capabilities:
-      - image
-      - text
-      variants:
-      - name: Q4_K_M
-        file: Nemo_Florence_VL.Q4_K_M.gguf
-        size: 6.96GB
-        recommended: true
-      - name: Q5_K_M
-        file: Nemo_Florence_VL.Q5_K_M.gguf
-        size: 8.13GB
-        recommended: false
-      - name: Q8_0
-        file: Nemo_Florence_VL.Q8_0.gguf
-        size: 12.13GB
-        recommended: false
-  joycaption:
-    series_name: JoyCaption
-    description: JoyCaption 专业图像描述生成模型
-    business_type: image_analysis
-    models:
-    - model_name: JoyCaption-Beta-One
-      repo: mradermacher/llama-joycaption-beta-one-hf-llava-GGUF
-      mmproj_repo: concedo/llama-joycaption-beta-one-hf-llava-mmproj-gguf
-      mmproj: llama-joycaption-beta-one-llava-mmproj-model-f16.gguf
-      description: 高质量图像描述生成，适合训练数据标注
-      note: mmproj 文件在单独的仓库中
-      capabilities:
-      - image
-      - caption
-      - detailed_description
-      variants:
-      - name: Q4_K_M
-        file: llama-joycaption-beta-one-hf-llava.Q4_K_M.gguf
-        size: 4.58GB
-        recommended: true
-      - name: Q8_0
-        file: llama-joycaption-beta-one-hf-llava.Q8_0.gguf
-        size: 7.95GB
-        recommended: false
-# 文本生成模型 - Qwen3 Abliterated 系列（无审查/支持NSFW）
-# 如需更多模型，请直接将 .gguf 文件放到 /models/LLM/GGUF/ 目录
+
+# 文本生成模型 - Qwen3 Abliterated 系列
 text_generation_models:
   qwen3-abliterated:
     series_name: Qwen3 Abliterated
-    description: Qwen3 破限制版本，无审查，支持 NSFW 内容（HuggingFace 高下载量）
+    description: Qwen3 破限制版本，无审查，支持 NSFW 内容
     business_type: text_generation
     models:
     - model_name: Qwen3-4B-Abliterated
@@ -267,10 +87,12 @@ text_generation_models:
         file: Huihui-Qwen3-4B-Instruct-2507-abliterated.Q8_0.gguf
         size: 4.0GB
         recommended: false
+
+# 视频分析模型 - Abliterated 版本
 video_analysis_models:
-  qwen2-vl-video:
-    series_name: Qwen2-VL
-    description: Qwen 2 视频理解模型
+  qwen2-vl-abliterated:
+    series_name: Qwen2-VL Abliterated
+    description: Qwen 2 视频理解模型 - 破限制版本
     business_type: video_analysis
     models:
     - model_name: Qwen2-VL-7B-Instruct-Abliterated
@@ -281,6 +103,7 @@ video_analysis_models:
       - video
       - image
       - abliterated
+      - uncensored
       variants:
       - name: Q4_K_M
         file: Qwen2-VL-7B-Instruct-abliterated.Q4_K_M.gguf
@@ -290,31 +113,28 @@ video_analysis_models:
         file: Qwen2-VL-7B-Instruct-abliterated.Q8_0.gguf
         size: 7.54GB
         recommended: false
+
+# 匹配规则
 matching_rules:
   patterns:
-  - pattern: qwen2.5-vl-3b
-    series: qwen2.5-vl
-    model: Qwen2.5-VL-3B-Instruct
   - pattern: qwen2.5-vl-7b.*nsfw
-    series: qwen2.5-vl
+    series: qwen2.5-vl-nsfw
     model: Qwen2.5-VL-7B-NSFW-Caption-V4
-  - pattern: qwen2.5-vl-7b
-    series: qwen2.5-vl
-    model: Qwen2.5-VL-7B-Instruct
-  - pattern: qwen3-vl-8b
-    series: qwen3-vl
-    model: Qwen3-VL-8B-Thinking
-  - pattern: qwen2-vl-7b
-    series: qwen2-vl-video
-    model: Qwen2-VL-7B-Instruct
+  - pattern: qwen2-vl-7b.*abliterated
+    series: qwen2-vl-abliterated
+    model: Qwen2-VL-7B-Instruct-Abliterated
+
+# 元数据
 metadata:
-  version: 1.0.0
-  last_updated: '2025-10-20'
+  version: 2.0.0
+  last_updated: '2025-10-29'
+  note: 'Only abliterated/uncensored/NSFW models included'
   supported_business_types:
   - image_analysis
   - text_generation
   - video_analysis
   recommendations:
-    beginner: Qwen2.5-VL-3B-Instruct (Q4_K_M)
-    balanced: Qwen2.5-VL-7B-Instruct (Q4_K_M)
-    quality: Qwen3-VL-8B-Thinking (Q8_0)
+    text_4b: Qwen3-4B-Abliterated (Q4_K_M)
+    text_8b: Qwen3-8B-Abliterated (Q4_K_M)
+    vision_nsfw: Qwen2.5-VL-7B-NSFW-Caption-V4 (Q4_K_M)
+    video_abliterated: Qwen2-VL-7B-Instruct-Abliterated (Q4_K_M)
