@@ -136,7 +136,7 @@ class NexaModelSelector:
             config = {
                 "base_url": base_url,
                 "system_prompt": system_prompt,
-                "engine_type": "🤖 nexa",
+                "engine_type": "nexa",
                 "service_available": False
             }
             return (config,)
@@ -157,7 +157,7 @@ class NexaModelSelector:
         config = {
             "base_url": base_url,
             "system_prompt": system_prompt,
-            "engine_type": "🤖 nexa",
+            "engine_type": "nexa",
             "service_available": True,
             "available_models": available_models
         }
