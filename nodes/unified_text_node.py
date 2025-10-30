@@ -100,9 +100,21 @@ class UnifiedTextModelSelector:
         api_type: str = "Ollama",
         remote_model: str = "",
         refresh_models: bool = False,
-        system_prompt: str = ""
+        system_prompt: str = "",
+        **kwargs  # 向后兼容旧参数
     ):
         """选择模型并返回配置"""
+        
+        # 向后兼容：处理旧的 n_gpu_layers 和 custom_gpu_layers 参数
+        if 'n_gpu_layers' in kwargs or 'custom_gpu_layers' in kwargs:
+            print("⚠️  检测到旧版本参数，已自动转换为新的 device 参数")
+            old_n_gpu_layers = kwargs.get('n_gpu_layers', 'All (Auto)')
+            if old_n_gpu_layers == 'All (Auto)':
+                device = 'Auto'
+            elif old_n_gpu_layers == 'CPU Only':
+                device = 'CPU'
+            else:  # Custom
+                device = 'GPU'  # 简化为 GPU
         
         print(f"\n{'='*80}")
         print(f" Unified Text Model Selector")
