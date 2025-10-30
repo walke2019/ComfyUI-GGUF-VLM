@@ -144,14 +144,14 @@ class MultiImageAnalysis:
         # 添加所有图像
         for temp_path in temp_paths:
             user_content.append({
-                "type": "🤖 image",
+                "type": "image",
                 "image": str(temp_path)
             })
         
         # 添加系统提示词（如果有）作为文本前缀
         if system_prompt and system_prompt.strip():
             user_content.append({
-                "type": "🤖 text",
+                "type": "text",
                 "text": f"{system_prompt.strip()}\n\n{prompt}"
             })
         else:
@@ -162,12 +162,12 @@ class MultiImageAnalysis:
                 "differences, patterns, and relationships between the images."
             )
             user_content.append({
-                "type": "🤖 text",
+                "type": "text",
                 "text": f"{default_prompt}\n\n{prompt}"
             })
         
         messages.append({
-            "role": "🤖 user",
+            "role": "user",
             "content": user_content
         })
         
@@ -275,13 +275,13 @@ class MultiImageComparison:
     
     # 预设提示词
     COMPARISON_PROMPTS = {
-        "similarities": "🤖 Identify and describe the similarities between these images. Focus on common elements, themes, colors, compositions, and subjects.",
-        "differences": "🤖 Identify and describe the differences between these images. Focus on what makes each image unique.",
-        "changes": "🤖 Analyze the changes across these images. Describe what has changed from one image to the next.",
-        "relationships": "🤖 Analyze the relationships between these images. How do they relate to each other? What story do they tell together?",
-        "sequence": "🤖 Analyze these images as a sequence. Describe the progression or timeline they represent.",
-        "quality": "🤖 Compare the quality of these images. Analyze aspects like resolution, clarity, composition, lighting, and technical execution.",
-        "style": "🤖 Compare the artistic style of these images. Analyze the visual style, artistic techniques, and aesthetic choices.",
+        "similarities": "Identify and describe the similarities between these images. Focus on common elements, themes, colors, compositions, and subjects.",
+        "differences": "Identify and describe the differences between these images. Focus on what makes each image unique.",
+        "changes": "Analyze the changes across these images. Describe what has changed from one image to the next.",
+        "relationships": "Analyze the relationships between these images. How do they relate to each other? What story do they tell together?",
+        "sequence": "Analyze these images as a sequence. Describe the progression or timeline they represent.",
+        "quality": "Compare the quality of these images. Analyze aspects like resolution, clarity, composition, lighting, and technical execution.",
+        "style": "Compare the artistic style of these images. Analyze the visual style, artistic techniques, and aesthetic choices.",
     }
     
     def compare_images(

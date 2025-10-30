@@ -227,7 +227,7 @@ class VisionLanguageNodeTransformers:
         
         if temp_path:
             user_content.append({
-                "type": "🤖 image",
+                "type": "image",
                 "image": str(temp_path)
             })
         
@@ -240,12 +240,12 @@ class VisionLanguageNodeTransformers:
             final_text = f"{default_prompt}\n\n{prompt}"
         
         user_content.append({
-            "type": "🤖 text",
+            "type": "text",
             "text": final_text
         })
         
         messages.append({
-            "role": "🤖 user",
+            "role": "user",
             "content": user_content
         })
         

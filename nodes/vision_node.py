@@ -472,13 +472,13 @@ class VisionLanguageNode:
             # 添加图像/视频帧
             for img_path in image_paths:
                 content.append({
-                    "type": "🤖 image_url",
+                    "type": "image_url",
                     "image_url": {"url": f"file://{img_path}"}
                 })
             
             # 添加用户提示词
             content.append({
-                "type": "🤖 text",
+                "type": "text",
                 "text": prompt
             })
             
