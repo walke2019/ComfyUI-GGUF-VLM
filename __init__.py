@@ -60,12 +60,14 @@ except Exception as e:
     VISION_NODES = {}
     VISION_DISPLAY = {}
 
-# 导入文本生成节点（新架构）
+# 导入文本生成节点（新架构：Local/Remote/Generation）
 try:
-    from .nodes.text_generation_nodes import NODE_CLASS_MAPPINGS as TEXT_NODES, NODE_DISPLAY_NAME_MAPPINGS as TEXT_DISPLAY
+    from .nodes.unified_text_node import NODE_CLASS_MAPPINGS as TEXT_NODES, NODE_DISPLAY_NAME_MAPPINGS as TEXT_DISPLAY
     print("✅ Text generation nodes loaded (new architecture)")
 except Exception as e:
     print(f"⚠️  Text generation nodes load failed: {e}")
+    import traceback
+    traceback.print_exc()
     TEXT_NODES = {}
     TEXT_DISPLAY = {}
 
