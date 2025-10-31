@@ -119,6 +119,8 @@ class VisionModelLoaderTransformers:
         # 确定模型 ID
         if model == "Huihui-Qwen3-VL-8B-Instruct-abliterated":
             model_id = "huihui-ai/Huihui-Qwen3-VL-8B-Instruct-abliterated"
+        elif model == "Huihui-Qwen3-VL-4B-Instruct-abliterated":
+            model_id = "huihui-ai/Huihui-Qwen3-VL-4B-Instruct-abliterated"
         else:
             model_id = f"qwen/{model}"
         
