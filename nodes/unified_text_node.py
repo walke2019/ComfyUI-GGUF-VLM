@@ -17,10 +17,32 @@ if str(module_path) not in sys.path:
 from core.model_loader import ModelLoader
 from core.inference_engine import InferenceEngine
 from core.inference.unified_api_engine import get_unified_api_engine
+import requests
 
 
 class UnifiedTextModelSelector:
     """统一的文本模型选择器 - 支持本地和远程 API"""
+    
+    @staticmethod
+    def get_ollama_models(base_url="http://127.0.0.1:11434"):
+        """获取 Ollama 模型列表"""
+        try:
+            # 尝试多个可能的端口
+            ports = [11434, 11435]
+            for port in ports:
+                try:
+                    url = f"http://127.0.0.1:{port}/api/tags"
+                    response = requests.get(url, timeout=2)
+                    if response.status_code == 200:
+                        data = response.json()
+                        models = [model['name'] for model in data.get('models', [])]
+                        if models:
+                            return models
+                except:
+                    continue
+            return ["No models found"]
+        except:
+            return ["No models found"]
     
     @classmethod
     def INPUT_TYPES(cls):
@@ -31,6 +53,9 @@ class UnifiedTextModelSelector:
         # 过滤文本模型
         vision_keywords = ['llava', 'vision', 'vl', 'multimodal', 'mm', 'clip', 'qwen-vl', 'qwen2-vl']
         text_models = [m for m in local_models if not any(kw in m.lower() for kw in vision_keywords)]
+        
+        # 获取 Ollama 远程模型列表
+        ollama_models = cls.get_ollama_models()
         
         return {
             "required": {
@@ -66,14 +91,9 @@ class UnifiedTextModelSelector:
                     "default": "Ollama",
                     "tooltip": "API 类型（推荐使用 Ollama）"
                 }),
-                "remote_model": ("STRING", {
-                    "default": "",
-                    "multiline": False,
-                    "tooltip": "远程模型名称（留空则自动获取）"
-                }),
-                "refresh_models": ("BOOLEAN", {
-                    "default": False,
-                    "tooltip": "刷新远程模型列表"
+                "remote_model": (ollama_models, {
+                    "default": ollama_models[0] if ollama_models else "No models found",
+                    "tooltip": "远程模型名称（从 Ollama 自动获取）"
                 }),
                 # 通用参数
                 "system_prompt": ("STRING", {
@@ -99,7 +119,6 @@ class UnifiedTextModelSelector:
         base_url: str = "http://127.0.0.1:11434",
         api_type: str = "Ollama",
         remote_model: str = "",
-        refresh_models: bool = False,
         system_prompt: str = "",
         **kwargs  # 向后兼容旧参数
     ):
@@ -195,7 +214,7 @@ class UnifiedTextModelSelector:
                 return (config,)
             
             # 获取可用模型
-            available_models = engine.get_available_models(force_refresh=refresh_models)
+            available_models = engine.get_available_models(force_refresh=False)
             
             if available_models:
                 print(f"✅ Found {len(available_models)} models from {api_type}")
