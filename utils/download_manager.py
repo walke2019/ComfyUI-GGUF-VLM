@@ -116,15 +116,17 @@ class DownloadManager:
         
         while retry_count < self.max_retries:
             try:
-                print(f"\n{'='*60}")
+                print(f"\n{'='*80}")
                 if retry_count > 0:
                     print(f"🔄 Retry {retry_count}/{self.max_retries}")
-                print(f"📥 Downloading repository")
-                print(f"📦 From: {repo_id}")
-                print(f"📁 To: {local_dir}")
-                print(f"🚫 Ignoring: {', '.join(ignore_patterns)}")
-                print(f"{'='*60}\n")
+                print(f"📥 [GGUF-VLM] Downloading Transformers Model")
+                print(f"📦 Repository: {repo_id}")
+                print(f"📁 Destination: {local_dir}")
+                print(f"🚫 Excluding: {', '.join(ignore_patterns)}")
+                print(f"⏳ Please wait, this may take several minutes...")
+                print(f"{'='*80}\n")
                 
+                # 使用 tqdm_class=None 禁用内部进度条，我们自己显示状态
                 snapshot_download(
                     repo_id=repo_id,
                     local_dir=local_dir,
@@ -132,11 +134,13 @@ class DownloadManager:
                     resume_download=resume,
                     max_workers=self.max_workers,
                     ignore_patterns=ignore_patterns,
+                    tqdm_class=None,  # 禁用 tqdm 进度条
                 )
                 
-                print(f"\n{'='*60}")
-                print("✅ Repository downloaded successfully!")
-                print(f"{'='*60}\n")
+                print(f"\n{'='*80}")
+                print("✅ [GGUF-VLM] Model downloaded successfully!")
+                print(f"📁 Location: {local_dir}")
+                print(f"{'='*80}\n")
                 
                 return True
                 
@@ -144,11 +148,12 @@ class DownloadManager:
                 retry_count += 1
                 if retry_count < self.max_retries:
                     wait_time = 5 * retry_count
-                    print(f"\n⚠️ Download error: {e}")
+                    print(f"\n⚠️ [GGUF-VLM] Download error: {e}")
                     print(f"⏳ Waiting {wait_time}s before retry...")
                     time.sleep(wait_time)
                 else:
-                    print(f"\n❌ Download failed after {self.max_retries} retries: {e}")
+                    print(f"\n❌ [GGUF-VLM] Download failed after {self.max_retries} retries")
+                    print(f"Error: {e}")
                     return False
     
     def check_repository_integrity(
