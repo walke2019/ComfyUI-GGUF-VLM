@@ -314,7 +314,6 @@ nexa list
 ```
 ComfyUI-GGUF-FX/
 ├── README.md                       # This file
-├── NEXA_SDK_GUIDE.md              # Detailed Nexa SDK guide
 ├── requirements.txt                # Dependencies
 ├── __init__.py                     # Node registration
 ├── config/
@@ -382,6 +381,5 @@ Contributions are welcome! Please:
 MIT License - see LICENSE file for details
 
 - **Nexa SDK**: https://github.com/NexaAI/nexa-sdk
-- **Nexa SDK Guide**: [NEXA_SDK_GUIDE.md](NEXA_SDK_GUIDE.md)
 - **ComfyUI**: https://github.com/comfyanonymous/ComfyUI
 
