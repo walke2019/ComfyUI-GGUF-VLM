@@ -54,3 +54,7 @@ downloads/
 
 # Test outputs
 test_output/
+Test/
+
+# Documentation
+docs/
