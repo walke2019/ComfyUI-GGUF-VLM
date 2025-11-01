@@ -90,18 +90,17 @@ class FileDownloader:
         desc: str = None
     ) -> Optional[str]:
         """
-        从 HuggingFace 下载文件
+        从 HuggingFace 下载文件（使用统一的下载管理器）
         
         Args:
             repo_id: HuggingFace 仓库 ID (例如: "Qwen/Qwen2.5-7B-Instruct-GGUF")
             filename: 文件名
             dest_dir: 目标目录
-            desc: 进度条描述
+            desc: 进度条描述（已弃用，保留用于兼容性）
         
         Returns:
             下载后的文件路径，失败返回 None
         """
-        url = f"https://huggingface.co/{repo_id}/resolve/main/{filename}"
         dest_path = os.path.join(dest_dir, filename)
         
         # 检查文件是否已存在
@@ -109,8 +108,18 @@ class FileDownloader:
             print(f"✅ File already exists: {dest_path}")
             return dest_path
         
-        print(f"📥 Downloading from {repo_id}...")
-        return self.download_file(url, dest_path, desc=desc or filename)
+        # 使用统一的下载管理器
+        from .download_manager import get_download_manager
+        
+        download_manager = get_download_manager()
+        downloaded_path = download_manager.download_single_file(
+            repo_id=repo_id,
+            filename=filename,
+            dest_dir=dest_dir,
+            resume=True
+        )
+        
+        return downloaded_path
     
     def get_remote_file_size(self, url: str) -> Optional[int]:
         """

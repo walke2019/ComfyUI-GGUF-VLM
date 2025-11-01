@@ -99,54 +99,29 @@ class TransformersInferenceEngine:
                         break
             
             if needs_download:
-                print(f"📥 Downloading model to: {model_checkpoint}")
-                self._check_disk_space(model_checkpoint)
+                from utils.download_manager import get_download_manager
                 
-                from huggingface_hub import snapshot_download
-                import time
+                download_manager = get_download_manager()
                 
-                max_retries = 3
-                retry_count = 0
+                # 检查磁盘空间
+                if not download_manager.check_disk_space(model_checkpoint, required_gb=10.0):
+                    raise RuntimeError("Insufficient disk space for model download")
                 
-                while retry_count < max_retries:
-                    try:
-                        print(f"\n{'='*60}")
-                        if retry_count > 0:
-                            print(f"🔄 Retry {retry_count}/{max_retries}")
-                        print(f"📦 Model: {model_id}")
-                        print(f"📁 Target: {model_checkpoint}")
-                        print(f"{'='*60}\n")
-                        
-                        snapshot_download(
-                            repo_id=model_id,
-                            local_dir=model_checkpoint,
-                            local_dir_use_symlinks=False,
-                            resume_download=True,  # 启用断点续传
-                            max_workers=4,  # 并发下载
-                            # 只下载 Transformers 需要的文件
-                            ignore_patterns=[
-                                "*.gguf",
-                                "GGUF/*",
-                                "*.bin",
-                                "*.msgpack",
-                            ],
-                        )
-                        
-                        print(f"\n{'='*60}")
-                        print("✅ Download completed successfully!")
-                        print(f"{'='*60}\n")
-                        break
-                        
-                    except Exception as e:
-                        retry_count += 1
-                        if retry_count < max_retries:
-                            wait_time = 5 * retry_count
-                            print(f"\n⚠️ Download error: {e}")
-                            print(f"⏳ Waiting {wait_time}s before retry...")
-                            time.sleep(wait_time)
-                        else:
-                            print(f"\n❌ Download failed after {max_retries} retries")
-                            raise
+                # 下载模型
+                success = download_manager.download_repository(
+                    repo_id=model_id,
+                    local_dir=model_checkpoint,
+                    ignore_patterns=[
+                        "*.gguf",
+                        "GGUF/*",
+                        "*.bin",
+                        "*.msgpack",
+                    ],
+                    resume=True
+                )
+                
+                if not success:
+                    raise RuntimeError(f"Failed to download model: {model_id}")
             
             # 加载 Processor（Qwen3-VL 不需要 min_pixels/max_pixels 参数）
             print(f"📦 Loading processor from: {model_checkpoint}")
