@@ -15,10 +15,10 @@ class PathConfig:
     # ============================================================================
     
     # LLM 模型目录（Transformers 模式）
-    LLM_MODELS_DIR = "LLM/GGUF"
+    LLM_MODELS_DIR = "LLM"  # Transformers 完整模型目录
     
     # GGUF 模型目录
-    GGUF_MODELS_DIR = "LLM/GGUF"  # ComfyUI 默认的 GGUF 模型目录
+    GGUF_MODELS_DIR = "LLM"  # GGUF 单文件模型也放在 LLM 目录
     
     # CLIP 模型目录（用于 mmproj 文件）
     CLIP_MODELS_DIR = "LLM/GGUF"

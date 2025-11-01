@@ -83,23 +83,70 @@ class TransformersInferenceEngine:
             model_checkpoint = PathConfig.get_model_path("llm", model_id)
             
             # 下载模型（如果需要）
-            if not os.path.exists(model_checkpoint):
+            # 检查关键文件是否存在
+            key_files = [
+                "config.json",
+                "model.safetensors.index.json",
+            ]
+            
+            needs_download = not os.path.exists(model_checkpoint)
+            if os.path.exists(model_checkpoint):
+                # 检查是否有关键文件缺失
+                for key_file in key_files:
+                    if not os.path.exists(os.path.join(model_checkpoint, key_file)):
+                        needs_download = True
+                        print(f"⚠️ Missing key file: {key_file}, will re-download")
+                        break
+            
+            if needs_download:
                 print(f"📥 Downloading model to: {model_checkpoint}")
                 self._check_disk_space(model_checkpoint)
                 
                 from huggingface_hub import snapshot_download
-                snapshot_download(
-                    repo_id=model_id,
-                    local_dir=model_checkpoint,
-                    local_dir_use_symlinks=False,
-                    # 只下载 Transformers 需要的文件，忽略 GGUF 等其他格式
-                    ignore_patterns=[
-                        "*.gguf",           # 忽略所有 GGUF 文件
-                        "GGUF/*",           # 忽略 GGUF 目录
-                        "*.bin",            # 忽略旧的 bin 格式
-                        "*.msgpack",        # 忽略其他格式
-                    ],
-                )
+                import time
+                
+                max_retries = 3
+                retry_count = 0
+                
+                while retry_count < max_retries:
+                    try:
+                        print(f"\n{'='*60}")
+                        if retry_count > 0:
+                            print(f"🔄 Retry {retry_count}/{max_retries}")
+                        print(f"📦 Model: {model_id}")
+                        print(f"📁 Target: {model_checkpoint}")
+                        print(f"{'='*60}\n")
+                        
+                        snapshot_download(
+                            repo_id=model_id,
+                            local_dir=model_checkpoint,
+                            local_dir_use_symlinks=False,
+                            resume_download=True,  # 启用断点续传
+                            max_workers=4,  # 并发下载
+                            # 只下载 Transformers 需要的文件
+                            ignore_patterns=[
+                                "*.gguf",
+                                "GGUF/*",
+                                "*.bin",
+                                "*.msgpack",
+                            ],
+                        )
+                        
+                        print(f"\n{'='*60}")
+                        print("✅ Download completed successfully!")
+                        print(f"{'='*60}\n")
+                        break
+                        
+                    except Exception as e:
+                        retry_count += 1
+                        if retry_count < max_retries:
+                            wait_time = 5 * retry_count
+                            print(f"\n⚠️ Download error: {e}")
+                            print(f"⏳ Waiting {wait_time}s before retry...")
+                            time.sleep(wait_time)
+                        else:
+                            print(f"\n❌ Download failed after {max_retries} retries")
+                            raise
             
             # 加载 Processor（Qwen3-VL 不需要 min_pixels/max_pixels 参数）
             print(f"📦 Loading processor from: {model_checkpoint}")
