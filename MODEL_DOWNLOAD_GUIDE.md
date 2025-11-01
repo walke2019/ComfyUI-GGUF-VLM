@@ -8,14 +8,11 @@
 
 | 模型 | 变体 | 大小 | 特点 |
 |------|------|------|------|
-| **Qwen3-4B-Abliterated** | Q4_K_M ⭐ | 2.3GB | 轻量快速，支持 NSFW |
-| | Q8_0 | 4.0GB | 高质量版本 |
-| **Qwen3-8B-Abliterated** | Q4_K_M ⭐ | 4.7GB | 旗舰模型，推理能力强 |
-| | Q8_0 | 8.1GB | 最高质量版本 |
-| **Huihui-Qwen3-4B** | Q4_K_M ⭐ | 2.3GB | 专门优化版本 |
-| | Q8_0 | 4.0GB | 高质量版本 |
+| **Huihui-Qwen3-8B-Abliterated-v2** | Q8_0 ⭐ | 8.5GB | 旗舰模型，最强性能 |
+| **Huihui-Qwen3-4B-Instruct-2507** | Q8_0 ⭐ | 4.0GB | 专门优化，指令微调 |
+| **Gemma-3-4B-Abliterated** | Q8_0 ⭐ | 4.0GB | Google 架构，创意写作 |
 
-⭐ = 推荐配置
+⭐ = 推荐配置（全部 Q8_0 高质量版本）
 
 ## 🚀 使用方法
 
@@ -25,9 +22,9 @@
 
 2. **在 model 下拉菜单中**，你会看到带 `[⬇️]` 前缀的可下载模型：
    ```
-   [⬇️ Qwen3 Abliterated] mlabonne_Qwen3-4B-abliterated-Q4_K_M.gguf
-   [⬇️ Qwen3 Abliterated] mlabonne_Qwen3-8B-abliterated-Q4_K_M.gguf
-   ...
+   [⬇️ Abliterated Models] Huihui-Qwen3-8B-abliterated-v2.Q8_0.gguf
+   [⬇️ Abliterated Models] Huihui-Qwen3-4B-Instruct-2507-abliterated.Q8_0.gguf
+   [⬇️ Abliterated Models] gemma-3-4b-abliterated.Q8_0.gguf
    ```
 
 3. **选择任意模型** → **运行工作流** → **自动下载到** `ComfyUI/models/LLM/`
@@ -42,11 +39,14 @@
 # 进入模型目录
 cd ComfyUI/models/LLM/
 
-# 下载 Qwen3-4B (推荐)
-wget https://huggingface.co/bartowski/mlabonne_Qwen3-4B-abliterated-GGUF/resolve/main/mlabonne_Qwen3-4B-abliterated-Q4_K_M.gguf
+# 下载 Huihui-Qwen3-8B (旗舰)
+wget https://huggingface.co/mradermacher/Huihui-Qwen3-8B-abliterated-v2-GGUF/resolve/main/Huihui-Qwen3-8B-abliterated-v2.Q8_0.gguf
 
-# 或下载 Qwen3-8B (旗舰)
-wget https://huggingface.co/bartowski/mlabonne_Qwen3-8B-abliterated-GGUF/resolve/main/mlabonne_Qwen3-8B-abliterated-Q4_K_M.gguf
+# 或下载 Huihui-Qwen3-4B (轻量)
+wget https://huggingface.co/mradermacher/Huihui-Qwen3-4B-Instruct-2507-abliterated-GGUF/resolve/main/Huihui-Qwen3-4B-Instruct-2507-abliterated.Q8_0.gguf
+
+# 或下载 Gemma-3-4B (Google)
+wget https://huggingface.co/mradermacher/gemma-3-4b-abliterated-GGUF/resolve/main/gemma-3-4b-abliterated.Q8_0.gguf
 ```
 
 ## 🖼️ 视觉模型
@@ -89,9 +89,9 @@ wget https://huggingface.co/bartowski/mlabonne_Qwen3-8B-abliterated-GGUF/resolve
 
 ## 🎯 推荐配置
 
-- **入门**: Qwen3-4B-Abliterated (Q4_K_M) - 2.3GB
-- **平衡**: Qwen3-8B-Abliterated (Q4_K_M) - 4.7GB  
-- **高质量**: Qwen3-8B-Abliterated (Q8_0) - 8.1GB
+- **轻量**: Gemma-3-4B-Abliterated (Q8_0) - 4.0GB
+- **平衡**: Huihui-Qwen3-4B-Instruct-2507 (Q8_0) - 4.0GB  
+- **旗舰**: Huihui-Qwen3-8B-Abliterated-v2 (Q8_0) - 8.5GB
 
 ---
 
