@@ -17,8 +17,10 @@ if str(module_path) not in sys.path:
 
 try:
     from config.paths import PathConfig
+    from utils.download_manager import get_download_manager
 except ImportError:
     from ...config.paths import PathConfig
+    from ...utils.download_manager import get_download_manager
 
 
 class TransformersInferenceEngine:
@@ -99,11 +101,6 @@ class TransformersInferenceEngine:
                         break
             
             if needs_download:
-                try:
-                    from utils.download_manager import get_download_manager
-                except ImportError:
-                    from ...utils.download_manager import get_download_manager
-                
                 download_manager = get_download_manager()
                 
                 # 检查磁盘空间
