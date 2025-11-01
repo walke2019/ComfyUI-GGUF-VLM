@@ -79,9 +79,9 @@ def check_all_nodes():
     print("  1. 重启 ComfyUI")
     print("  2. 查看控制台输出，确认所有节点加载成功")
     print("  3. 检查节点菜单中是否有以下分类:")
-    print("     - 🤖 GGUF-Fusion/Text")
-    print("     - 🖼️ GGUF-Fusion/Vision")
-    print("     - 🎨 GGUF-Fusion/Multi-Image")
+    print("     - 🤖 GGUF-VLM/Text")
+    print("     - 🖼️ GGUF-VLM/Vision")
+    print("     - 🎨 GGUF-VLM/Multi-Image")
     print()
     
     return True

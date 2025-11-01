@@ -1,4 +1,4 @@
-# ComfyUI-GGUF-FX
+# ComfyUI-GGUF-VLM
 
 Complete GGUF model support for ComfyUI with local and Nexa SDK inference modes.
 
@@ -312,7 +312,7 @@ nexa list
 ## 📁 Directory Structure
 
 ```
-ComfyUI-GGUF-FX/
+ComfyUI-GGUF-VLM/
 ├── README.md                       # This file
 ├── requirements.txt                # Dependencies
 ├── __init__.py                     # Node registration

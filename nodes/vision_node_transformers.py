@@ -103,7 +103,7 @@ class VisionModelLoaderTransformers:
     RETURN_TYPES = TRANSFORMERS_MODEL_OUTPUT["types"]
     RETURN_NAMES = TRANSFORMERS_MODEL_OUTPUT["names"]
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-Fusion/Transformers"
+    CATEGORY = "🤖 GGUF-VLM/Transformers"
     
     def load_model(
         self,
@@ -187,7 +187,7 @@ class VisionLanguageNodeTransformers:
     RETURN_TYPES = TEXT_OUTPUT["types"]
     RETURN_NAMES = TEXT_OUTPUT["names"]
     FUNCTION = "generate"
-    CATEGORY = "🤖 GGUF-Fusion/Transformers"
+    CATEGORY = "🤖 GGUF-VLM/Transformers"
     OUTPUT_NODE = True
     
     def generate(

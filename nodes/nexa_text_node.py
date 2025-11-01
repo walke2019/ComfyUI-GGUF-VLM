@@ -111,7 +111,7 @@ class NexaModelSelector:
     RETURN_TYPES = ("NEXA_MODEL",)
     RETURN_NAMES = ("model_config",)
     FUNCTION = "select_model"
-    CATEGORY = "🤖 GGUF-Fusion/Nexa"
+    CATEGORY = "🤖 GGUF-VLM/Nexa"
     OUTPUT_NODE = True
     
     def select_model(
@@ -260,7 +260,7 @@ class NexaTextGeneration:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("context", "thinking")
     FUNCTION = "generate"
-    CATEGORY = "🤖 GGUF-Fusion/Nexa"
+    CATEGORY = "🤖 GGUF-VLM/Nexa"
     OUTPUT_NODE = True
     
     @staticmethod
@@ -468,7 +468,7 @@ class NexaServiceStatus:
     RETURN_TYPES = ("STRING", "STRING", "STRING")
     RETURN_NAMES = ("status", "remote_models", "local_models")
     FUNCTION = "check_status"
-    CATEGORY = "🤖 GGUF-Fusion/Nexa"
+    CATEGORY = "🤖 GGUF-VLM/Nexa"
     OUTPUT_NODE = True
     
     def check_status(self, base_url: str, models_dir: str, refresh: bool = False):

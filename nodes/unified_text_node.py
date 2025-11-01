@@ -63,7 +63,7 @@ class LocalTextModelLoader:
     RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model_config",)
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-Fusion/Text"
+    CATEGORY = "🤖 GGUF-VLM/Text"
     
     def load_model(self, model, n_ctx=8192, device="Auto", system_prompt=""):
         """加载本地 GGUF 模型"""
@@ -174,7 +174,7 @@ class RemoteTextModelSelector:
     RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model_config",)
     FUNCTION = "select_model"
-    CATEGORY = "🤖 GGUF-Fusion/Text"
+    CATEGORY = "🤖 GGUF-VLM/Text"
     
     def select_model(self, base_url, api_type, model, system_prompt=""):
         """选择远程 API 模型"""
@@ -317,7 +317,7 @@ class TextGeneration:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("context", "thinking")
     FUNCTION = "generate"
-    CATEGORY = "🤖 GGUF-Fusion/Text"
+    CATEGORY = "🤖 GGUF-VLM/Text"
     OUTPUT_NODE = True
     
     @staticmethod

@@ -25,7 +25,7 @@ try:
     from utils.device_optimizer import DeviceOptimizer
     from utils.mmproj_validator import MMProjValidator
 except ImportError as e:
-    print(f"[ComfyUI-GGUF-Fusion] Import error in vision_node: {e}")
+    print(f"[ComfyUI-GGUF-VLM] Import error in vision_node: {e}")
     # 尝试相对导入
     from ..core.model_loader import ModelLoader
     from ..core.inference_engine import InferenceEngine
@@ -126,7 +126,7 @@ class VisionModelLoader:
     RETURN_TYPES = ("VISION_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-Fusion/Vision"
+    CATEGORY = "🤖 GGUF-VLM/Vision"
     
     def load_model(self, model, n_ctx=8192, device="Auto", mmproj_file=""):
         """加载视觉语言模型"""
@@ -408,7 +408,7 @@ class VisionLanguageNode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("context",)
     FUNCTION = "describe_image"
-    CATEGORY = "🤖 GGUF-Fusion/Vision"
+    CATEGORY = "🤖 GGUF-VLM/Vision"
     OUTPUT_NODE = True
     
     def describe_image(self, model, prompt, max_tokens=512, 

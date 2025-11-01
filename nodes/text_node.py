@@ -19,7 +19,7 @@ try:
     from utils.downloader import FileDownloader
     from models.text_models import TextModelConfig, TextModelPresets
 except ImportError as e:
-    print(f"[ComfyUI-GGUF-Fusion] Import error in text_node: {e}")
+    print(f"[ComfyUI-GGUF-VLM] Import error in text_node: {e}")
     # 尝试相对导入
     from ..core.model_loader import ModelLoader
     from ..core.inference_engine import InferenceEngine
@@ -119,7 +119,7 @@ class TextModelLoader:
     RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-Fusion/Text"
+    CATEGORY = "🤖 GGUF-VLM/Text"
     
     def load_model(self, model, n_ctx=8192, device="Auto", system_prompt=""):
         """加载文本模型"""
@@ -265,7 +265,7 @@ class TextGenerationNode:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("context", "thinking")
     FUNCTION = "generate"
-    CATEGORY = "🤖 GGUF-Fusion/Text"
+    CATEGORY = "🤖 GGUF-VLM/Text"
     OUTPUT_NODE = True
     
     @staticmethod
