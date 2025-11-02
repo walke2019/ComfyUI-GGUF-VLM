@@ -24,6 +24,16 @@ class DownloadManager:
         """
         self.max_retries = max_retries
         self.max_workers = max_workers
+        
+        # 检查是否需要使用镜像站
+        if os.environ.get('HF_ENDPOINT') is None:
+            # 自动检测网络，如果连接 huggingface.co 失败则使用镜像
+            try:
+                import socket
+                socket.create_connection(("huggingface.co", 443), timeout=3)
+            except:
+                print("⚠️ [GGUF-VLM] Cannot reach huggingface.co, using mirror...")
+                os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
     
     def download_single_file(
         self,
