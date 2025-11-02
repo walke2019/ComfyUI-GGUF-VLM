@@ -137,15 +137,23 @@ class DownloadManager:
                 print(f"{'='*80}\n")
                 
                 # 使用 tqdm_class=None 禁用内部进度条，我们自己显示状态
-                snapshot_download(
-                    repo_id=repo_id,
-                    local_dir=local_dir,
-                    local_dir_use_symlinks=False,
-                    resume_download=resume,
-                    max_workers=self.max_workers,
-                    ignore_patterns=ignore_patterns,
-                    tqdm_class=None,  # 禁用 tqdm 进度条
-                )
+                try:
+                    snapshot_download(
+                        repo_id=repo_id,
+                        local_dir=local_dir,
+                        local_dir_use_symlinks=False,
+                        resume_download=resume,
+                        max_workers=self.max_workers,
+                        ignore_patterns=ignore_patterns,
+                        tqdm_class=None,  # 禁用 tqdm 进度条
+                    )
+                except Exception as download_error:
+                    # 如果 snapshot_download 失败，尝试使用 Git LFS
+                    print(f"\n⚠️ [GGUF-VLM] Standard download failed, trying Git LFS...")
+                    print(f"Error: {download_error}")
+                    
+                    if not self._download_with_git_lfs(repo_id, local_dir, ignore_patterns):
+                        raise download_error
                 
                 print(f"\n{'='*80}")
                 print("✅ [GGUF-VLM] Model downloaded successfully!")
@@ -165,6 +173,85 @@ class DownloadManager:
                     print(f"\n❌ [GGUF-VLM] Download failed after {self.max_retries} retries")
                     print(f"Error: {e}")
                     return False
+    
+    def _download_with_git_lfs(
+        self,
+        repo_id: str,
+        local_dir: str,
+        ignore_patterns: Optional[List[str]] = None
+    ) -> bool:
+        """
+        使用 Git LFS 下载大文件（备用方案）
+        
+        Args:
+            repo_id: HuggingFace 仓库 ID
+            local_dir: 本地目录
+            ignore_patterns: 忽略的文件模式
+        
+        Returns:
+            成功返回 True，失败返回 False
+        """
+        import subprocess
+        import shutil
+        
+        try:
+            # 检查 git-lfs 是否安装
+            result = subprocess.run(['git', 'lfs', 'version'], 
+                                   capture_output=True, text=True, timeout=5)
+            if result.returncode != 0:
+                print("❌ [GGUF-VLM] Git LFS not installed")
+                return False
+            
+            print("✓ [GGUF-VLM] Using Git LFS for large files")
+            
+            # 构建仓库 URL
+            hf_endpoint = os.environ.get('HF_ENDPOINT', 'https://huggingface.co')
+            repo_url = f"{hf_endpoint}/{repo_id}"
+            
+            print(f"🔗 Cloning from: {repo_url}")
+            
+            # Clone 仓库
+            subprocess.run(['git', 'clone', repo_url, local_dir], 
+                          check=True, timeout=600)
+            
+            # 进入目录
+            os.chdir(local_dir)
+            
+            # 拉取 LFS 文件
+            print("📥 Pulling LFS files...")
+            subprocess.run(['git', 'lfs', 'pull', '--include=*.safetensors'], 
+                          check=True, timeout=3600)
+            
+            # 删除不需要的文件
+            if ignore_patterns:
+                print("🧹 Cleaning up excluded files...")
+                for pattern in ignore_patterns:
+                    if '*' in pattern:
+                        # 使用 glob 模式删除
+                        import glob
+                        for file in glob.glob(pattern):
+                            try:
+                                if os.path.isfile(file):
+                                    os.remove(file)
+                                elif os.path.isdir(file):
+                                    shutil.rmtree(file)
+                            except:
+                                pass
+            
+            # 删除 .git 目录
+            git_dir = os.path.join(local_dir, '.git')
+            if os.path.exists(git_dir):
+                shutil.rmtree(git_dir)
+            
+            print("✅ [GGUF-VLM] Git LFS download completed")
+            return True
+            
+        except subprocess.TimeoutExpired:
+            print("❌ [GGUF-VLM] Git LFS download timeout")
+            return False
+        except Exception as e:
+            print(f"❌ [GGUF-VLM] Git LFS download failed: {e}")
+            return False
     
     def check_repository_integrity(
         self,
