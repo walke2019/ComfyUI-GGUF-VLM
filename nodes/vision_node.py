@@ -9,6 +9,7 @@ import numpy as np
 from pathlib import Path
 from PIL import Image
 import folder_paths
+from comfy.comfy_types import IO
 
 # 添加父目录到路径
 module_path = Path(__file__).parent.parent
@@ -126,7 +127,7 @@ class VisionModelLoader:
     RETURN_TYPES = ("VISION_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-VLM/🖼️ Vision Models/📥 Load Model"
+    CATEGORY = "🤖 GGUF-VLM/🖼️ Vision Models"
     
     def load_model(self, model, n_ctx=8192, device="Auto", mmproj_file=""):
         """加载视觉语言模型"""
@@ -197,6 +198,9 @@ class VisionModelLoader:
                 if download_info.get('mmproj'):
                     # 使用 mmproj_repo（如果指定）或默认使用模型仓库
                     mmproj_repo = download_info.get('mmproj_repo', download_info['repo'])
+                    print(f"🔍 mmproj_repo from config: {download_info.get('mmproj_repo')}")
+                    print(f"📦 Using mmproj repo: {mmproj_repo}")
+                    print(f"📄 mmproj filename: {download_info['mmproj']}")
                     mmproj_downloaded = downloader.download_from_huggingface(
                         repo_id=mmproj_repo,
                         filename=download_info['mmproj'],
@@ -354,9 +358,9 @@ class VisionLanguageNode:
                 "model": ("VISION_MODEL", {
                     "tooltip": "视觉语言模型配置"
                 }),
-                "prompt": ("STRING", {
+                "prompt": (IO.STRING, {
                     "default": "Describe this image in detail.",
-                    "multiline": True,
+                    "multiline": False,
                     "tooltip": "用户提示词"
                 }),
                 "max_tokens": ("INT", {
@@ -401,7 +405,7 @@ class VisionLanguageNode:
                 "video": ("IMAGE", {
                     "tooltip": "输入视频帧序列（与图像二选一）"
                 }),
-                "system_prompt": ("STRING", {
+                "system_prompt": (IO.STRING, {
                     "default": "You are a helpful assistant that describes images and videos accurately and in detail.",
                     "multiline": True,
                     "tooltip": "系统提示词（可自定义模型行为）"
@@ -412,7 +416,7 @@ class VisionLanguageNode:
     RETURN_TYPES = ("STRING",)
     RETURN_NAMES = ("context",)
     FUNCTION = "describe_image"
-    CATEGORY = "🤖 GGUF-VLM/🖼️ Vision Models/🔍 Analyze"
+    CATEGORY = "🤖 GGUF-VLM/🖼️ Vision Models"
     OUTPUT_NODE = True
     
     def describe_image(self, model, prompt, max_tokens=512, 
@@ -511,6 +515,9 @@ class VisionLanguageNode:
             
             output_text = response["choices"][0]["message"]["content"]
             
+            # 清理输出文本：去除首尾空白和多余空行
+            output_text = output_text.strip()
+            
             # 清理临时文件
             for img_path in image_paths:
                 try:
@@ -519,7 +526,7 @@ class VisionLanguageNode:
                     pass
             
             print(f"✅ Generated description ({len(output_text)} chars)")
-            return (str(output_text),)
+            return (output_text,)
         
         except ImportError as e:
             error_msg = "❌ llama-cpp-python not installed. Install with: pip install llama-cpp-python"
@@ -587,5 +594,5 @@ NODE_CLASS_MAPPINGS = {
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "VisionModelLoader": "🖼️ Vision Model Loader (GGUF)",
-    "VisionLanguageNode": "🖼️ Image Analysis",
+    "VisionLanguageNode": "🖼️ Image Analysis (GGUF)",
 }

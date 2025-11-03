@@ -6,6 +6,7 @@ Nexa SDK Text Node - 使用 Nexa SDK 服务的文本生成节点
 import re
 import os
 from typing import Tuple
+from comfy.comfy_types import IO
 
 # 尝试导入路径配置
 try:
@@ -83,24 +84,66 @@ def parse_model_input(model_input: str) -> str:
     return model_input
 
 
-class NexaModelSelector:
-    """Nexa SDK 模型选择器"""
+class RemoteAPIConfig:
+    """远程 API 配置节点（Nexa/Ollama）"""
+    
+    @staticmethod
+    def get_available_models(base_url="http://127.0.0.1:11434", api_type="nexa"):
+        """获取可用模型列表"""
+        try:
+            # 尝试多个常用端口
+            ports_to_try = [40054, 11434, 11435]
+            
+            # 如果 base_url 中指定了端口，优先使用
+            if ':' in base_url.split('//')[-1]:
+                try:
+                    engine = get_nexa_engine(base_url)
+                    if engine.is_service_available():
+                        models = engine.get_available_models(force_refresh=False)
+                        if models:
+                            return models
+                except:
+                    pass
+            
+            # 尝试常用端口
+            for port in ports_to_try:
+                try:
+                    test_url = f"http://127.0.0.1:{port}"
+                    engine = get_nexa_engine(test_url)
+                    if engine.is_service_available():
+                        models = engine.get_available_models(force_refresh=False)
+                        if models:
+                            return models
+                except:
+                    continue
+            
+            return ["(请点击刷新按钮)"]
+        except:
+            return ["(请点击刷新按钮)"]
     
     @classmethod
     def INPUT_TYPES(cls):
+        # 获取可用模型列表（会尝试多个端口）
+        available_models = cls.get_available_models()
+        
         return {
             "required": {
                 "base_url": ("STRING", {
                     "default": "http://127.0.0.1:11434",
-                    "tooltip": "Nexa SDK 服务地址"
+                    "multiline": False,
+                    "tooltip": "API 服务地址（例如：http://127.0.0.1:40054）"
                 }),
-                "refresh_models": ("BOOLEAN", {
-                    "default": False,
-                    "tooltip": "刷新模型列表"
+                "api_type": (["Nexa SDK", "Ollama"], {
+                    "default": "Ollama",
+                    "tooltip": "API 类型"
+                }),
+                "model": (available_models, {
+                    "default": available_models[0] if available_models else "(请点击刷新按钮)",
+                    "tooltip": "选择模型（点击刷新按钮更新列表）"
                 }),
             },
             "optional": {
-                "system_prompt": ("STRING", {
+                "system_prompt": (IO.STRING, {
                     "default": "",
                     "multiline": True,
                     "tooltip": "系统提示词（可选）"
@@ -108,19 +151,26 @@ class NexaModelSelector:
             }
         }
     
-    RETURN_TYPES = ("NEXA_MODEL",)
+    RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model_config",)
-    FUNCTION = "select_model"
-    CATEGORY = "🤖 GGUF-VLM/💬 Text Models/📥 Load Model"
-    OUTPUT_NODE = True
+    FUNCTION = "configure_api"
+    CATEGORY = "🤖 GGUF-VLM/💬 Text Models"
     
-    def select_model(
+    def configure_api(
         self, 
-        base_url: str, 
-        refresh_models: bool = False,
+        base_url: str,
+        api_type: str,
+        model: str,
         system_prompt: str = ""
     ):
-        """选择模型并返回配置"""
+        """配置远程 API"""
+        
+        # 映射 API 类型
+        api_type_map = {
+            "Nexa SDK": "nexa",
+            "Ollama": "ollama"
+        }
+        api_key = api_type_map.get(api_type, "nexa")
         
         # 创建或获取引擎
         engine = get_nexa_engine(base_url)
@@ -129,310 +179,59 @@ class NexaModelSelector:
         is_available = engine.is_service_available()
         
         if not is_available:
-            error_msg = f"⚠️  Nexa SDK service is not available at {base_url}"
+            error_msg = f"⚠️  {api_type} service is not available at {base_url}"
             print(error_msg)
-            print("   Please make sure 'nexa serve' is running.")
+            print(f"   Please make sure the service is running.")
             
             config = {
+                "mode": "remote",
                 "base_url": base_url,
+                "api_type": api_key,
+                "model_name": model,
                 "system_prompt": system_prompt,
-                "engine_type": "nexa",
-                "service_available": False
+                "service_available": False,
+                "error": error_msg
             }
             return (config,)
         
-        # 从 Nexa SDK 服务获取可用模型
-        available_models = engine.get_available_models(force_refresh=refresh_models)
+        # 获取可用模型
+        available_models = engine.get_available_models(force_refresh=False)
         
-        # 格式化输出
-        if available_models:
-            models_text = "\n".join(available_models)
-            print(f"✅ Found {len(available_models)} models")
-            print(f"💡 Tip: Use 'nexa pull <model>' to download more models")
+        # 确定使用的模型
+        if model and model.strip() and not model.startswith("("):
+            # 用户选择了有效的模型
+            selected_model = model.strip()
+            print(f"   使用选择的模型: {selected_model}")
+        elif available_models and available_models[0] and not available_models[0].startswith("("):
+            # 自动选择第一个可用模型
+            selected_model = available_models[0]
+            print(f"   自动选择模型: {selected_model}")
         else:
-            models_text = "⚠️  No models found. Run: nexa pull <model-name>"
-            print(models_text)
+            selected_model = ""
+            print(f"   ⚠️  未找到可用模型，请点击刷新按钮")
         
-        # 创建配置
+        # 创建配置（使用 TEXT_MODEL 格式，兼容 TextGeneration 节点）
         config = {
+            "mode": "remote",
             "base_url": base_url,
+            "api_type": api_key,
+            "model_name": selected_model,
             "system_prompt": system_prompt,
-            "engine_type": "nexa",
             "service_available": True,
             "available_models": available_models
         }
         
-        print(f"✅ Nexa SDK configured")
+        print(f"✅ {api_type} configured")
         print(f"   Service URL: {base_url}")
+        print(f"   Model: {selected_model}")
         print(f"   Available models: {len(available_models)}")
         
         return (config,)
 
 
-class NexaSDKTextGeneration:
-    """Nexa SDK 文本生成节点"""
-    
-    @classmethod
-    def INPUT_TYPES(cls):
-        # 动态获取可用模型列表
-        from ..core.inference.nexa_engine import get_nexa_engine
-        engine = get_nexa_engine()
-        
-        # 从 Nexa SDK API 获取模型
-        available_models = engine.get_available_models()
-        
-        # 合并预设和 API 模型
-        all_models = ["Custom (输入自定义模型 ID)"]
-        
-        # 添加 API 中的模型（已下载的）
-        if available_models:
-            all_models.extend(available_models)
-        
-        # 添加预设模型（作为参考）
-        all_models.append("--- Preset Models (需要 nexa pull) ---")
-        all_models.extend(PRESET_MODELS[1:])  # 跳过第一个 "Custom"
-        
-        return {
-            "required": {
-                "model_config": ("NEXA_MODEL", {
-                    "tooltip": "Nexa 模型配置（来自 Model Selector）"
-                }),
-                "preset_model": (all_models, {
-                    "default": all_models[0],
-                    "tooltip": "可用模型列表（顶部为已下载模型）"
-                }),
-                "custom_model": ("STRING", {
-                    "default": "",
-                    "multiline": False,
-                    "tooltip": "自定义模型 ID（格式: author/model:quant）"
-                }),
-                "auto_download": ("BOOLEAN", {
-                    "default": True,
-                    "tooltip": "自动下载模型（使用 nexa pull）"
-                }),
-                "max_tokens": ("INT", {
-                    "default": 512,
-                    "min": 1,
-                    "max": 8192,
-                    "step": 1,
-                    "tooltip": "最大生成 token 数"
-                }),
-                "temperature": ("FLOAT", {
-                    "default": 0.7,
-                    "min": 0.0,
-                    "max": 2.0,
-                    "step": 0.1,
-                    "tooltip": "温度参数（越高越随机）"
-                }),
-                "top_p": ("FLOAT", {
-                    "default": 0.9,
-                    "min": 0.0,
-                    "max": 1.0,
-                    "step": 0.05,
-                    "tooltip": "Top-p 采样"
-                }),
-                "top_k": ("INT", {
-                    "default": 40,
-                    "min": 0,
-                    "max": 100,
-                    "step": 1,
-                    "tooltip": "Top-k 采样（0 表示禁用）"
-                }),
-                "repetition_penalty": ("FLOAT", {
-                    "default": 1.1,
-                    "min": 1.0,
-                    "max": 2.0,
-                    "step": 0.1,
-                    "tooltip": "重复惩罚"
-                }),
-                "enable_thinking": ("BOOLEAN", {
-                    "default": False,
-                    "tooltip": "启用思考模式（支持 DeepSeek-R1, Qwen3-Thinking 等模型）"
-                }),
-                "prompt": ("STRING", {
-                    "default": "Hello, how are you?",
-                    "multiline": True,
-                    "tooltip": "输入提示词"
-                }),
-            }
-        }
-    
-    RETURN_TYPES = ("STRING", "STRING")
-    RETURN_NAMES = ("context", "thinking")
-    FUNCTION = "generate"
-    CATEGORY = "🤖 GGUF-VLM/💬 Text Models/✨ Generate"
-    OUTPUT_NODE = True
-    
-    @staticmethod
-    def _extract_thinking(text: str, enable_thinking: bool) -> Tuple[str, str]:
-        """
-        从输出中提取思考内容
-        
-        支持多种格式:
-        1. <think>...</think> (Qwen3, DeepSeek-R1)
-        2. <thinking>...</thinking>
-        3. [THINKING]...[/THINKING]
-        
-        无论 enable_thinking 是否启用，都会移除 think 标签。
-        当 enable_thinking=False 时，不返回 thinking 内容。
-        
-        Returns:
-            (final_output, thinking_content)
-        """
-        # 模式 1: <think>...</think>
-        think_pattern = r'<think>(.*?)</think>'
-        matches = re.findall(think_pattern, text, re.DOTALL | re.IGNORECASE)
-        if matches:
-            thinking = '\n\n'.join(matches) if enable_thinking else ""
-            # 移除思考标签，保留最终答案
-            final_output = re.sub(think_pattern, '', text, flags=re.DOTALL | re.IGNORECASE).strip()
-            return final_output, thinking
-        
-        # 模式 2: <thinking>...</thinking>
-        thinking_pattern = r'<thinking>(.*?)</thinking>'
-        matches = re.findall(thinking_pattern, text, re.DOTALL | re.IGNORECASE)
-        if matches:
-            thinking = '\n\n'.join(matches) if enable_thinking else ""
-            final_output = re.sub(thinking_pattern, '', text, flags=re.DOTALL | re.IGNORECASE).strip()
-            return final_output, thinking
-        
-        # 模式 3: [THINKING]...[/THINKING]
-        bracket_pattern = r'\[THINKING\](.*?)\[/THINKING\]'
-        matches = re.findall(bracket_pattern, text, re.DOTALL | re.IGNORECASE)
-        if matches:
-            thinking = '\n\n'.join(matches) if enable_thinking else ""
-            final_output = re.sub(bracket_pattern, '', text, flags=re.DOTALL | re.IGNORECASE).strip()
-            return final_output, thinking
-        
-        # 没有找到思考标记，返回原文
-        return text, ""
-    
-    def generate(
-        self,
-        model_config,
-        preset_model: str,
-        custom_model: str,
-        auto_download: bool,
-        prompt: str,
-        max_tokens: int = 512,
-        temperature: float = 0.7,
-        top_p: float = 0.9,
-        top_k: int = 40,
-        repetition_penalty: float = 1.1,
-        enable_thinking: bool = False
-    ):
-        """生成文本"""
-        
-        # 获取配置
-        base_url = model_config.get('base_url', 'http://127.0.0.1:11434')
-        system_prompt = model_config.get('system_prompt', '')
-        
-        # 获取引擎
-        engine = get_nexa_engine(base_url)
-        
-        # 检查服务是否可用
-        if not engine.is_service_available():
-            error_msg = f"❌ Nexa SDK service is not available at {base_url}"
-            print(error_msg)
-            print("   Please make sure the service is running.")
-            return (error_msg, "")
-        
-        # 确定使用哪个模型
-        if preset_model == "Custom (输入自定义模型)":
-            if not custom_model:
-                error_msg = "❌ Please specify a custom model"
-                print(error_msg)
-                return (error_msg, "")
-            model = parse_model_input(custom_model)
-            print(f"📝 Using custom model: {model}")
-        else:
-            model = preset_model
-            print(f"📋 Using preset model: {model}")
-        
-        # 如果启用自动下载，确保模型可用
-        if auto_download:
-            print(f"🔍 Checking model availability...")
-            engine.ensure_model_available(model, auto_download=True)
-        
-        # Nexa SDK 只支持通过 'nexa pull' 下载的模型
-        # 模型格式: author/model-name:quant
-        model_id = model
-        print(f"🌐 Using Nexa SDK model: {model_id}")
-        print(f"💡 Make sure you've run: nexa pull {model_id}")
-        
-        # 处理思考控制
-        if not enable_thinking and system_prompt:
-            # 如果禁用思考，添加 no_think 到系统提示词
-            if 'no_think' not in system_prompt.lower():
-                system_prompt = f"{system_prompt} no_think"
-        elif not enable_thinking and not system_prompt:
-            system_prompt = "no_think"
-        
-        # 构建消息列表
-        messages = []
-        
-        # 1. 系统提示词（如果有）
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        
-        # 2. 当前用户输入
-        messages.append({"role": "user", "content": prompt})
-        
-        print(f"🤖 Generating text with Nexa SDK...")
-        print(f"   Model: {model_id}")
-        print(f"   Auto-download: {'✅ Enabled' if auto_download else '❌ Disabled'}")
-        print(f"   Messages: {len(messages)} messages")
-        if not enable_thinking:
-            print(f"   🚫 Thinking disabled")
-        
-        try:
-            # 准备参数
-            params = {
-                "temperature": temperature,
-                "max_tokens": max_tokens,
-                "top_p": top_p,
-                "auto_download": auto_download,
-            }
-            
-            # 只在非零时添加 top_k 和 repetition_penalty
-            if top_k > 0:
-                params["top_k"] = top_k
-            if repetition_penalty > 1.0:
-                params["repetition_penalty"] = repetition_penalty
-            
-            # 调用 API
-            response = engine.chat_completion(
-                model=model_id,
-                messages=messages,
-                **params
-            )
-            
-            # 提取生成的文本
-            raw_output = response['choices'][0]['message']['content']
-            
-            # 提取思考内容
-            final_output, thinking = self._extract_thinking(raw_output, enable_thinking)
-            
-            # 清理输出：移除可能的角色前缀
-            final_output = final_output.strip()
-            for prefix in ["assistant:", "Assistant:", "ASSISTANT:"]:
-                if final_output.startswith(prefix):
-                    final_output = final_output[len(prefix):].strip()
-                    break
-            
-            if enable_thinking and thinking:
-                print(f"   💭 Thinking process extracted ({len(thinking)} chars)")
-            
-            print(f"   ✅ Generated {len(final_output)} characters")
-            
-            return (final_output, thinking)
-        
-        except Exception as e:
-            error_msg = f"❌ Generation failed: {str(e)}"
-            print(error_msg)
-            import traceback
-            traceback.print_exc()
-            return (error_msg, "")
+# RemoteTextGeneration 节点已移除
+# 请使用 unified_text_node.py 中的 TextGeneration 节点
+# RemoteAPIConfig 现在输出 TEXT_MODEL 类型，可以直接连接到 TextGeneration
 
 
 class NexaServiceStatus:
@@ -516,13 +315,11 @@ class NexaServiceStatus:
 
 # 节点注册
 NODE_CLASS_MAPPINGS = {
-    "NexaModelSelector": NexaModelSelector,
-    "NexaSDKTextGeneration": NexaSDKTextGeneration,
+    "RemoteAPIConfig": RemoteAPIConfig,
     "NexaServiceStatus": NexaServiceStatus,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "NexaModelSelector": "🌐 Remote API Config (Nexa/Ollama)",
-    "NexaSDKTextGeneration": "🌐 Text Generation (Remote)",
+    "RemoteAPIConfig": "🌐 Remote API Config (Nexa/Ollama)",
     "NexaServiceStatus": "📊 Service Status Check",
 }

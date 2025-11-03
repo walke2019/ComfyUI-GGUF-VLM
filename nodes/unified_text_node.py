@@ -8,6 +8,7 @@ import sys
 import re
 from pathlib import Path
 from typing import Tuple
+from comfy.comfy_types import IO
 
 # 添加父目录到路径
 module_path = Path(__file__).parent.parent
@@ -52,7 +53,7 @@ class LocalTextModelLoader:
                 }),
             },
             "optional": {
-                "system_prompt": ("STRING", {
+                "system_prompt": (IO.STRING, {
                     "default": "",
                     "multiline": True,
                     "tooltip": "系统提示词（可选）"
@@ -63,7 +64,7 @@ class LocalTextModelLoader:
     RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model_config",)
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-VLM/💬 Text Models/✨ Generate"
+    CATEGORY = "🤖 GGUF-VLM/💬 Text Models"
     
     def load_model(self, model, n_ctx=8192, device="Auto", system_prompt=""):
         """加载本地 GGUF 模型"""
@@ -163,7 +164,7 @@ class RemoteTextModelSelector:
                 }),
             },
             "optional": {
-                "system_prompt": ("STRING", {
+                "system_prompt": (IO.STRING, {
                     "default": "",
                     "multiline": True,
                     "tooltip": "系统提示词（可选）"
@@ -174,7 +175,7 @@ class RemoteTextModelSelector:
     RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model_config",)
     FUNCTION = "select_model"
-    CATEGORY = "🤖 GGUF-VLM/💬 Text Models/✨ Generate"
+    CATEGORY = "🤖 GGUF-VLM/💬 Text Models"
     
     def select_model(self, base_url, api_type, model, system_prompt=""):
         """选择远程 API 模型"""
@@ -268,7 +269,7 @@ class TextGeneration:
                     "tooltip": "模型配置（来自 Model Selector）"
                 }),
                 "max_tokens": ("INT", {
-                    "default": 256,
+                    "default": 512,
                     "min": 1,
                     "max": 8192,
                     "step": 1,
@@ -306,7 +307,7 @@ class TextGeneration:
                     "default": False,
                     "tooltip": "启用思考模式（支持 DeepSeek-R1, Qwen3-Thinking 等模型）"
                 }),
-                "prompt": ("STRING", {
+                "prompt": (IO.STRING, {
                     "default": "Hello, how are you?",
                     "multiline": True,
                     "tooltip": "输入提示词"
@@ -317,7 +318,7 @@ class TextGeneration:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("context", "thinking")
     FUNCTION = "generate"
-    CATEGORY = "🤖 GGUF-VLM/💬 Text Models/✨ Generate"
+    CATEGORY = "🤖 GGUF-VLM/💬 Text Models"
     OUTPUT_NODE = True
     
     @staticmethod

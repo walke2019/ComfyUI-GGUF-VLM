@@ -10,6 +10,7 @@ from pathlib import Path
 from PIL import Image
 from torchvision.transforms import ToPILImage
 import folder_paths
+from comfy.comfy_types import IO
 
 # 添加父目录到路径
 module_path = Path(__file__).parent.parent
@@ -22,6 +23,9 @@ try:
     from config.node_definitions import (
         SEED_INPUT,
         TEMPERATURE_INPUT,
+        TOP_P_INPUT,
+        TOP_K_INPUT,
+        REPETITION_PENALTY_INPUT,
         PROMPT_INPUT,
         SYSTEM_PROMPT_INPUT,
         TEXT_OUTPUT,
@@ -33,6 +37,9 @@ except ImportError:
     from ..config.node_definitions import (
         SEED_INPUT,
         TEMPERATURE_INPUT,
+        TOP_P_INPUT,
+        TOP_K_INPUT,
+        REPETITION_PENALTY_INPUT,
         PROMPT_INPUT,
         SYSTEM_PROMPT_INPUT,
         TEXT_OUTPUT,
@@ -41,7 +48,7 @@ except ImportError:
 
 
 class MultiImageAnalysis:
-    """多图像分析节点"""
+    """图像/视频分析节点（1 个视频 + 3 个图像输入）"""
     
     @classmethod
     def INPUT_TYPES(cls):
@@ -49,14 +56,11 @@ class MultiImageAnalysis:
             "required": merge_inputs(
                 {
                     "model_config": ("TRANSFORMERS_MODEL",),
-                },
-                PROMPT_INPUT,
-                TEMPERATURE_INPUT,
-                {
+                    "prompt": (IO.STRING, {"default": "Describe these images.", "multiline": False, "tooltip": "用户提示词"}),
                     "max_tokens": (
                         "INT",
                         {
-                            "default": 2048,
+                            "default": 512,
                             "min": 128,
                             "max": 256000,
                             "step": 1,
@@ -64,17 +68,19 @@ class MultiImageAnalysis:
                         }
                     ),
                 },
+                TEMPERATURE_INPUT,
+                TOP_P_INPUT,
+                TOP_K_INPUT,
+                REPETITION_PENALTY_INPUT,
                 SEED_INPUT
             ),
             "optional": {
-                "image_1": ("IMAGE",),
-                "image_2": ("IMAGE",),
-                "image_3": ("IMAGE",),
-                "image_4": ("IMAGE",),
-                "image_5": ("IMAGE",),
-                "image_6": ("IMAGE",),
+                "video": ("IMAGE", {"tooltip": "视频帧序列或单张图像"}),
+                "image_1": ("IMAGE", {"tooltip": "图像 1"}),
+                "image_2": ("IMAGE", {"tooltip": "图像 2"}),
+                "image_3": ("IMAGE", {"tooltip": "图像 3"}),
                 "system_prompt": (
-                    "STRING",
+                    IO.STRING,
                     {
                         "default": "",
                         "multiline": True,
@@ -87,25 +93,26 @@ class MultiImageAnalysis:
     RETURN_TYPES = TEXT_OUTPUT["types"]
     RETURN_NAMES = TEXT_OUTPUT["names"]
     FUNCTION = "analyze_images"
-    CATEGORY = "🤖 GGUF-VLM/🖼️ Vision Models/🔍 Analyze"
+    CATEGORY = "🤖 GGUF-VLM/🖼️ Vision Models"
     OUTPUT_NODE = True
     
     def analyze_images(
         self,
         model_config,
         prompt,
-        temperature,
         max_tokens,
+        temperature,
+        top_p,
+        top_k,
+        repetition_penalty,
         seed,
+        video=None,
         image_1=None,
         image_2=None,
         image_3=None,
-        image_4=None,
-        image_5=None,
-        image_6=None,
         system_prompt=""
     ):
-        """分析多张图像"""
+        """分析图像或视频（1 个视频 + 最多 3 个图像）"""
         
         # 获取引擎
         from .vision_node_transformers import VisionModelLoaderTransformers
@@ -118,22 +125,42 @@ class MultiImageAnalysis:
             if not success:
                 raise RuntimeError(f"Failed to load model: {model_config.get('model_name', 'unknown')}")
         
-        # 收集所有输入的图像
+        # 收集所有输入的图像/视频
         images = []
         temp_paths = []
         
-        for idx, image in enumerate([image_1, image_2, image_3, image_4, image_5, image_6], 1):
-            if image is not None:
-                pil_image = ToPILImage()(image[0].permute(2, 0, 1))
-                temp_path = Path(folder_paths.temp_directory) / f"multi_image_{seed}_{idx}.png"
-                pil_image.save(temp_path)
-                temp_paths.append(temp_path)
-                images.append(temp_path)
+        # 首先处理视频输入（如果有）
+        all_inputs = [video] if video is not None else []
+        # 然后添加其他图像输入
+        all_inputs.extend([image_1, image_2, image_3])
+        
+        for idx, image_tensor in enumerate(all_inputs, 1):
+            if image_tensor is not None:
+                # 检查是单帧图像还是视频帧序列
+                num_frames = image_tensor.shape[0]
+                
+                if num_frames == 1:
+                    # 单帧图像
+                    pil_image = ToPILImage()(image_tensor[0].permute(2, 0, 1))
+                    temp_path = Path(folder_paths.temp_directory) / f"multi_input_{seed}_{idx}.png"
+                    pil_image.save(temp_path)
+                    temp_paths.append(temp_path)
+                    images.append(temp_path)
+                    print(f"📸 Input {idx}: Single image")
+                else:
+                    # 视频帧序列：保存所有帧
+                    print(f"📹 Input {idx}: Video with {num_frames} frames")
+                    for frame_idx in range(num_frames):
+                        pil_image = ToPILImage()(image_tensor[frame_idx].permute(2, 0, 1))
+                        temp_path = Path(folder_paths.temp_directory) / f"multi_input_{seed}_{idx}_frame_{frame_idx:04d}.png"
+                        pil_image.save(temp_path)
+                        temp_paths.append(temp_path)
+                        images.append(temp_path)
         
         if not images:
-            raise ValueError("至少需要提供一张图像")
+            raise ValueError("至少需要提供一个图像或视频输入")
         
-        print(f"📸 Analyzing {len(images)} images")
+        print(f"📸 Analyzing {len(images)} inputs (images/videos)")
         
         # 构建消息（Qwen3-VL 格式）
         messages = []
@@ -177,9 +204,9 @@ class MultiImageAnalysis:
                 messages=messages,
                 temperature=temperature,
                 max_new_tokens=max_tokens,
-                top_p=0.8,
-                top_k=20,
-                repetition_penalty=1.0,
+                top_p=top_p,
+                top_k=top_k,
+                repetition_penalty=repetition_penalty,
                 seed=seed
             )
             
@@ -210,135 +237,11 @@ class MultiImageAnalysis:
             raise
 
 
-class MultiImageComparison:
-    """多图像对比节点（预设提示词）"""
-    
-    @classmethod
-    def INPUT_TYPES(cls):
-        return {
-            "required": {
-                "model_config": ("TRANSFORMERS_MODEL",),
-                "comparison_type": (
-                    [
-                        "similarities - 找出相似之处",
-                        "differences - 找出不同之处",
-                        "changes - 分析变化",
-                        "relationships - 分析关系",
-                        "sequence - 分析顺序",
-                        "quality - 质量对比",
-                        "style - 风格对比",
-                        "custom - 自定义",
-                    ],
-                    {
-                        "default": "similarities - 找出相似之处",
-                        "tooltip": "对比类型"
-                    }
-                ),
-                "custom_prompt": (
-                    "STRING",
-                    {
-                        "default": "",
-                        "multiline": True,
-                        "tooltip": "自定义提示词（当选择 custom 时使用）"
-                    }
-                ),
-                **TEMPERATURE_INPUT,
-                **{
-                    "max_tokens": (
-                        "INT",
-                        {
-                            "default": 2048,
-                            "min": 128,
-                            "max": 256000,
-                            "step": 1,
-                            "tooltip": "最大生成 token 数"
-                        }
-                    ),
-                },
-                **SEED_INPUT,
-            },
-            "optional": {
-                "image_1": ("IMAGE",),
-                "image_2": ("IMAGE",),
-                "image_3": ("IMAGE",),
-                "image_4": ("IMAGE",),
-                "image_5": ("IMAGE",),
-                "image_6": ("IMAGE",),
-            }
-        }
-    
-    RETURN_TYPES = TEXT_OUTPUT["types"]
-    RETURN_NAMES = TEXT_OUTPUT["names"]
-    FUNCTION = "compare_images"
-    CATEGORY = "🤖 GGUF-VLM/🖼️ Vision Models/🔍 Analyze"
-    OUTPUT_NODE = True
-    
-    # 预设提示词
-    COMPARISON_PROMPTS = {
-        "similarities": "Identify and describe the similarities between these images. Focus on common elements, themes, colors, compositions, and subjects.",
-        "differences": "Identify and describe the differences between these images. Focus on what makes each image unique.",
-        "changes": "Analyze the changes across these images. Describe what has changed from one image to the next.",
-        "relationships": "Analyze the relationships between these images. How do they relate to each other? What story do they tell together?",
-        "sequence": "Analyze these images as a sequence. Describe the progression or timeline they represent.",
-        "quality": "Compare the quality of these images. Analyze aspects like resolution, clarity, composition, lighting, and technical execution.",
-        "style": "Compare the artistic style of these images. Analyze the visual style, artistic techniques, and aesthetic choices.",
-    }
-    
-    def compare_images(
-        self,
-        model_config,
-        comparison_type,
-        custom_prompt,
-        temperature,
-        max_tokens,
-        seed,
-        image_1=None,
-        image_2=None,
-        image_3=None,
-        image_4=None,
-        image_5=None,
-        image_6=None
-    ):
-        """对比多张图像"""
-        
-        # 解析对比类型
-        comp_key = comparison_type.split(" - ")[0]
-        
-        # 确定提示词
-        if comp_key == "custom":
-            if not custom_prompt or not custom_prompt.strip():
-                raise ValueError("请提供自定义提示词")
-            prompt = custom_prompt.strip()
-        else:
-            prompt = self.COMPARISON_PROMPTS.get(comp_key, self.COMPARISON_PROMPTS["similarities"])
-        
-        print(f"🔍 Comparison type: {comparison_type}")
-        
-        # 使用 MultiImageAnalysis 的逻辑
-        analyzer = MultiImageAnalysis()
-        return analyzer.analyze_images(
-            model_config=model_config,
-            prompt=prompt,
-            temperature=temperature,
-            max_tokens=max_tokens,
-            seed=seed,
-            image_1=image_1,
-            image_2=image_2,
-            image_3=image_3,
-            image_4=image_4,
-            image_5=image_5,
-            image_6=image_6,
-            system_prompt=""
-        )
-
-
 # 导出节点
 NODE_CLASS_MAPPINGS = {
     "MultiImageAnalysis": MultiImageAnalysis,
-    "MultiImageComparison": MultiImageComparison,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "MultiImageAnalysis": "🖼️ Multi-Image Analysis",
-    "MultiImageComparison": "🖼️ Multi-Image Comparison",
+    "MultiImageAnalysis": "🖼️ Image/Video Analysis (Transformers)",
 }

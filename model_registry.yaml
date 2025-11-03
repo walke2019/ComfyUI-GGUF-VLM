@@ -3,29 +3,89 @@
 
 # 视觉语言模型 - Abliterated 版本
 vision_language_models:
-  qwen2.5-vl-nsfw:
-    series_name: Qwen2.5-VL NSFW
-    description: Qwen 2.5 视觉语言模型 NSFW 版本
+  qwen2.5-vl-abliterated:
+    series_name: Qwen2.5-VL Abliterated
+    description: Qwen 2.5 视觉语言模型 Abliterated 版本
     business_type: video_analysis
     models:
+    - model_name: Qwen2.5-VL-3B-Instruct-Abliterated
+      repo: mradermacher/Qwen2.5-VL-3B-Instruct-abliterated-GGUF
+      mmproj: mmproj-Qwen2.5-VL-3B-Instruct-Q8_0.gguf
+      mmproj_repo: ggml-org/Qwen2.5-VL-3B-Instruct-GGUF
+      description: 3B Abliterated 版本，轻量级无审查模型（使用官方 mmproj）
+      capabilities:
+      - image
+      - video
+      - abliterated
+      - uncensored
+      variants:
+      - name: Q8_0
+        file: Qwen2.5-VL-3B-Instruct-abliterated.Q8_0.gguf
+        size: 3.2GB
+        recommended: true
+    - model_name: Qwen2.5-VL-7B-Instruct-Abliterated
+      repo: mradermacher/Qwen2.5-VL-7B-Instruct-abliterated-GGUF
+      mmproj: mmproj-Qwen2.5-VL-7B-Instruct-Q8_0.gguf
+      mmproj_repo: ggml-org/Qwen2.5-VL-7B-Instruct-GGUF
+      description: 7B Abliterated 版本，强大的无审查模型（使用官方 mmproj）
+      capabilities:
+      - image
+      - video
+      - abliterated
+      - uncensored
+      variants:
+      - name: Q8_0
+        file: Qwen2.5-VL-7B-Instruct-abliterated.Q8_0.gguf
+        size: 7.5GB
+        recommended: true
+    - model_name: Qwen2.5-VL-7B-NSFW-Caption-V3-Abliterated
+      repo: mradermacher/Qwen2.5-VL-7B-NSFW-Caption-V3-abliterated-GGUF
+      mmproj: mmproj-Qwen2.5-VL-7B-Instruct-Q8_0.gguf
+      mmproj_repo: ggml-org/Qwen2.5-VL-7B-Instruct-GGUF
+      description: NSFW Caption V3 Abliterated 版本（使用官方 mmproj）
+      capabilities:
+      - image
+      - video
+      - nsfw
+      - caption
+      - abliterated
+      variants:
+      - name: Q8_0
+        file: Qwen2.5-VL-7B-NSFW-Caption-V3-abliterated.Q8_0.gguf
+        size: 7.5GB
+        recommended: true
+    - model_name: Qwen2.5-VL-7B-NSFW-Caption-V3-Abliterated-i1
+      repo: mradermacher/Qwen2.5-VL-7B-NSFW-Caption-V3-abliterated-i1-GGUF
+      mmproj: mmproj-Qwen2.5-VL-7B-Instruct-Q8_0.gguf
+      mmproj_repo: ggml-org/Qwen2.5-VL-7B-Instruct-GGUF
+      description: NSFW Caption V3 Abliterated i1 版本（重要性矩阵优化，使用官方 mmproj）
+      capabilities:
+      - image
+      - video
+      - nsfw
+      - caption
+      - abliterated
+      - imatrix
+      variants:
+      - name: Q6_K
+        file: Qwen2.5-VL-7B-NSFW-Caption-V3-abliterated.i1-Q6_K.gguf
+        size: 6.2GB
+        recommended: true
     - model_name: Qwen2.5-VL-7B-NSFW-Caption-V4
       repo: mradermacher/Qwen2.5-VL-7B-NSFW-Caption-V4-GGUF
-      mmproj: Qwen2.5-VL-7B-NSFW-Caption-V4.mmproj-f16.gguf
-      description: 专门用于图像和视频描述的 NSFW 版本
+      mmproj: mmproj-Qwen2.5-VL-7B-Instruct-Q8_0.gguf
+      mmproj_repo: ggml-org/Qwen2.5-VL-7B-Instruct-GGUF
+      description: NSFW Caption V4 最新版本（使用官方 mmproj）
       capabilities:
       - image
       - video
       - nsfw
       - caption
       variants:
-      - name: Q4_K_M
-        file: Qwen2.5-VL-7B-NSFW-Caption-V4.Q4_K_M.gguf
-        size: 4.36GB
-        recommended: true
       - name: Q8_0
         file: Qwen2.5-VL-7B-NSFW-Caption-V4.Q8_0.gguf
-        size: 7.55GB
-        recommended: false
+        size: 7.5GB
+        recommended: true
 
 # 文本生成模型 - Abliterated 系列
 text_generation_models:
@@ -104,8 +164,17 @@ video_analysis_models:
 # 匹配规则
 matching_rules:
   patterns:
-  - pattern: qwen2.5-vl-7b.*nsfw
-    series: qwen2.5-vl-nsfw
+  - pattern: qwen2.5-vl-3b.*abliterated
+    series: qwen2.5-vl-abliterated
+    model: Qwen2.5-VL-3B-Instruct-Abliterated
+  - pattern: qwen2.5-vl-7b.*instruct.*abliterated
+    series: qwen2.5-vl-abliterated
+    model: Qwen2.5-VL-7B-Instruct-Abliterated
+  - pattern: qwen2.5-vl-7b.*nsfw.*v3.*abliterated
+    series: qwen2.5-vl-abliterated
+    model: Qwen2.5-VL-7B-NSFW-Caption-V3-Abliterated
+  - pattern: qwen2.5-vl-7b.*nsfw.*v4
+    series: qwen2.5-vl-abliterated
     model: Qwen2.5-VL-7B-NSFW-Caption-V4
   - pattern: qwen2-vl-7b.*abliterated
     series: qwen2-vl-abliterated
@@ -113,15 +182,18 @@ matching_rules:
 
 # 元数据
 metadata:
-  version: 2.0.0
-  last_updated: '2025-10-29'
-  note: 'Only abliterated/uncensored/NSFW models included'
+  version: 2.1.0
+  last_updated: '2025-11-03'
+  note: 'Updated with latest abliterated/NSFW models from mradermacher'
   supported_business_types:
   - image_analysis
   - text_generation
   - video_analysis
   recommendations:
-    text_4b: Qwen3-4B-Abliterated (Q4_K_M)
-    text_8b: Qwen3-8B-Abliterated (Q4_K_M)
-    vision_nsfw: Qwen2.5-VL-7B-NSFW-Caption-V4 (Q4_K_M)
+    text_4b: Huihui-Qwen3-4B-Instruct-2507-abliterated (Q8_0)
+    text_8b: Huihui-Qwen3-8B-abliterated-v2 (Q8_0)
+    vision_3b: Qwen2.5-VL-3B-Instruct-abliterated (Q8_0)
+    vision_7b: Qwen2.5-VL-7B-Instruct-abliterated (Q8_0)
+    vision_nsfw_v4: Qwen2.5-VL-7B-NSFW-Caption-V4 (Q8_0)
+    vision_nsfw_v3: Qwen2.5-VL-7B-NSFW-Caption-V3-abliterated (Q8_0)
     video_abliterated: Qwen2-VL-7B-Instruct-Abliterated (Q4_K_M)

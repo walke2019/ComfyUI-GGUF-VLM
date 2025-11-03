@@ -61,9 +61,14 @@ except Exception as e:
     VISION_DISPLAY = {}
 
 # 导入文本生成节点（新架构：Local/Remote/Generation）
+# 注意：unified_text_node 中的 RemoteTextModelSelector 与 nexa_text_node 中的 RemoteAPIConfig 冲突
+# 只加载本地文本模型加载器，远程 API 使用 nexa_text_node
 try:
-    from .nodes.unified_text_node import NODE_CLASS_MAPPINGS as TEXT_NODES, NODE_DISPLAY_NAME_MAPPINGS as TEXT_DISPLAY
-    print("✅ Text generation nodes loaded (new architecture)")
+    from .nodes.unified_text_node import NODE_CLASS_MAPPINGS as TEXT_NODES_ALL, NODE_DISPLAY_NAME_MAPPINGS as TEXT_DISPLAY_ALL
+    # 只保留本地文本模型相关节点，移除远程 API 节点
+    TEXT_NODES = {k: v for k, v in TEXT_NODES_ALL.items() if k not in ["RemoteTextModelSelector"]}
+    TEXT_DISPLAY = {k: v for k, v in TEXT_DISPLAY_ALL.items() if k not in ["RemoteTextModelSelector"]}
+    print("✅ Text generation nodes loaded (local only)")
 except Exception as e:
     print(f"⚠️  Text generation nodes load failed: {e}")
     import traceback
@@ -132,6 +137,9 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **NEXA_DISPLAY,
 }
 
+# 注册 web 目录（前端扩展）
+WEB_DIRECTORY = "./web"
+
 print(f"📦 ComfyUI-GGUF-VLM loaded: {len(NODE_CLASS_MAPPINGS)} nodes available")
 print(f"   💬 Text Models: Text-to-Text generation (Qwen3, LLaMA3, etc.)")
 print(f"   🖼️ Vision Models: Image-Text-to-Text analysis (Qwen2.5-VL, LLaVA, etc.)")
@@ -140,5 +148,6 @@ print(f"")
 print(f"   🔹 Local: GGUF models via llama-cpp-python")
 print(f"   🔹 Remote: API services (Nexa/Ollama)")
 print(f"   🔹 Transformers: HuggingFace models")
+print(f"   🎨 Frontend: Web extensions loaded from {WEB_DIRECTORY}")
 
-__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS']
+__all__ = ['NODE_CLASS_MAPPINGS', 'NODE_DISPLAY_NAME_MAPPINGS', 'WEB_DIRECTORY']

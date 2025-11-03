@@ -15,12 +15,33 @@ module_path = Path(__file__).parent.parent.parent
 if str(module_path) not in sys.path:
     sys.path.insert(0, str(module_path))
 
+# 导入配置和工具（ComfyUI 环境兼容）
 try:
+    # 方式1: 尝试从当前包导入
     from config.paths import PathConfig
     from utils.download_manager import get_download_manager
 except ImportError:
-    from ...config.paths import PathConfig
-    from ...utils.download_manager import get_download_manager
+    try:
+        # 方式2: 尝试相对导入
+        from ...config.paths import PathConfig
+        from ...utils.download_manager import get_download_manager
+    except (ImportError, ValueError):
+        # 方式3: 动态导入（最可靠）
+        import importlib.util
+        
+        # 导入 PathConfig
+        paths_file = module_path / 'config' / 'paths.py'
+        spec = importlib.util.spec_from_file_location('config.paths', paths_file)
+        paths_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(paths_module)
+        PathConfig = paths_module.PathConfig
+        
+        # 导入 get_download_manager
+        dm_file = module_path / 'utils' / 'download_manager.py'
+        spec = importlib.util.spec_from_file_location('utils.download_manager', dm_file)
+        dm_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(dm_module)
+        get_download_manager = dm_module.get_download_manager
 
 
 class TransformersInferenceEngine:
@@ -228,44 +249,70 @@ class TransformersInferenceEngine:
                     torch.cuda.manual_seed_all(seed)
             
             with torch.no_grad():
-                # 使用新的 API：processor.apply_chat_template
-                # 不再需要 process_vision_info
-                inputs = self.processor.apply_chat_template(
+                # 使用 1038lab/ComfyUI-QwenVL 的方式：先生成文本提示，再处理图像
+                # Step 1: 生成文本提示（不 tokenize）
+                text_prompt = self.processor.apply_chat_template(
                     messages,
-                    tokenize=True,
-                    add_generation_prompt=True,
-                    return_dict=True,
+                    tokenize=False,
+                    add_generation_prompt=True
+                )
+                
+                # Step 2: 提取图像
+                pil_images = []
+                for msg in messages:
+                    if isinstance(msg.get('content'), list):
+                        for item in msg['content']:
+                            if item.get('type') == 'image':
+                                # 图像已经是 PIL Image 或路径
+                                from PIL import Image
+                                img = item.get('image')
+                                if isinstance(img, str):
+                                    pil_images.append(Image.open(img))
+                                elif isinstance(img, Image.Image):
+                                    pil_images.append(img)
+                
+                # Step 3: 使用 processor 处理文本和图像
+                inputs = self.processor(
+                    text=text_prompt,
+                    images=pil_images if pil_images else None,
                     return_tensors="pt"
                 )
                 
-                inputs = inputs.to(self.model.device)
+                # 移动到设备
+                model_inputs = {k: v.to(self.model.device) for k, v in inputs.items() if torch.is_tensor(v)}
                 
-                # 生成参数（遵循 Qwen3-VL 推荐）
+                # 生成参数（遵循 1038lab/ComfyUI-QwenVL 的方式）
+                stop_tokens = [self.processor.tokenizer.eos_token_id]
+                if hasattr(self.processor.tokenizer, 'eot_id'):
+                    stop_tokens.append(self.processor.tokenizer.eot_id)
+                
                 generation_config = {
                     "max_new_tokens": max_new_tokens,
-                    "temperature": temperature,
-                    "top_p": top_p,
-                    "top_k": top_k,
                     "repetition_penalty": repetition_penalty,
+                    "eos_token_id": stop_tokens,
+                    "pad_token_id": self.processor.tokenizer.pad_token_id,
                     "do_sample": temperature > 0,
+                    "temperature": temperature if temperature > 0 else None,
+                    "top_p": top_p if temperature > 0 else None,
+                    "top_k": top_k if temperature > 0 else None,
                 }
                 
+                # 移除 None 值
+                generation_config = {k: v for k, v in generation_config.items() if v is not None}
+                
+                print(f"🔍 Inference config: temp={temperature}, max_tokens={max_new_tokens}, top_p={top_p}, rep_penalty={repetition_penalty}")
+                
                 # 生成
-                generated_ids = self.model.generate(**inputs, **generation_config)
+                generated_ids = self.model.generate(**model_inputs, **generation_config)
                 
-                # 解码
-                generated_ids_trimmed = [
-                    out_ids[len(in_ids):]
-                    for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
-                ]
-                
-                result = self.processor.batch_decode(
-                    generated_ids_trimmed,
-                    skip_special_tokens=True,
-                    clean_up_tokenization_spaces=False,
+                # 解码（只解码新生成的 tokens）
+                input_ids_len = model_inputs["input_ids"].shape[1]
+                generated_text = self.processor.tokenizer.decode(
+                    generated_ids[0, input_ids_len:],
+                    skip_special_tokens=True
                 )
                 
-                return result[0] if result else ""
+                return generated_text.strip()
                 
         except Exception as e:
             print(f"❌ Inference failed: {e}")

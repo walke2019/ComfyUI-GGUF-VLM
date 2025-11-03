@@ -9,6 +9,7 @@ from .device_optimizer import DeviceOptimizer
 from .mmproj_finder import MMProjFinder
 from .mmproj_validator import MMProjValidator
 from .system_prompts import SystemPromptsManager
+from .download_manager import DownloadManager, get_download_manager
 
 __all__ = [
     'FileDownloader', 
@@ -18,4 +19,6 @@ __all__ = [
     'MMProjFinder',
     'MMProjValidator',
     'SystemPromptsManager',
+    'DownloadManager',
+    'get_download_manager',
 ]

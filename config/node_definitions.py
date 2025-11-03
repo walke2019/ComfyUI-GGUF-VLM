@@ -62,16 +62,16 @@ TOP_K_INPUT = {
     )
 }
 
-# Repetition penalty 参数（Qwen3-VL 推荐）
+# Repetition penalty 参数（1038lab/ComfyUI-QwenVL 推荐 1.2）
 REPETITION_PENALTY_INPUT = {
     "repetition_penalty": (
         "FLOAT",
         {
-            "default": 1.0,
+            "default": 1.2,
             "min": 1.0,
             "max": 2.0,
             "step": 0.05,
-            "tooltip": "重复惩罚（Qwen3-VL 推荐: 1.0）"
+            "tooltip": "重复惩罚（推荐: 1.2，防止重复生成）"
         }
     )
 }

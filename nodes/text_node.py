@@ -5,6 +5,7 @@ Text Generation Node - 文本生成节点
 import os
 import sys
 from pathlib import Path
+from comfy.comfy_types import IO
 
 # 添加父目录到路径
 module_path = Path(__file__).parent.parent
@@ -108,7 +109,7 @@ class TextModelLoader:
                 }),
             },
             "optional": {
-                "system_prompt": ("STRING", {
+                "system_prompt": (IO.STRING, {
                     "default": "",
                     "multiline": True,
                     "tooltip": "系统提示词（可选）"
@@ -119,7 +120,7 @@ class TextModelLoader:
     RETURN_TYPES = ("TEXT_MODEL",)
     RETURN_NAMES = ("model",)
     FUNCTION = "load_model"
-    CATEGORY = "🤖 GGUF-VLM/💬 Text Models/📥 Load Model"
+    CATEGORY = "🤖 GGUF-VLM/💬 Text Models"
     
     def load_model(self, model, n_ctx=8192, device="Auto", system_prompt=""):
         """加载文本模型"""
@@ -258,7 +259,7 @@ class TextGenerationNode:
                     "default": False,
                     "tooltip": "启用思考模式（支持 DeepSeek-R1, Qwen3-Thinking 等模型）"
                 }),
-                "prompt": ("STRING", {
+                "prompt": (IO.STRING, {
                     "default": "Hello, how are you?",
                     "multiline": True,
                     "tooltip": "输入提示词"
@@ -269,7 +270,7 @@ class TextGenerationNode:
     RETURN_TYPES = ("STRING", "STRING")
     RETURN_NAMES = ("context", "thinking")
     FUNCTION = "generate"
-    CATEGORY = "🤖 GGUF-VLM/💬 Text Models/✨ Generate"
+    CATEGORY = "🤖 GGUF-VLM/💬 Text Models"
     OUTPUT_NODE = True
     
     @staticmethod
