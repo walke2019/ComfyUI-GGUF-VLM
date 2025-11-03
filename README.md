@@ -22,6 +22,9 @@ Complete GGUF model support for ComfyUI with local and Nexa SDK inference modes.
 - ✅ **Thinking mode support** - DeepSeek-R1, Qwen3-Thinking
 - ✅ **Multi-image analysis** - Compare up to 6 images simultaneously
 - ✅ **Device optimization** - CUDA, MPS, CPU with auto-detection
+- ✅ **Frontend extensions** - ComfyUI web interface enhancements (v2.3.0)
+- ✅ **Unified API engine** - Support for Nexa SDK, Ollama, OpenAI-compatible APIs
+- ✅ **Node definitions** - Standardized parameter definitions across all nodes
 
 ## 🤖 Supported Models
 
@@ -154,7 +157,7 @@ Load GGUF models from `/workspace/ComfyUI/models/LLM/GGUF/`
 
 **Parameters:**
 - `model`: Select from available GGUF files
-- `device`: cuda/cpu/mps
+- `device`: cuda/cpu/mps (Auto-detection available)
 - `n_ctx`: Context window (default: 8192)
 - `n_gpu_layers`: GPU layers (-1 for all)
 
@@ -164,13 +167,13 @@ Load GGUF models from `/workspace/ComfyUI/models/LLM/GGUF/`
 #### 🔷 Text Generation
 Generate text with loaded GGUF model
 
-**Parameters:**
+**Parameters (Qwen3-VL Optimized):**
 - `model`: From Text Model Loader
-- `max_tokens`: Maximum tokens (1-8192, **recommended: 256**)
-- `temperature`: Temperature (0.0-2.0)
-- `top_p`: Top-p sampling (0.0-1.0)
-- `top_k`: Top-k sampling (0-100)
-- `repetition_penalty`: Repetition penalty (1.0-2.0)
+- `max_tokens`: Maximum tokens (1-32768, **recommended: 256-512**)
+- `temperature`: Temperature (0.0-2.0, **default: 0.7**)
+- `top_p`: Top-p sampling (0.0-1.0, **default: 0.8**)
+- `top_k`: Top-k sampling (0-100, **default: 20**)
+- `repetition_penalty`: Repetition penalty (1.0-2.0, **default: 1.2**)
 - `enable_thinking`: Enable thinking mode
 - `prompt`: Input prompt (**at bottom for easy editing**)
 
@@ -182,16 +185,22 @@ Generate text with loaded GGUF model
 - ✅ Stop sequences: `["User:", "System:", "\n\n\n", "\n\n##", "\n\nNote:", "\n\nThis "]`
 - ✅ Automatic paragraph merging for single-paragraph prompts
 - ✅ Detailed console logging
+- ✅ Standardized parameters via `config/node_definitions.py`
 
 ### Nexa SDK Nodes
 
-#### 🔷 Nexa Model Selector
-Configure Nexa SDK service
+#### 🔷 Nexa Model Selector (with Frontend Extension)
+Configure Nexa SDK service with dynamic model refresh
 
 **Parameters:**
 - `base_url`: Service URL (default: `http://127.0.0.1:11434`)
 - `refresh_models`: Refresh model list
 - `system_prompt`: System prompt (optional)
+
+**Frontend Features (v2.3.0):**
+- 🔄 **Refresh Models Button** - Click to update model list in real-time
+- 📡 **API Integration** - Fetches models from `/api/tags` endpoint
+- ⚡ **Dynamic Updates** - No need to restart ComfyUI
 
 **Output:**
 - `model_config`: Configuration for Text Generation
@@ -346,6 +355,38 @@ find ~/.cache/nexa.ai/nexa_sdk/models -name "*.lock" -delete
 nexa list
 ```
 
+## 🏗️ Architecture Highlights (v2.3.0)
+
+### Unified Node Definitions
+All nodes now use standardized parameter definitions from `config/node_definitions.py`:
+
+- **Consistent defaults** - Qwen3-VL optimized values across all nodes
+- **Reusable templates** - `TEMPERATURE_INPUT`, `TOP_P_INPUT`, `TOP_K_INPUT`, etc.
+- **Easy maintenance** - Change once, apply everywhere
+- **Type safety** - Centralized parameter validation
+
+### Unified API Engine
+`core/inference/unified_api_engine.py` provides a single interface for:
+
+- **Nexa SDK** - `http://127.0.0.1:11434`
+- **Ollama** - Compatible API format
+- **OpenAI** - Compatible API format
+- **Custom APIs** - Any OpenAI-compatible endpoint
+
+### Frontend Extensions
+`web/remote_api_config.js` enhances ComfyUI interface:
+
+- **Dynamic model refresh** - Real-time updates without restart
+- **API integration** - Direct communication with backend services
+- **User-friendly** - One-click model list updates
+
+### Cache Management
+`core/cache_manager.py` optimizes memory usage:
+
+- **Smart caching** - Keep frequently used models in memory
+- **Memory monitoring** - Automatic cleanup when needed
+- **Performance** - Faster model switching
+
 ## 📁 Directory Structure
 
 ```
@@ -354,24 +395,53 @@ ComfyUI-GGUF-VLM/
 ├── requirements.txt                # Dependencies
 ├── __init__.py                     # Node registration
 ├── config/
-│   └── paths.py                    # Path configuration
+│   ├── paths.py                    # Path configuration
+│   └── node_definitions.py         # Unified node parameter definitions
 ├── core/
 │   ├── inference_engine.py        # GGUF inference engine
 │   ├── model_loader.py            # Model loader
+│   ├── cache_manager.py           # Model cache management
 │   └── inference/
 │       ├── nexa_engine.py         # Nexa SDK engine
-│       └── transformers_engine.py # Transformers engine
+│       ├── transformers_engine.py # Transformers engine
+│       └── unified_api_engine.py  # Unified API engine (Nexa/Ollama/OpenAI)
 ├── nodes/
-│   ├── text_node.py               # Text Generation nodes
+│   ├── text_node.py               # Text Generation nodes (local GGUF)
+│   ├── unified_text_node.py       # Unified text generation nodes
 │   ├── nexa_text_node.py          # Nexa SDK nodes
-│   ├── vision_node.py             # Vision nodes
+│   ├── vision_node.py             # Vision nodes (GGUF)
+│   ├── vision_node_transformers.py # Vision nodes (Transformers)
+│   ├── multi_image_node.py        # Multi-image analysis nodes
 │   └── system_prompt_node.py      # System prompt config
-└── utils/
-    ├── device_optimizer.py        # Device optimization
-    └── system_prompts.py          # System prompt presets
+├── utils/
+│   ├── device_optimizer.py        # Device optimization
+│   ├── system_prompts.py          # System prompt presets
+│   ├── downloader.py              # Model downloader
+│   ├── validator.py               # Model validator
+│   ├── registry.py                # Model registry manager
+│   └── download_manager.py        # Download manager
+└── web/
+    └── remote_api_config.js        # Frontend extension for API config
 ```
 
 ## 🔄 Recent Updates
+
+### v2.3.0 (2025-11-04) - Latest
+- ✅ **Frontend extensions** - ComfyUI web interface enhancements
+  - `web/remote_api_config.js` - Dynamic model refresh button for RemoteAPIConfig node
+  - Real-time model list updates from API services
+- ✅ **Unified API engine** - `core/inference/unified_api_engine.py`
+  - Support for Nexa SDK, Ollama, OpenAI-compatible APIs
+  - Unified interface for multiple API backends
+- ✅ **Standardized node definitions** - `config/node_definitions.py`
+  - Consistent parameter definitions across all nodes
+  - Qwen3-VL optimized defaults (temperature=0.7, top_p=0.8, top_k=20)
+  - Reusable parameter templates
+- ✅ **Enhanced cache management** - `core/cache_manager.py`
+  - Improved model caching and memory management
+- ✅ **Unified text nodes** - `nodes/unified_text_node.py`
+  - Consolidated text generation interface
+  - Local and remote model support
 
 ### v2.2 (2025-10-29)
 - ✅ **Simplified Nexa Model Selector** - Removed unused `models_dir` and `model_source`
@@ -402,6 +472,8 @@ Pillow>=9.0.0
 requests>=2.25.0
 nexaai  # Optional, for Nexa SDK mode
 ```
+
+**Note:** All dependencies are automatically installed via `requirements.txt` during setup.
 
 ## 🤝 Contributing
 
