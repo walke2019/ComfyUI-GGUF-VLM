@@ -1,17 +1,28 @@
 [project]
-name = "comfyui-qwen2_5-vl-gguf"
-description = "ComfyUI nodes for running GGUF quantized Qwen2.5-VL models using llama.cpp"
-version = "1.0.0"
+name = "comfyui-gguf-vlm"
+description = "ComfyUI multi-modal inference plugin focused on Qwen-VL models with GGUF, Transformers, and Ollama support"
+version = "2.3.0"
 license = {text = "MIT"}
 dependencies = [
     "llama-cpp-python>=0.2.0",
+    "transformers>=4.30.0",
+    "torch>=2.0.0",
     "Pillow>=9.0.0",
-    "numpy>=1.20.0"
+    "numpy>=1.20.0",
+    "requests>=2.25.0",
+    "pyyaml>=6.0.0",
+    "huggingface-hub>=0.16.0"
 ]
+
+[project.optional-dependencies]
+nexa = ["nexaai"]
 
 [project.urls]
 Repository = "https://github.com/walke2019/ComfyUI-GGUF-VLM"
+Issues = "https://github.com/walke2019/ComfyUI-GGUF-VLM/issues"
 
 [tool.comfy]
-DisplayName = "Qwen2.5-VL GGUF Nodes"
+DisplayName = "GGUF-VLM: Qwen-VL & Multi-Backend"
+PublisherId = "walke2019"
+Icon = ""
 
