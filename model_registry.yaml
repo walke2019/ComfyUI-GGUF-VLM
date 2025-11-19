@@ -179,6 +179,15 @@ matching_rules:
   - pattern: qwen2-vl-7b.*abliterated
     series: qwen2-vl-abliterated
     model: Qwen2-VL-7B-Instruct-Abliterated
+  - pattern: gemma.*3.*4b.*abliterated
+    series: abliterated
+    model: Gemma-3-4B-Abliterated
+  - pattern: huihui.*qwen3.*8b.*abliterated
+    series: abliterated
+    model: Huihui-Qwen3-8B-Abliterated-v2
+  - pattern: huihui.*qwen3.*4b.*abliterated
+    series: abliterated
+    model: Huihui-Qwen3-4B-Instruct-2507-Abliterated
 
 # 元数据
 metadata:

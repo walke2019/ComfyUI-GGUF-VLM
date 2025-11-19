@@ -3,6 +3,7 @@ Vision Language Node - 视觉语言模型节点
 """
 
 import os
+import platform
 import sys
 import uuid
 import numpy as np
@@ -220,9 +221,23 @@ class VisionModelLoader:
             model = re.sub(r'^✓\s*', '', model)
         
         # 查找模型路径
+        print(f"🔍 Searching for model: {model}")
         model_path = loader.find_model(model)
         if not model_path:
-            raise FileNotFoundError(f"Model not found: {model}")
+            # 提供更详细的错误信息
+            available_models = loader.list_models()
+            error_msg = f"❌ Model not found: {model}\n\n"
+            error_msg += f"📁 Searched in directories:\n"
+            for dir_path in loader.model_dirs:
+                error_msg += f"   - {dir_path}\n"
+            error_msg += f"\n💡 Available models ({len(available_models)}):\n"
+            for i, m in enumerate(available_models[:10], 1):
+                error_msg += f"   {i}. {m}\n"
+            if len(available_models) > 10:
+                error_msg += f"   ... and {len(available_models) - 10} more\n"
+            raise FileNotFoundError(error_msg)
+        
+        print(f"✅ Found model at: {model_path}")
         
         # 查找 mmproj 文件
         mmproj_path = None
@@ -479,9 +494,25 @@ class VisionLanguageNode:
             
             # 添加图像/视频帧
             for img_path in image_paths:
+                # 1. 确保路径有效（非空且文件存在）
+                if not img_path or not os.path.exists(img_path):
+                    raise FileNotFoundError(f"无效的图像路径：{img_path}")
+                
+                # 2. 自动判断系统类型，适配路径格式
+                if platform.system() == "Windows":
+                    # Windows 系统：转换为绝对路径 + 替换为 / 分隔符 + 拼接 file:// 协议
+                    abs_path = os.path.abspath(img_path)
+                    # 处理盘符（如 C:\ → /C:/），避免 file://C:/ 格式错误
+                    img_url = f"file:///{abs_path.replace(os.sep, '/')}"
+                else:
+                    # Linux/Mac 系统：直接使用绝对路径（天然 / 分隔符）
+                    abs_path = os.path.abspath(img_path)
+                    img_url = f"file://{abs_path}"
+                
+                # 3. 构建图像内容（与原有逻辑兼容）
                 content.append({
                     "type": "image_url",
-                    "image_url": {"url": f"file://{img_path}"}
+                    "image_url": {"url": img_url}
                 })
             
             # 添加用户提示词

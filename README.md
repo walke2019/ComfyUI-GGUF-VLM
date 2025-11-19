@@ -98,6 +98,13 @@ pip install nexaai
 - **Vision Analysis** - 单图分析
 - **Multi-Image Analysis** - 多图对比分析
 
+### 🆕 工具节点
+- **Memory Manager (GGUF)** - 显存/内存管理工具
+  - 清理已加载的模型
+  - 强制垃圾回收
+  - 清理GPU缓存
+  - 显示显存使用情况
+
 ### 工具节点
 - **System Prompt Config** - 系统提示词配置
 - **Model Manager** - 模型管理器
@@ -122,7 +129,15 @@ ComfyUI-GGUF-VLM/
 
 ## 🔄 更新日志
 
-### v2.3.0 (当前版本)
+### v1.1.0 (2025-11-19) - 社区贡献版
+- ✅ **Windows路径修复** - 采纳 @niceqwer55555 的改进方案
+- ✅ **显存管理** - 新增Memory Manager节点
+- ✅ **Qwen3模型支持** - 改进模型过滤逻辑
+- ✅ **Gemma3支持** - 添加Gemma3模型匹配规则
+- ✅ **错误处理增强** - 更详细的调试信息
+- 📖 详见 [CHANGELOG.md](CHANGELOG.md) 和 [COMMUNITY_CONTRIBUTIONS.md](COMMUNITY_CONTRIBUTIONS.md)
+
+### v2.3.0
 - ✅ 前端扩展 - 动态模型刷新
 - ✅ 统一 API 引擎 - 支持多种 API 后端
 - ✅ 标准化节点定义 - 统一参数配置
@@ -135,6 +150,24 @@ ComfyUI-GGUF-VLM/
 - transformers (Transformers 推理)
 - torch (深度学习框架)
 - nexaai (可选,用于 Nexa SDK)
+
+## 🤝 社区贡献
+
+感谢所有为项目做出贡献的开发者！
+
+### 最近采纳的贡献
+- [@niceqwer55555](https://github.com/niceqwer55555) - Windows路径修复、显存管理建议
+- [@youforgetsomething](https://github.com/youforgetsomething) - Qwen3模型过滤问题反馈
+- [@huansizhiying](https://github.com/huansizhiying) - Gemma3支持请求
+- [@LiangWei88](https://github.com/LiangWei88) - 错误处理改进建议
+
+📖 查看完整贡献记录: [COMMUNITY_CONTRIBUTIONS.md](COMMUNITY_CONTRIBUTIONS.md)
+
+### 如何贡献
+1. 在GitHub上创建Issue描述问题或建议
+2. 提供代码示例或修复方案（如果可能）
+3. 我们会审查并采纳有价值的贡献
+4. 采纳后会在文档中记录并致谢
 
 ## 📄 许可证
 

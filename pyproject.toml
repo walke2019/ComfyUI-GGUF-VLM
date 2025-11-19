@@ -1,7 +1,7 @@
 [project]
 name = "ComfyUI-GGUF-VLM"
 description = "ComfyUI multi-modal inference plugin focused on Qwen-VL models with GGUF, Transformers, and Ollama support"
-version = "1.0.0"
+version = "1.1.0"
 license = { file = "LICENSE" }
 
 [project.urls]

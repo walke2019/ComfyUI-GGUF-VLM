@@ -31,7 +31,18 @@ class InferenceEngine:
             
             # 检查是否已加载
             if model_path in self.loaded_models:
+                print(f"ℹ️ Model already loaded: {model_path}")
                 return True
+            
+            # 验证模型文件存在
+            import os
+            if not os.path.exists(model_path):
+                print(f"❌ Model file not found: {model_path}")
+                return False
+            
+            # 检查文件大小
+            file_size = os.path.getsize(model_path) / (1024**3)  # GB
+            print(f"📊 Model file size: {file_size:.2f} GB")
             
             # 加载模型
             n_ctx = kwargs.get('n_ctx', 8192)
@@ -41,8 +52,22 @@ class InferenceEngine:
             # 检查是否是视觉模型
             mmproj_path = kwargs.get('mmproj_path')
             
+            print(f"🔧 Loading parameters:")
+            print(f"   - n_ctx: {n_ctx}")
+            print(f"   - n_gpu_layers: {n_gpu_layers}")
+            print(f"   - verbose: {verbose}")
+            
             if mmproj_path:
+                # 验证mmproj文件存在
+                if not os.path.exists(mmproj_path):
+                    print(f"❌ mmproj file not found: {mmproj_path}")
+                    return False
+                
+                mmproj_size = os.path.getsize(mmproj_path) / (1024**2)  # MB
+                print(f"   - mmproj: {mmproj_path} ({mmproj_size:.2f} MB)")
+                
                 # 视觉语言模型
+                print("🔄 Loading vision model with mmproj...")
                 chat_handler = Llava15ChatHandler(clip_model_path=mmproj_path, verbose=verbose)
                 llm = Llama(
                     model_path=model_path,
@@ -54,6 +79,7 @@ class InferenceEngine:
                 )
             else:
                 # 纯文本模型
+                print("🔄 Loading text model...")
                 llm = Llama(
                     model_path=model_path,
                     n_ctx=n_ctx,
@@ -62,10 +88,24 @@ class InferenceEngine:
                 )
             
             self.loaded_models[model_path] = llm
+            print(f"✅ Model loaded successfully: {os.path.basename(model_path)}")
             return True
             
+        except FileNotFoundError as e:
+            print(f"❌ File not found error: {e}")
+            print(f"   Model path: {model_path}")
+            if mmproj_path:
+                print(f"   mmproj path: {mmproj_path}")
+            return False
+        except ImportError as e:
+            print(f"❌ Import error: {e}")
+            print("   Make sure llama-cpp-python is installed correctly")
+            return False
         except Exception as e:
-            print(f"❌ Failed to load model {model_path}: {e}")
+            print(f"❌ Failed to load model: {e}")
+            print(f"   Model path: {model_path}")
+            import traceback
+            print(f"   Traceback:\n{traceback.format_exc()}")
             return False
     
     def unload_model(self, model_path: str):
@@ -187,5 +227,26 @@ class InferenceEngine:
     
     def clear_all(self):
         """清除所有已加载的模型"""
+        # 显式删除模型对象以释放内存
+        for model_path in list(self.loaded_models.keys()):
+            try:
+                del self.loaded_models[model_path]
+            except:
+                pass
+        
         self.loaded_models.clear()
         self.model_contexts.clear()
+        
+        # 强制垃圾回收
+        import gc
+        gc.collect()
+        
+        # 如果使用CUDA，清理GPU缓存
+        try:
+            import torch
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                torch.cuda.synchronize()
+                print("✅ GPU cache cleared")
+        except ImportError:
+            pass

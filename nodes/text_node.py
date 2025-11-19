@@ -59,25 +59,46 @@ class TextModelLoader:
         # 过滤本地模型：只显示文本生成类型的模型
         local_models = []
         
-        # 视觉模型关键词列表（用于排除）
+        # 视觉模型关键词列表（用于排除）- 使用更精确的匹配
         vision_keywords = [
-            'llava', 'vision', 'vl', 'multimodal', 'mm', 
-            'clip', 'qwen-vl', 'qwen2-vl', 'minicpm-v',
-            'phi-3-vision', 'internvl', 'cogvlm'
+            'llava', 'vision', 'multimodal', 'mm', 
+            'clip', 'minicpm-v', 'phi-3-vision', 
+            'internvl', 'cogvlm', 'mmproj'
+        ]
+        
+        # 特定的视觉模型模式（更精确的匹配）
+        vision_patterns = [
+            'qwen-vl', 'qwen2-vl', 'qwen2.5-vl', 'qwen3-vl',  # Qwen VL系列
+            '-vl-', '_vl_', '.vl.',  # 通用VL模式
         ]
         
         for model_file in all_local_models:
-            # 检查文件名是否包含视觉模型关键词
             model_lower = model_file.lower()
-            is_vision_model = any(keyword in model_lower for keyword in vision_keywords)
             
-            if is_vision_model:
-                continue  # 跳过视觉模型
-            
-            # 检查 registry 中的模型信息
+            # 首先检查registry信息（最准确）
             model_info = registry.find_model_by_filename(model_file)
-            # 如果找到模型信息且是文本生成类型，或者找不到信息（未知模型，保留）
-            if model_info is None or model_info.get('business_type') == 'text_generation':
+            if model_info:
+                business_type = model_info.get('business_type')
+                if business_type == 'text_generation':
+                    local_models.append(model_file)
+                    continue
+                elif business_type in ['image_analysis', 'video_analysis']:
+                    continue  # 跳过视觉模型
+            
+            # 如果registry中没有信息，使用关键词过滤
+            # 检查是否匹配视觉模型模式
+            is_vision_model = False
+            for pattern in vision_patterns:
+                if pattern in model_lower:
+                    is_vision_model = True
+                    break
+            
+            if not is_vision_model:
+                # 检查通用视觉关键词
+                is_vision_model = any(keyword in model_lower for keyword in vision_keywords)
+            
+            if not is_vision_model:
+                # 不是视觉模型，添加到列表
                 local_models.append(model_file)
         
         # 获取可下载的文本模型（传递 loader 以检查下载状态）
