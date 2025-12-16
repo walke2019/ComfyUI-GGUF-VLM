@@ -17,26 +17,25 @@ module_path = Path(__file__).parent.parent
 if str(module_path) not in sys.path:
     sys.path.insert(0, str(module_path))
 
+# 使用相对导入
+from ..core.model_loader import ModelLoader
+from ..core.inference_engine import InferenceEngine
+from ..core.cache_manager import CacheManager
+from ..utils.registry import RegistryManager
+from ..utils.downloader import FileDownloader
+from ..models.vision_models import VisionModelConfig, VisionModelPresets
+from ..utils.device_optimizer import DeviceOptimizer
+
+# 可选导入
 try:
-    from core.model_loader import ModelLoader
-    from core.inference_engine import InferenceEngine
-    from core.cache_manager import CacheManager
-    from utils.registry import RegistryManager
-    from utils.downloader import FileDownloader
-    from models.vision_models import VisionModelConfig, VisionModelPresets
-    from utils.device_optimizer import DeviceOptimizer
-    from utils.mmproj_validator import MMProjValidator
-except ImportError as e:
-    print(f"[ComfyUI-GGUF-VLM] Import error in vision_node: {e}")
-    # 尝试相对导入
-    from ..core.model_loader import ModelLoader
-    from ..core.inference_engine import InferenceEngine
-    from ..core.cache_manager import CacheManager
-    from ..utils.registry import RegistryManager
-    from ..utils.downloader import FileDownloader
-    from ..models.vision_models import VisionModelConfig, VisionModelPresets
-    from ..utils.device_optimizer import DeviceOptimizer
+    from ..utils.mmproj_validator import MMProjValidator
+except ImportError:
+    MMProjValidator = None
+
+try:
     from ..utils.mmproj_finder import MMProjFinder
+except ImportError:
+    MMProjFinder = None
 
 
 class VisionModelLoader:
@@ -101,9 +100,9 @@ class VisionModelLoader:
         
         return {
             "required": {
-                "model": (categorized_models, {
-                    "default": categorized_models[0] if categorized_models else "No models found",
-                    "tooltip": "选择视觉语言模型（按类型分组）"
+                # 使用空元组表示动态列表，由前端 JavaScript 控制
+                "model": ((), {
+                    "tooltip": "选择视觉语言模型（点击 🔄 Refresh Models 按钮更新列表）"
                 }),
                 "n_ctx": ("INT", {
                     "default": 8192,

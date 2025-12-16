@@ -124,12 +124,14 @@ class RemoteTextModelSelector:
     """远程 API 文本模型选择器"""
     
     @staticmethod
-    def get_ollama_models(base_url="http://127.0.0.1:11434"):
-        """获取 Ollama 模型列表"""
+    def get_remote_models(base_url="http://127.0.0.1:11434"):
+        """获取远程模型列表（支持 Ollama/Nexa/LM Studio）"""
         try:
-            ports = [11434, 8080]
+            # 尝试多个常用端口
+            ports = [11434, 8080, 1234]  # Ollama, Nexa, LM Studio
             for port in ports:
                 try:
+                    # 尝试 Ollama 格式
                     url = f"http://127.0.0.1:{port}/api/tags"
                     response = requests.get(url, timeout=2)
                     if response.status_code == 200:
@@ -138,6 +140,19 @@ class RemoteTextModelSelector:
                         if models:
                             return models
                 except:
+                    pass
+                
+                try:
+                    # 尝试 OpenAI 兼容格式 (LM Studio/Nexa)
+                    url = f"http://127.0.0.1:{port}/v1/models"
+                    response = requests.get(url, timeout=2)
+                    if response.status_code == 200:
+                        data = response.json()
+                        if 'data' in data:
+                            models = [model['id'] for model in data.get('data', [])]
+                            if models:
+                                return models
+                except:
                     continue
             return ["No models found"]
         except:
@@ -145,22 +160,22 @@ class RemoteTextModelSelector:
     
     @classmethod
     def INPUT_TYPES(cls):
-        ollama_models = cls.get_ollama_models()
+        remote_models = cls.get_remote_models()
         
         return {
             "required": {
                 "base_url": ("STRING", {
                     "default": "http://127.0.0.1:11434",
                     "multiline": False,
-                    "tooltip": "API 服务地址（Ollama: 11434, Nexa: 8080）"
+                    "tooltip": "API 服务地址（Ollama: 11434, Nexa: 8080, LM Studio: 1234）"
                 }),
-                "api_type": (["Ollama", "Nexa SDK", "OpenAI Compatible"], {
+                "api_type": (["Ollama", "Nexa SDK", "LM Studio", "OpenAI Compatible"], {
                     "default": "Ollama",
-                    "tooltip": "API 类型（推荐使用 Ollama）"
+                    "tooltip": "API 类型（LM Studio 使用 OpenAI 兼容格式）"
                 }),
-                "model": (ollama_models, {
-                    "default": ollama_models[0] if ollama_models else "No models found",
-                    "tooltip": "远程模型名称（从 Ollama 自动获取）"
+                "model": (remote_models, {
+                    "default": remote_models[0] if remote_models else "No models found",
+                    "tooltip": "远程模型名称（自动获取）"
                 }),
             },
             "optional": {
@@ -186,6 +201,7 @@ class RemoteTextModelSelector:
         api_type_map = {
             "Ollama": "ollama",
             "Nexa SDK": "nexa",
+            "LM Studio": "lmstudio",
             "OpenAI Compatible": "openai"
         }
         api_type_key = api_type_map.get(api_type, "ollama")

@@ -56,6 +56,11 @@ class ModelLoader:
         if os.path.exists(text_encoders_dir):
             dirs.append(text_encoders_dir)
         
+        # ComfyUI clip 目录
+        clip_dir = os.path.join(folder_paths.models_dir, "clip")
+        if os.path.exists(clip_dir):
+            dirs.append(clip_dir)
+        
         # 兼容旧版 VLM_GGUF 目录
         vlm_gguf_dir = os.path.join(folder_paths.models_dir, "VLM_GGUF")
         if os.path.exists(vlm_gguf_dir):
@@ -68,6 +73,13 @@ class ModelLoader:
                 dirs.extend(configured)
         except Exception as e:
             print(f"⚠️  Could not get folder_paths for text_encoders: {e}")
+        
+        try:
+            configured_clip = folder_paths.get_folder_paths("clip")
+            if configured_clip:
+                dirs.extend(configured_clip)
+        except Exception as e:
+            print(f"⚠️  Could not get folder_paths for clip: {e}")
         
         # 去重
         unique_dirs = []

@@ -7,6 +7,8 @@ import json
 from aiohttp import web
 from server import PromptServer
 from .core.inference.nexa_engine import get_nexa_engine
+from .core.model_loader import ModelLoader
+from .utils.registry import RegistryManager
 
 
 # 注册 API 路由
@@ -51,6 +53,72 @@ async def refresh_models(request):
         return web.json_response({
             "success": True,
             "models": models,
+            "error": None
+        })
+        
+    except Exception as e:
+        return web.json_response({
+            "success": False,
+            "models": [],
+            "error": str(e)
+        })
+
+
+# 刷新本地视觉模型列表
+@PromptServer.instance.routes.get("/gguf-vlm/refresh-local-vision-models")
+async def refresh_local_vision_models(request):
+    """
+    刷新本地视觉模型列表
+    
+    Returns:
+        JSON: {"success": bool, "models": list, "error": str}
+    """
+    try:
+        # 创建加载器和注册表
+        loader = ModelLoader()
+        registry = RegistryManager()
+        
+        # 获取所有本地模型
+        all_local_models = loader.list_models()
+        print(f"📦 Found {len(all_local_models)} local GGUF files")
+        
+        # 过滤视觉模型
+        local_models = []
+        for model_file in all_local_models:
+            model_info = registry.find_model_by_filename(model_file)
+            # 如果是视觉模型或未知模型（可能是视觉模型）
+            if model_info is None or model_info.get('business_type') in ['image_analysis', 'video_analysis']:
+                local_models.append(model_file)
+        
+        # 获取可下载的模型
+        image_models = registry.get_downloadable_models(business_type='image_analysis', model_loader=loader)
+        video_models = registry.get_downloadable_models(business_type='video_analysis', model_loader=loader)
+        
+        # 构建分类列表
+        categorized_models = []
+        
+        if image_models:
+            categorized_models.append("--- 🖼️ 图像分析模型 ---")
+            categorized_models.extend([name for name, _ in image_models])
+        
+        if video_models:
+            categorized_models.append("--- 🎥 视频分析模型 ---")
+            categorized_models.extend([name for name, _ in video_models])
+        
+        if local_models:
+            categorized_models.append("--- 💾 本地模型 ---")
+            categorized_models.extend(local_models)
+        
+        if not categorized_models:
+            return web.json_response({
+                "success": False,
+                "models": [],
+                "error": "No vision models found"
+            })
+        
+        return web.json_response({
+            "success": True,
+            "models": categorized_models,
             "error": None
         })
         

@@ -103,8 +103,11 @@ class RemoteAPIConfig:
                     pass
             
             # 根据 API 类型选择端口扫描顺序
-            if api_type.lower() == "ollama":
+            api_type_lower = api_type.lower()
+            if api_type_lower == "ollama":
                 ports_to_try = [11434]  # Ollama 官方默认端口
+            elif api_type_lower in ["lm studio", "lmstudio"]:
+                ports_to_try = [1234]  # LM Studio 官方默认端口
             else:  # Nexa SDK
                 ports_to_try = [8080]  # Nexa SDK 官方默认端口
             
@@ -131,11 +134,11 @@ class RemoteAPIConfig:
                 "base_url": ("STRING", {
                     "default": "http://127.0.0.1:11434",
                     "multiline": False,
-                    "tooltip": "API 服务地址（Ollama: 11434, Nexa: 8080）"
+                    "tooltip": "API 服务地址（Ollama: 11434, Nexa: 8080, LM Studio: 1234）"
                 }),
-                "api_type": (["Nexa SDK", "Ollama"], {
+                "api_type": (["Ollama", "Nexa SDK", "LM Studio"], {
                     "default": "Ollama",
-                    "tooltip": "API 类型"
+                    "tooltip": "API 类型（LM Studio 使用 OpenAI 兼容格式）"
                 }),
                 # 使用空元组表示动态列表，由前端 JavaScript 控制
                 "model": ((), {
@@ -167,15 +170,16 @@ class RemoteAPIConfig:
         """配置远程 API"""
         
         print(f"\n{'='*80}")
-        print(f" 🌐 Remote API Config (Nexa/Ollama)")
+        print(f" 🌐 Remote API Config (Nexa/Ollama/LM Studio)")
         print(f"{'='*80}")
         
         # 映射 API 类型
         api_type_map = {
             "Nexa SDK": "nexa",
-            "Ollama": "ollama"
+            "Ollama": "ollama",
+            "LM Studio": "lmstudio"
         }
-        api_key = api_type_map.get(api_type, "nexa")
+        api_key = api_type_map.get(api_type, "ollama")
         
         # 创建或获取引擎
         engine = get_nexa_engine(base_url)
@@ -194,7 +198,8 @@ class RemoteAPIConfig:
             status_info += f"请确保服务正在运行\n"
             status_info += f"\n提示：\n"
             status_info += f"- Ollama: 运行 'ollama serve'\n"
-            status_info += f"- Nexa SDK: 运行 'nexa serve'"
+            status_info += f"- Nexa SDK: 运行 'nexa serve'\n"
+            status_info += f"- LM Studio: 启动本地服务器 (端口 1234)"
             
             print(error_msg)
             print(f"   URL: {base_url}")
@@ -376,6 +381,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "RemoteAPIConfig": "🌐 Remote API Config (Nexa/Ollama)",
+    "RemoteAPIConfig": "🌐 Remote API Config (Ollama/Nexa/LM Studio)",
     "NexaServiceStatus": "📊 Service Status Check",
 }
