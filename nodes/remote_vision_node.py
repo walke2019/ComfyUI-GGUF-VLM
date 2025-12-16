@@ -192,10 +192,8 @@ class RemoteVisionAnalysis:
             print(error_msg)
             return (error_msg,)
         
-        if image is None:
-            error_msg = "❌ 请提供输入图像"
-            print(error_msg)
-            return (error_msg,)
+        # 允许纯文本模式（无图像）
+        text_only_mode = (image is None)
         
         base_url = model_config["base_url"]
         api_type = model_config["api_type"]
@@ -206,9 +204,13 @@ class RemoteVisionAnalysis:
         print(f"📍 URL: {base_url}")
         print(f"🤖 Model: {model_name}")
         
-        # 将图像转换为 base64
-        image_base64 = self._image_to_base64(image)
-        print(f"📷 图像已编码 (base64)")
+        # 将图像转换为 base64（如果有图像）
+        image_base64 = None
+        if not text_only_mode:
+            image_base64 = self._image_to_base64(image)
+            print(f"📷 图像已编码 (base64)")
+        else:
+            print(f"📝 纯文本模式（无图像）")
         
         # 获取 API 引擎
         engine = get_unified_api_engine(base_url, api_type)
@@ -219,23 +221,30 @@ class RemoteVisionAnalysis:
         if system_prompt:
             messages.append({"role": "system", "content": system_prompt})
         
-        # 视觉消息格式
-        user_content = [
-            {
-                "type": "image_url",
-                "image_url": {
-                    "url": f"data:image/png;base64,{image_base64}"
+        # 构建用户消息
+        if text_only_mode:
+            # 纯文本模式
+            messages.append({"role": "user", "content": prompt})
+        else:
+            # 视觉消息格式
+            user_content = [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": f"data:image/png;base64,{image_base64}"
+                    }
+                },
+                {
+                    "type": "text",
+                    "text": prompt
                 }
-            },
-            {
-                "type": "text",
-                "text": prompt
-            }
-        ]
+            ]
+            messages.append({"role": "user", "content": user_content})
         
-        messages.append({"role": "user", "content": user_content})
-        
-        print(f"\n💬 正在分析图像...")
+        if text_only_mode:
+            print(f"\n💬 正在生成文本响应...")
+        else:
+            print(f"\n💬 正在分析图像...")
         print(f"   Prompt: {prompt[:50]}...")
         print(f"   Max tokens: {max_tokens}")
         print(f"   Temperature: {temperature}")

@@ -157,18 +157,21 @@ class MultiImageAnalysis:
                         temp_paths.append(temp_path)
                         images.append(temp_path)
         
-        if not images:
-            raise ValueError("至少需要提供一个图像或视频输入")
+        # 允许纯文本模式（无图像/视频）
+        text_only_mode = (len(images) == 0)
         
-        print(f"📸 Analyzing {len(images)} inputs (images/videos)")
+        if text_only_mode:
+            print(f"📝 Text-only mode (no images/videos)")
+        else:
+            print(f"📸 Analyzing {len(images)} inputs (images/videos)")
         
         # 构建消息（Qwen3-VL 格式）
         messages = []
         
-        # 构建用户消息内容（包含所有图像和文本）
+        # 构建用户消息内容
         user_content = []
         
-        # 添加所有图像
+        # 添加所有图像（如果有）
         for temp_path in temp_paths:
             user_content.append({
                 "type": "image",
@@ -176,22 +179,36 @@ class MultiImageAnalysis:
             })
         
         # 添加系统提示词（如果有）作为文本前缀
-        if system_prompt and system_prompt.strip():
-            user_content.append({
-                "type": "text",
-                "text": f"{system_prompt.strip()}\n\n{prompt}"
-            })
+        if text_only_mode:
+            # 纯文本模式
+            if system_prompt and system_prompt.strip():
+                user_content.append({
+                    "type": "text",
+                    "text": f"{system_prompt.strip()}\n\n{prompt}"
+                })
+            else:
+                user_content.append({
+                    "type": "text",
+                    "text": prompt
+                })
         else:
-            # 使用多图像分析的默认系统提示词
-            default_prompt = (
-                "You are an expert image analyst. When given multiple images, "
-                "carefully compare and analyze them, identifying similarities, "
-                "differences, patterns, and relationships between the images."
-            )
-            user_content.append({
-                "type": "text",
-                "text": f"{default_prompt}\n\n{prompt}"
-            })
+            # 有图像的模式
+            if system_prompt and system_prompt.strip():
+                user_content.append({
+                    "type": "text",
+                    "text": f"{system_prompt.strip()}\n\n{prompt}"
+                })
+            else:
+                # 使用多图像分析的默认系统提示词
+                default_prompt = (
+                    "You are an expert image analyst. When given multiple images, "
+                    "carefully compare and analyze them, identifying similarities, "
+                    "differences, patterns, and relationships between the images."
+                )
+                user_content.append({
+                    "type": "text",
+                    "text": f"{default_prompt}\n\n{prompt}"
+                })
         
         messages.append({
             "role": "user",

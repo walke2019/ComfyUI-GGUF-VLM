@@ -436,16 +436,17 @@ class VisionLanguageNode:
     def describe_image(self, model, prompt, max_tokens=512, 
                       temperature=0.7, top_p=0.9, top_k=40, seed=0,
                       image=None, video=None, system_prompt=None):
-        """生成图像/视频描述"""
+        """生成图像/视频描述，也支持纯文本对话"""
         try:
             from llama_cpp import Llama
             from llama_cpp.llama_chat_format import Qwen25VLChatHandler
             
-            # 验证输入：必须提供图像或视频之一
-            if image is None and video is None:
-                raise ValueError("必须提供 image 或 video 输入之一")
+            # 允许纯文本模式（无图像/视频）
             if image is not None and video is not None:
                 raise ValueError("不能同时提供 image 和 video 输入，请只选择一个")
+            
+            # 判断是否为纯文本模式
+            text_only_mode = (image is None and video is None)
             
             engine = self._get_engine()
             model_path = model['model_path']
@@ -455,9 +456,12 @@ class VisionLanguageNode:
             is_video = video is not None
             input_data = video if is_video else image
             
-            print(f"📊 输入类型: {'视频' if is_video else '图像'}")
-            if is_video:
-                print(f"🎬 视频帧数: {input_data.shape[0]}")
+            if text_only_mode:
+                print(f"📊 输入类型: 纯文本（无图像）")
+            else:
+                print(f"📊 输入类型: {'视频' if is_video else '图像'}")
+                if is_video:
+                    print(f"🎬 视频帧数: {input_data.shape[0]}")
             
             # 加载模型（如果未加载）
             if not engine.is_model_loaded(model_path):
@@ -481,17 +485,19 @@ class VisionLanguageNode:
                 llm = engine.loaded_models[model_path]
             
             # 处理图像或视频帧
-            if is_video:
-                # 视频：保存多个帧
-                image_paths = self._save_video_frames(input_data, seed)
-            else:
-                # 图像：保存单帧
-                image_paths = [self._save_temp_image(input_data, seed)]
+            image_paths = []
+            if not text_only_mode:
+                if is_video:
+                    # 视频：保存多个帧
+                    image_paths = self._save_video_frames(input_data, seed)
+                else:
+                    # 图像：保存单帧
+                    image_paths = [self._save_temp_image(input_data, seed)]
             
             # 构建消息内容
             content = []
             
-            # 添加图像/视频帧
+            # 添加图像/视频帧（如果有）
             for img_path in image_paths:
                 # 1. 确保路径有效（非空且文件存在）
                 if not img_path or not os.path.exists(img_path):
@@ -530,7 +536,10 @@ class VisionLanguageNode:
             
             messages.append({"role": "user", "content": content})
             
-            print(f"🤖 Generating {'video' if is_video else 'image'} description...")
+            if text_only_mode:
+                print(f"🤖 Generating text response (no image)...")
+            else:
+                print(f"🤖 Generating {'video' if is_video else 'image'} description...")
             print(f"📝 用户提示词: {prompt[:50]}...")
             
             # 生成描述

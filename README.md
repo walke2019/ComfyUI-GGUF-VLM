@@ -49,13 +49,14 @@ Windows 用户推荐使用 [LM Studio](https://lmstudio.ai/)：
 ### 视觉分析
 
 ```
-🌐 Remote Vision Model Config → 🔍 Remote Vision Analysis ← IMAGE
+🌐 Remote Vision Model Config → 🔍 Remote Vision Analysis ← IMAGE (可选)
 ```
 
-1. 加载视觉模型 (如 Qwen2.5-VL)
-2. 添加 **Remote Vision Model Config** 节点
-3. 点击 **🔄 Refresh Models** 获取模型
+1. 在远程服务中加载视觉模型 (如 LM Studio 加载 Qwen3 VL GGUF)
+2. 添加 **Remote Vision Model Config** 节点，填写 base_url
+3. 点击 **🔄 Refresh Models** 获取远程模型列表
 4. 连接 **Remote Vision Analysis** 节点
+5. 图像输入可选，支持纯文本对话
 
 > ⏱️ 视觉模型处理较慢，默认超时 300 秒
 
@@ -79,7 +80,7 @@ ComfyUI/models/
 ### 视觉分析
 
 ```
-🖼️ Vision Model Loader (GGUF) → 🖼️ Image Analysis (GGUF) ← IMAGE
+🖼️ Vision Model Loader (GGUF) → 🖼️ Image Analysis (GGUF) ← IMAGE (可选)
 ```
 
 1. 下载 GGUF 视觉模型和对应的 mmproj 文件
@@ -95,12 +96,15 @@ ComfyUI/models/
 3. 添加 **Vision Model Loader** 节点
 4. 点击 **🔄 Refresh Local Models** 刷新
 5. 连接 **Image Analysis** 节点
+6. 图像/视频输入可选，支持纯文本对话
 
-### 多图分析
+### 多图分析 (Transformers)
 
 ```
-�️ Vision Model Loader → 📸 Multi-Image Analysis ← IMAGE (最多6张)
+🖼️ Vision Model Loader (Transformers) → 📸 Multi-Image Analysis ← IMAGE (1视频+3图像)
 ```
+
+支持 1 个视频输入 + 最多 3 个图像输入进行对比分析，也支持纯文本模式。
 
 ---
 
@@ -112,19 +116,20 @@ ComfyUI/models/
 | 🌐 Remote API Config | 远程文本 API 配置 |
 | 🌐 Remote Vision Model Config | 远程视觉 API 配置 |
 | 🤖 Text Generation | 文本生成 |
-| 🔍 Remote Vision Analysis | 远程图像分析 |
+| 🔍 Remote Vision Analysis | 远程图像分析（图像可选） |
 
 ### 本地模式
 | 节点 | 说明 |
 |------|------|
 | 🖼️ Vision Model Loader (GGUF) | 本地视觉模型加载 |
-| 🖼️ Image Analysis (GGUF) | 本地图像分析 |
-| 📸 Multi-Image Analysis | 多图对比分析 |
+| 🖼️ Image Analysis (GGUF) | 本地图像分析（图像可选） |
+| 🖼️ Vision Model Loader (Transformers) | Transformers 视觉模型 |
+| �  Multi-Image Analysis | 多图对比分析（1视频+3图像） |
 
 ### 工具
 | 节点 | 说明 |
 |------|------|
-| 📋 System Prompt Config | 系统提示词 |
+| �  System Prompt Config | 系统提示词 |
 | 🧹 Memory Manager | 显存管理 |
 
 ---
@@ -135,6 +140,7 @@ ComfyUI/models/
 - ✅ LM Studio 支持（文本+视觉）
 - ✅ 远程视觉分析节点
 - ✅ 动态模型刷新按钮
+- ✅ VL 模型支持纯文本模式（无图像）
 
 ### v1.1.0 (2025-11-19)
 - ✅ Windows 路径修复
