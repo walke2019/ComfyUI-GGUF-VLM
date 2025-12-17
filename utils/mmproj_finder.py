@@ -97,6 +97,26 @@ class MMProjFinder:
         """模型名.mmproj-f16.gguf (直接替换，点号分隔)"""
         return model.replace('.gguf', '.mmproj-f16.gguf')
     
+    def _pattern_19(self, model):
+        """保留量化后缀-mmproj.gguf (如 Qwen2.5-VL-7B-Instruct-abliterated-Q4_K_M-mmproj.gguf)"""
+        return model.replace('.gguf', '-mmproj.gguf')
+    
+    def _pattern_20(self, model):
+        """保留量化后缀-mmproj-F16.gguf (如 Qwen2.5-VL-7B-Instruct-Q8_0-mmproj-F16.gguf)"""
+        return model.replace('.gguf', '-mmproj-F16.gguf')
+    
+    def _pattern_21(self, model):
+        """保留量化后缀-mmproj-f16.gguf (小写版本)"""
+        return model.replace('.gguf', '-mmproj-f16.gguf')
+    
+    def _pattern_22(self, model):
+        """去掉量化后缀-mmproj-F16.gguf (大写F16)"""
+        return re.sub(r'-Q\d+_[KM\d]+\.gguf$', '-mmproj-F16.gguf', model)
+    
+    def _pattern_23(self, model):
+        """去掉量化后缀-mmproj-F16.gguf (大写F16，另一种量化格式)"""
+        return re.sub(r'-Q\d+_\d+\.gguf$', '-mmproj-F16.gguf', model)
+    
     def find_mmproj(self, model_filename: str, model_dir: str = None) -> Optional[str]:
         """
         查找模型对应的 mmproj 文件
@@ -141,6 +161,8 @@ class MMProjFinder:
             self._pattern_10, self._pattern_11, self._pattern_12,
             self._pattern_13, self._pattern_14, self._pattern_15,
             self._pattern_16, self._pattern_17, self._pattern_18,
+            self._pattern_19, self._pattern_20, self._pattern_21,
+            self._pattern_22, self._pattern_23,
         ]
         
         for pattern in patterns:
@@ -155,15 +177,27 @@ class MMProjFinder:
         base_name = model_filename.replace('.gguf', '')
         
         # 移除常见的量化后缀
-        for suffix in ['-Q8_0', '-Q6_K', '-Q5_K_M', '-Q4_K_M', '.Q8_0', '.Q6_K', '.Q5_K_M', '.Q4_K_M']:
+        for suffix in ['-Q8_0', '-Q6_K', '-Q5_K_M', '-Q4_K_M', '-Q4_K_S', '-Q3_K_M', '-Q2_K', '.Q8_0', '.Q6_K', '.Q5_K_M', '.Q4_K_M', '.Q4_K_S', '.Q3_K_M', '.Q2_K']:
             if base_name.endswith(suffix):
                 clean_name = base_name[:-len(suffix)]
+                # 不带量化后缀的 mmproj 命名
                 possible_names.add(clean_name + "-mmproj.gguf")
                 possible_names.add(clean_name + ".mmproj.gguf")
                 possible_names.add(clean_name + "-mmproj-f16.gguf")
+                possible_names.add(clean_name + "-mmproj-F16.gguf")  # 大写 F16
                 possible_names.add(clean_name + ".mmproj-f16.gguf")
+                possible_names.add(clean_name + ".mmproj-F16.gguf")  # 大写 F16
                 possible_names.add("mmproj-" + clean_name + ".gguf")
                 possible_names.add("mmproj-" + clean_name + "-f16.gguf")
+                possible_names.add("mmproj-" + clean_name + "-F16.gguf")  # 大写 F16
+                
+                # 带量化后缀的 mmproj 命名 (如 Qwen2.5-VL-7B-Instruct-Q8_0-mmproj-F16.gguf)
+                possible_names.add(base_name + "-mmproj.gguf")
+                possible_names.add(base_name + "-mmproj-f16.gguf")
+                possible_names.add(base_name + "-mmproj-F16.gguf")  # 大写 F16
+                possible_names.add(base_name + ".mmproj.gguf")
+                possible_names.add(base_name + ".mmproj-f16.gguf")
+                possible_names.add(base_name + ".mmproj-F16.gguf")  # 大写 F16
         
         return list(possible_names)
     

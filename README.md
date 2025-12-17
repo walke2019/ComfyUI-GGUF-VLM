@@ -4,6 +4,12 @@ ComfyUI 多模态推理插件，支持本地 GGUF 模型和远程 API (Ollama/LM
 
 ## 📦 安装
 
+## 📸 截图
+
+![节点示例1](PixPin_2025-12-17_02-11-37.png)
+
+![节点示例2](PixPin_2025-12-17_02-11-49.png)
+
 ```bash
 cd ComfyUI/custom_nodes
 git clone https://github.com/walke2019/ComfyUI-GGUF-VLM.git
@@ -147,11 +153,6 @@ ComfyUI/models/
 - ✅ Memory Manager 节点
 - ✅ 增强错误处理
 
-## 📸 截图
-
-![节点示例1](PixPin_2025-12-17_02-11-37.png)
-
-![节点示例2](PixPin_2025-12-17_02-11-49.png)
 
 ## 📄 License
 
