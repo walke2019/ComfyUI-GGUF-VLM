@@ -128,3 +128,90 @@ async def refresh_local_vision_models(request):
             "models": [],
             "error": str(e)
         })
+
+
+# 刷新本地文本模型列表
+@PromptServer.instance.routes.get("/gguf-vlm/refresh-local-text-models")
+async def refresh_local_text_models(request):
+    """
+    刷新本地文本模型列表
+    
+    Returns:
+        JSON: {"success": bool, "models": list, "error": str}
+    """
+    try:
+        # 创建加载器和注册表
+        loader = ModelLoader()
+        registry = RegistryManager()
+        
+        # 获取所有本地模型
+        all_local_models = loader.list_models()
+        print(f"📦 Found {len(all_local_models)} local GGUF files")
+        
+        # 视觉模型关键词列表（用于排除）
+        vision_keywords = [
+            'llava', 'vision', 'multimodal', 'mm', 
+            'clip', 'minicpm-v', 'phi-3-vision', 
+            'internvl', 'cogvlm', 'mmproj'
+        ]
+        
+        # 特定的视觉模型模式
+        vision_patterns = [
+            'qwen-vl', 'qwen2-vl', 'qwen2.5-vl', 'qwen3-vl',
+            '-vl-', '_vl_', '.vl.',
+        ]
+        
+        # 过滤文本模型
+        local_models = []
+        for model_file in all_local_models:
+            model_lower = model_file.lower()
+            
+            # 首先检查registry信息
+            model_info = registry.find_model_by_filename(model_file)
+            if model_info:
+                business_type = model_info.get('business_type')
+                if business_type == 'text_generation':
+                    local_models.append(model_file)
+                    continue
+                elif business_type in ['image_analysis', 'video_analysis']:
+                    continue
+            
+            # 使用关键词过滤
+            is_vision_model = False
+            for pattern in vision_patterns:
+                if pattern in model_lower:
+                    is_vision_model = True
+                    break
+            
+            if not is_vision_model:
+                is_vision_model = any(keyword in model_lower for keyword in vision_keywords)
+            
+            if not is_vision_model:
+                local_models.append(model_file)
+        
+        # 获取可下载的文本模型
+        downloadable = registry.get_downloadable_models(business_type='text_generation', model_loader=loader)
+        downloadable_names = [name for name, _ in downloadable]
+        
+        # 合并列表
+        all_models = local_models + downloadable_names
+        
+        if not all_models:
+            return web.json_response({
+                "success": False,
+                "models": [],
+                "error": "No text models found"
+            })
+        
+        return web.json_response({
+            "success": True,
+            "models": all_models,
+            "error": None
+        })
+        
+    except Exception as e:
+        return web.json_response({
+            "success": False,
+            "models": [],
+            "error": str(e)
+        })

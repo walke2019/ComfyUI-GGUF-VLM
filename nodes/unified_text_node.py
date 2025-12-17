@@ -587,7 +587,7 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "LocalTextModelLoader": "🖥️ Local Text Model Loader",
+    "LocalTextModelLoader": "🖥️ Local Text Model Loader (GGUF)",
     "RemoteTextModelSelector": "🌐 Remote Text Model Selector",
     "TextGeneration": "🤖 Text Generation",
 }

@@ -513,6 +513,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "TextModelLoader": "💬 Text Model Loader (Local)",
-    "TextGenerationNode": "💬 Text Generation (Local)",
+    "TextModelLoader": "🖥️ Local Text Model Loader (GGUF)",
+    "TextGenerationNode": "🖥️ Local Text Generation (GGUF)",
 }

@@ -4,9 +4,19 @@ ComfyUI 多模态推理插件，支持本地 GGUF 模型和远程 API (Ollama/LM
 
 ## 📸 截图
 
-![节点示例1](PixPin_2025-12-17_02-11-37.png)
+![远程文本模型](workflows/PixPin_2025-12-17_12-51-06.png)
 
-![节点示例2](PixPin_2025-12-17_02-11-49.png)
+![远程视觉模型](workflows/PixPin_2025-12-17_12-53-03.png)
+
+![本地文本模型](workflows/PixPin_2025-12-17_12-54-42.png)
+
+![本地视觉模型](workflows/PixPin_2025-12-17_12-56-36.png)
+
+![Transformers多图分析](workflows/PixPin_2025-12-17_12-58-05.png)
+
+## 📂 示例工作流
+
+导入 [workflows/Example.json](workflows/Example.json) 查看完整示例。
 
 ## 📦 安装
 
@@ -147,18 +157,20 @@ ComfyUI/models/
 ### 远程模式
 | 节点 | 说明 |
 |------|------|
-| 🌐 Remote API Config | 远程文本 API 配置 |
-| 🌐 Remote Vision Model Config | 远程视觉 API 配置 |
+| 🌐 Remote Text Model Config | 远程文本模型配置 (Ollama/Nexa/LM Studio) |
+| 🌐 Remote Vision Model Config | 远程视觉模型配置 |
 | 🤖 Text Generation | 文本生成 |
 | 🔍 Remote Vision Analysis | 远程图像分析（图像可选） |
 
 ### 本地模式
 | 节点 | 说明 |
 |------|------|
+| �️ LLocal Text Model Loader (GGUF) | 本地文本模型加载 |
+| �️️ Local Text Generation (GGUF) | 本地文本生成 |
 | 🖼️ Local Vision Model Loader (GGUF) | 本地视觉模型加载 |
 | 🖼️ Local Image Analysis (GGUF) | 本地图像分析（图像可选） |
 | 🖼️ Vision Model Loader (Transformers) | Transformers 视觉模型 |
-| 🖼️ ImageI/Video Analysis (Transformers) | 多图对比分析（1视频+3图像） |
+| 📸 Multi-Image Analysis | 多图对比分析（1视频+3图像） |
 
 ### 工具
 | 节点 | 说明 |
@@ -173,7 +185,8 @@ ComfyUI/models/
 ### v1.3.0 (2025-12-17)
 - ✅ 增强 mmproj 文件匹配（支持保留量化后缀命名）
 - ✅ 添加 clip/gguf 子目录支持
-- ✅ 重命名本地视觉节点（Local Vision Model Loader / Local Image Analysis）
+- ✅ 重命名本地节点（Local Vision/Text Model Loader）
+- ✅ 本地文本模型支持刷新按钮
 - ✅ 添加 llama-cpp-python CUDA 安装说明
 
 ### v1.2.0 (2025-12-17)

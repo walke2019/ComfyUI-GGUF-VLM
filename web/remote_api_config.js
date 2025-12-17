@@ -10,8 +10,11 @@ import { api } from "../../scripts/api.js";
 // 远程 API 节点（需要 base_url 和 api_type）
 const REMOTE_API_NODES = ["RemoteAPIConfig", "RemoteVisionModelConfig"];
 
-// 本地模型节点（刷新本地文件）
-const LOCAL_MODEL_NODES = ["VisionModelLoader"];
+// 本地视觉模型节点（刷新本地文件）
+const LOCAL_VISION_NODES = ["VisionModelLoader"];
+
+// 本地文本模型节点（刷新本地文件）
+const LOCAL_TEXT_NODES = ["TextModelLoader", "LocalTextModelLoader"];
 
 // 注册节点扩展
 app.registerExtension({
@@ -96,8 +99,8 @@ app.registerExtension({
             };
         }
         
-        // 处理本地模型节点
-        if (LOCAL_MODEL_NODES.includes(nodeData.name)) {
+        // 处理本地视觉模型节点
+        if (LOCAL_VISION_NODES.includes(nodeData.name)) {
             const onNodeCreated = nodeType.prototype.onNodeCreated;
             nodeType.prototype.onNodeCreated = function() {
                 const result = onNodeCreated?.apply(this, arguments);
@@ -145,6 +148,80 @@ app.registerExtension({
                                 modelWidget.value = data.models.includes(currentModel) ? currentModel : data.models[0];
                                 this.setDirtyCanvas(true, true);
                                 console.log(`✅ Refreshed ${data.models.length} local vision models`);
+                            } else {
+                                const errorMsg = data.error || "No models found";
+                                modelWidget.options.values = [`⚠️ ${errorMsg}`];
+                                modelWidget.value = `⚠️ ${errorMsg}`;
+                                this.setDirtyCanvas(true, true);
+                            }
+                        } else {
+                            modelWidget.options.values = [`❌ API Error ${response.status}`];
+                            modelWidget.value = `❌ API Error ${response.status}`;
+                            this.setDirtyCanvas(true, true);
+                        }
+                    } catch (error) {
+                        const modelWidget = this.widgets.find(w => w.name === "model");
+                        if (modelWidget) {
+                            modelWidget.options.values = [error.name === 'AbortError' ? "❌ Request timeout" : "❌ Request failed"];
+                            modelWidget.value = modelWidget.options.values[0];
+                            this.setDirtyCanvas(true, true);
+                        }
+                    }
+                };
+                
+                return result;
+            };
+        }
+        
+        // 处理本地文本模型节点
+        if (LOCAL_TEXT_NODES.includes(nodeData.name)) {
+            const onNodeCreated = nodeType.prototype.onNodeCreated;
+            nodeType.prototype.onNodeCreated = function() {
+                const result = onNodeCreated?.apply(this, arguments);
+                
+                const modelWidget = this.widgets.find(w => w.name === "model");
+                const modelWidgetIndex = this.widgets.findIndex(w => w.name === "model");
+                
+                // 添加刷新按钮
+                this.addWidget("button", "🔄 Refresh Local Models", null, () => {
+                    this.refreshLocalTextModels();
+                });
+                
+                // 将按钮移到 model 后面
+                if (modelWidgetIndex !== -1 && this.widgets.length > 1) {
+                    const button = this.widgets.pop();
+                    this.widgets.splice(modelWidgetIndex + 1, 0, button);
+                }
+                
+                // 本地文本模型刷新方法
+                this.refreshLocalTextModels = async function() {
+                    try {
+                        const modelWidget = this.widgets.find(w => w.name === "model");
+                        if (!modelWidget) {
+                            console.error("❌ Cannot find model widget");
+                            return;
+                        }
+                        
+                        const apiEndpoint = `/gguf-vlm/refresh-local-text-models`;
+                        
+                        const controller = new AbortController();
+                        const timeoutId = setTimeout(() => controller.abort(), 10000);
+                        
+                        const response = await fetch(apiEndpoint, {
+                            method: 'GET',
+                            signal: controller.signal
+                        });
+                        
+                        clearTimeout(timeoutId);
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success && data.models && data.models.length > 0) {
+                                const currentModel = modelWidget.value;
+                                modelWidget.options.values = data.models;
+                                modelWidget.value = data.models.includes(currentModel) ? currentModel : data.models[0];
+                                this.setDirtyCanvas(true, true);
+                                console.log(`✅ Refreshed ${data.models.length} local text models`);
                             } else {
                                 const errorMsg = data.error || "No models found";
                                 modelWidget.options.values = [`⚠️ ${errorMsg}`];

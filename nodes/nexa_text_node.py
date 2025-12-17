@@ -381,6 +381,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "RemoteAPIConfig": "🌐 Remote API Config (Ollama/Nexa/LM Studio)",
+    "RemoteAPIConfig": "🌐 Remote Text Model Config (Ollama/Nexa/LM Studio)",
     "NexaServiceStatus": "📊 Service Status Check",
 }
