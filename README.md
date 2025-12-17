@@ -74,6 +74,27 @@ Windows 用户推荐使用 [LM Studio](https://lmstudio.ai/)：
 
 > ⚠️ **注意**: 本地视觉模型目前仅支持 **Qwen2.5-VL** 系列
 
+### ⚙️ Local Vision Model Loader (GGUF) 安装注意事项
+
+使用 **🖼️ Local Vision Model Loader (GGUF)** 和 **🖼️ Local Image Analysis (GGUF)** 节点需要安装 llama-cpp-python（带 CUDA 支持）：
+
+**推荐环境配置：**
+- PyTorch: 2.9.1+cu126
+- CUDA: 12.6
+- llama-cpp-python: 0.3.16
+
+**安装命令（CUDA 12.6）：**
+```bash
+pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu126
+```
+
+**其他 CUDA 版本：**
+- CUDA 12.1: `https://abetlen.github.io/llama-cpp-python/whl/cu121`
+- CUDA 12.2: `https://abetlen.github.io/llama-cpp-python/whl/cu122`
+- CUDA 12.4: `https://abetlen.github.io/llama-cpp-python/whl/cu124`
+
+> 💡 如果遇到 `llama-cpp-python not installed` 错误，请确保使用上述命令安装带 CUDA 支持的版本
+
 ### 模型目录
 
 ```
@@ -86,7 +107,7 @@ ComfyUI/models/
 ### 视觉分析
 
 ```
-🖼️ Vision Model Loader (GGUF) → 🖼️ Image Analysis (GGUF) ← IMAGE (可选)
+🖼️ Local Vision Model Loader (GGUF) → 🖼️ Local Image Analysis (GGUF) ← IMAGE (可选)
 ```
 
 1. 下载 GGUF 视觉模型和对应的 mmproj 文件
@@ -106,15 +127,15 @@ ComfyUI/models/
    - `ComfyUI/models/text_encoders/`
    - `ComfyUI/models/clip/`
    - `ComfyUI/models/clip/gguf/`
-3. 添加 **Vision Model Loader** 节点
+3. 添加 **Local Vision Model Loader** 节点
 4. 点击 **🔄 Refresh Local Models** 刷新
-5. 连接 **Image Analysis** 节点
+5. 连接 **Local Image Analysis** 节点
 6. 图像/视频输入可选，支持纯文本对话
 
 ### 多图分析 (Transformers)
 
 ```
-🖼️ Vision Model Loader (Transformers) → 📸 Multi-Image Analysis ← IMAGE (1视频+3图像)
+🖼️ Vision Model Loader (Transformers) → �️ Image/Vaideo Analysis (Transformers) ← IMAGE (1视频+3图像)
 ```
 
 支持 1 个视频输入 + 最多 3 个图像输入进行对比分析，也支持纯文本模式。
@@ -134,15 +155,15 @@ ComfyUI/models/
 ### 本地模式
 | 节点 | 说明 |
 |------|------|
-| 🖼️ Vision Model Loader (GGUF) | 本地视觉模型加载 |
-| 🖼️ Image Analysis (GGUF) | 本地图像分析（图像可选） |
+| 🖼️ Local Vision Model Loader (GGUF) | 本地视觉模型加载 |
+| 🖼️ Local Image Analysis (GGUF) | 本地图像分析（图像可选） |
 | 🖼️ Vision Model Loader (Transformers) | Transformers 视觉模型 |
-| �  Multi-Image Analysis | 多图对比分析（1视频+3图像） |
+| �️ ImageI/Video Analysis (Transformers) | 多图对比分析（1视频+3图像） |
 
 ### 工具
 | 节点 | 说明 |
 |------|------|
-| �  System Prompt Config | 系统提示词 |
+| 📋 System Prompt Config | 系统提示词 |
 | 🧹 Memory Manager | 显存管理 |
 
 ---

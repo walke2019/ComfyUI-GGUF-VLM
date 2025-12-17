@@ -632,6 +632,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "VisionModelLoader": "🖼️ Vision Model Loader (GGUF)",
-    "VisionLanguageNode": "🖼️ Image Analysis (GGUF)",
+    "VisionModelLoader": "🖼️ Local Vision Model Loader (GGUF)",
+    "VisionLanguageNode": "🖼️ Local Image Analysis (GGUF)",
 }
