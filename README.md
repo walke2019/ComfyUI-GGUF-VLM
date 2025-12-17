@@ -158,7 +158,7 @@ ComfyUI/models/
 | 🖼️ Local Vision Model Loader (GGUF) | 本地视觉模型加载 |
 | 🖼️ Local Image Analysis (GGUF) | 本地图像分析（图像可选） |
 | 🖼️ Vision Model Loader (Transformers) | Transformers 视觉模型 |
-| �️ ImageI/Video Analysis (Transformers) | 多图对比分析（1视频+3图像） |
+| 🖼️ ImageI/Video Analysis (Transformers) | 多图对比分析（1视频+3图像） |
 
 ### 工具
 | 节点 | 说明 |
@@ -169,6 +169,12 @@ ComfyUI/models/
 ---
 
 ## 🔄 更新日志
+
+### v1.3.0 (2025-12-17)
+- ✅ 增强 mmproj 文件匹配（支持保留量化后缀命名）
+- ✅ 添加 clip/gguf 子目录支持
+- ✅ 重命名本地视觉节点（Local Vision Model Loader / Local Image Analysis）
+- ✅ 添加 llama-cpp-python CUDA 安装说明
 
 ### v1.2.0 (2025-12-17)
 - ✅ LM Studio 支持（文本+视觉）
