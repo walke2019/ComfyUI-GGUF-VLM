@@ -2,13 +2,13 @@
 
 ComfyUI 多模态推理插件，支持本地 GGUF 模型和远程 API (Ollama/LM Studio)。
 
-## 📦 安装
-
 ## 📸 截图
 
 ![节点示例1](PixPin_2025-12-17_02-11-37.png)
 
 ![节点示例2](PixPin_2025-12-17_02-11-49.png)
+
+## 📦 安装
 
 ```bash
 cd ComfyUI/custom_nodes
@@ -95,10 +95,17 @@ ComfyUI/models/
    Qwen2.5-VL-7B-Instruct-Q8_0.gguf            # 主模型
    Qwen2.5-VL-7B-Instruct-Q8_0-mmproj-F16.gguf # mmproj 文件
    ```
-   支持的 mmproj 命名格式：
-   - `模型名-mmproj.gguf`
-   - `模型名.mmproj-f16.gguf`
-   - `去掉量化后缀-mmproj-f16.gguf`
+   支持的 mmproj 命名格式（自动匹配）：
+   - `模型名-mmproj.gguf` (如 `Qwen2.5-VL-7B-Instruct-Q8_0-mmproj.gguf`)
+   - `模型名-mmproj-F16.gguf` (如 `Qwen2.5-VL-7B-Instruct-Q8_0-mmproj-F16.gguf`)
+   - `模型名-mmproj-f16.gguf` (小写 f16 也支持)
+   - `去掉量化后缀-mmproj-f16.gguf` (如 `Qwen2.5-VL-7B-Instruct-mmproj-f16.gguf`)
+   
+   支持的模型目录：
+   - `ComfyUI/models/LLM/GGUF/`
+   - `ComfyUI/models/text_encoders/`
+   - `ComfyUI/models/clip/`
+   - `ComfyUI/models/clip/gguf/`
 3. 添加 **Vision Model Loader** 节点
 4. 点击 **🔄 Refresh Local Models** 刷新
 5. 连接 **Image Analysis** 节点
