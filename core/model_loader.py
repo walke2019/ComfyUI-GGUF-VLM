@@ -61,6 +61,11 @@ class ModelLoader:
         if os.path.exists(clip_dir):
             dirs.append(clip_dir)
         
+        # ComfyUI clip/gguf 子目录
+        clip_gguf_dir = os.path.join(folder_paths.models_dir, "clip", "gguf")
+        if os.path.exists(clip_gguf_dir):
+            dirs.append(clip_gguf_dir)
+        
         # 兼容旧版 VLM_GGUF 目录
         vlm_gguf_dir = os.path.join(folder_paths.models_dir, "VLM_GGUF")
         if os.path.exists(vlm_gguf_dir):
