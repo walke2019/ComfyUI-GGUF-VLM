@@ -1,6 +1,6 @@
 # ComfyUI-GGUF-VLM
 
-ComfyUI 多模态推理插件，支持本地 GGUF 模型和远程 API (Ollama/LM Studio)。
+ComfyUI 多模态推理插件，支持本地 GGUF 模型和远程 API (Ollama/LM Studio/Nexa SDK)。
 
 ## 📸 截图
 
@@ -31,7 +31,7 @@ pip install -r requirements.txt
 
 ## 🌐 远程模式
 
-通过 Ollama、LM Studio 等服务调用模型。
+通过 Ollama、LM Studio、Nexa SDK等服务调用模型。
 
 ### 💡 推荐：LM Studio (Windows)
 
@@ -49,7 +49,7 @@ Windows 用户推荐使用 [LM Studio](https://lmstudio.ai/)：
 |------|---------|---------|---------|
 | Ollama | ✅ | ✅ | 11434 |
 | LM Studio | ✅ | ✅ | 1234 |
-| Nexa SDK | ✅ | ❌ | 8000 |
+| Nexa SDK | ✅ | ✅ | 8080 |
 
 ### 文本生成
 
@@ -165,8 +165,8 @@ ComfyUI/models/
 ### 本地模式
 | 节点 | 说明 |
 |------|------|
-| �️ LLocal Text Model Loader (GGUF) | 本地文本模型加载 |
-| �️️ Local Text Generation (GGUF) | 本地文本生成 |
+| 📋 LLocal Text Model Loader (GGUF) | 本地文本模型加载 |
+| 📋 Local Text Generation (GGUF) | 本地文本生成 |
 | 🖼️ Local Vision Model Loader (GGUF) | 本地视觉模型加载 |
 | 🖼️ Local Image Analysis (GGUF) | 本地图像分析（图像可选） |
 | 🖼️ Vision Model Loader (Transformers) | Transformers 视觉模型 |

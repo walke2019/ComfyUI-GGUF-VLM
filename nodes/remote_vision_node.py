@@ -1,6 +1,6 @@
 """
 远程视觉模型节点
-支持 LM Studio、Ollama 等 OpenAI 兼容 API 的视觉模型
+支持 LM Studio、Ollama、Nexa SDK 等 OpenAI 兼容 API 的视觉模型
 """
 
 import os
@@ -59,11 +59,11 @@ class RemoteVisionModelConfig:
                 "base_url": ("STRING", {
                     "default": "http://127.0.0.1:1234",
                     "multiline": False,
-                    "tooltip": "API 服务地址（LM Studio 默认: 1234, Ollama: 11434）"
+                    "tooltip": "API 服务地址（LM Studio: 1234, Ollama: 11434, Nexa SDK: 8080）"
                 }),
-                "api_type": (["LM Studio", "Ollama", "OpenAI Compatible"], {
+                "api_type": (["LM Studio", "Ollama", "Nexa SDK", "OpenAI Compatible"], {
                     "default": "LM Studio",
-                    "tooltip": "API 类型"
+                    "tooltip": "API 类型（均使用 OpenAI 兼容格式）"
                 }),
                 # 使用空元组表示动态列表，由前端 JavaScript 控制
                 "model": ((), {
@@ -93,6 +93,7 @@ class RemoteVisionModelConfig:
         api_type_map = {
             "LM Studio": "lmstudio",
             "Ollama": "ollama",
+            "Nexa SDK": "nexa",
             "OpenAI Compatible": "openai"
         }
         api_type_key = api_type_map.get(api_type, "lmstudio")
@@ -308,6 +309,6 @@ NODE_CLASS_MAPPINGS = {
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
-    "RemoteVisionModelConfig": "🌐 Remote Vision Model Config (LM Studio/Ollama)",
+    "RemoteVisionModelConfig": "🌐 Remote Vision Model Config (LM Studio/Ollama/Nexa)",
     "RemoteVisionAnalysis": "🖼️ Remote Vision Analysis",
 }
