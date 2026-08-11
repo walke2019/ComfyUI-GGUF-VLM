@@ -42,14 +42,16 @@ except Exception as e:
     LEGACY_NODES = {}
     LEGACY_DISPLAY = {}
 
-# 导入模型管理器节点
-try:
-    from .custom_model_manager import NODE_CLASS_MAPPINGS as MANAGER_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as MANAGER_DISPLAY
-    print("✅ Model manager loaded")
-except Exception as e:
-    print(f"⚠️  Model manager load failed: {e}")
-    MANAGER_MAPPINGS = {}
-    MANAGER_DISPLAY = {}
+# 可选模型管理器节点（当前仓库未内置 custom_model_manager.py，静默跳过以避免启动噪音）
+MANAGER_MAPPINGS = {}
+MANAGER_DISPLAY = {}
+manager_path = module_path / "custom_model_manager.py"
+if manager_path.exists():
+    try:
+        from .custom_model_manager import NODE_CLASS_MAPPINGS as MANAGER_MAPPINGS, NODE_DISPLAY_NAME_MAPPINGS as MANAGER_DISPLAY
+        print("✅ Model manager loaded")
+    except Exception as e:
+        print(f"⚠️  Model manager load failed: {e}")
 
 # 导入 GGUF 模式视觉节点
 try:
@@ -103,6 +105,24 @@ except Exception as e:
     PROMPT_NODES = {}
     PROMPT_DISPLAY = {}
 
+# 导入业务工作流节点
+try:
+    from .nodes.business_nodes import NODE_CLASS_MAPPINGS as BUSINESS_NODES, NODE_DISPLAY_NAME_MAPPINGS as BUSINESS_DISPLAY
+    print("✅ Business VLM nodes loaded")
+except Exception as e:
+    print(f"⚠️  Business VLM nodes load failed: {e}")
+    BUSINESS_NODES = {}
+    BUSINESS_DISPLAY = {}
+
+# 导入 v2 迁移目标节点
+try:
+    from .nodes.v2_nodes import NODE_CLASS_MAPPINGS as V2_NODES, NODE_DISPLAY_NAME_MAPPINGS as V2_DISPLAY
+    print("✅ V2 migration target nodes loaded")
+except Exception as e:
+    print(f"⚠️  V2 migration target nodes load failed: {e}")
+    V2_NODES = {}
+    V2_DISPLAY = {}
+
 # 导入 Nexa SDK 节点（新增）
 try:
     from .nodes.nexa_text_node import NODE_CLASS_MAPPINGS as NEXA_NODES, NODE_DISPLAY_NAME_MAPPINGS as NEXA_DISPLAY
@@ -123,6 +143,8 @@ NODE_CLASS_MAPPINGS = {
     **TRANSFORMERS_NODES,    # Transformers 模式视觉节点
     **MULTI_IMAGE_NODES,     # 多图像分析节点
     **PROMPT_NODES,          # 系统提示词配置节点
+    **BUSINESS_NODES,        # Caption/OCR/Prompt/JSON/Video 业务节点
+    **V2_NODES,              # v2 迁移目标节点
     **NEXA_NODES,            # Nexa SDK 节点
 }
 
@@ -134,6 +156,8 @@ NODE_DISPLAY_NAME_MAPPINGS = {
     **TRANSFORMERS_DISPLAY,
     **MULTI_IMAGE_DISPLAY,
     **PROMPT_DISPLAY,
+    **BUSINESS_DISPLAY,
+    **V2_DISPLAY,
     **NEXA_DISPLAY,
 }
 

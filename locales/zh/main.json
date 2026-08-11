@@ -1,0 +1,11 @@
+{
+  "settingsCategories": {
+    "GGUF-VLM": "GGUF-VLM",
+    "Business": "业务工作流",
+    "Vision Models": "视觉模型",
+    "Remote": "远程",
+    "Local": "本地",
+    "Text": "文本",
+    "v2": "v2"
+  }
+}

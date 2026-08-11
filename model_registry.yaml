@@ -3,6 +3,30 @@
 
 # 视觉语言模型 - Abliterated 版本
 vision_language_models:
+  qwen3-vl-official:
+    series_name: Qwen3-VL Official
+    description: Qwen3-VL 官方 GGUF，多模态图像/文本推理，推荐通过 llama.cpp server、LM Studio 或 Ollama OpenAI-compatible 后端运行
+    business_type: image_analysis
+    models:
+    - model_name: Qwen3-VL-8B-Instruct-GGUF
+      repo: Qwen/Qwen3-VL-8B-Instruct-GGUF
+      mmproj: mmproj-Qwen3VL-8B-Instruct-F16.gguf
+      description: Qwen3-VL 8B 官方 GGUF；适合图像分析、OCR、caption、纯文本对话
+      capabilities:
+      - image
+      - text_only
+      - caption
+      - ocr
+      - qwen3_vl
+      variants:
+      - name: Q4_K_M
+        file: Qwen3VL-8B-Instruct-Q4_K_M.gguf
+        size: 5.03GB
+        recommended: true
+      - name: Q8_0
+        file: Qwen3VL-8B-Instruct-Q8_0.gguf
+        size: 8.71GB
+        recommended: false
   qwen2.5-vl-abliterated:
     series_name: Qwen2.5-VL Abliterated
     description: Qwen 2.5 视觉语言模型 Abliterated 版本
@@ -164,6 +188,9 @@ video_analysis_models:
 # 匹配规则
 matching_rules:
   patterns:
+  - pattern: qwen3.*vl.*8b.*instruct
+    series: qwen3-vl-official
+    model: Qwen3-VL-8B-Instruct-GGUF
   - pattern: qwen2.5-vl-3b.*abliterated
     series: qwen2.5-vl-abliterated
     model: Qwen2.5-VL-3B-Instruct-Abliterated
@@ -191,9 +218,9 @@ matching_rules:
 
 # 元数据
 metadata:
-  version: 2.1.0
-  last_updated: '2025-11-03'
-  note: 'Updated with latest abliterated/NSFW models from mradermacher'
+  version: 2.2.0
+  last_updated: '2026-08-07'
+  note: 'Adds Qwen3-VL official GGUF and issue-driven compatibility updates'
   supported_business_types:
   - image_analysis
   - text_generation
@@ -202,6 +229,7 @@ metadata:
     text_4b: Huihui-Qwen3-4B-Instruct-2507-abliterated (Q8_0)
     text_8b: Huihui-Qwen3-8B-abliterated-v2 (Q8_0)
     vision_3b: Qwen2.5-VL-3B-Instruct-abliterated (Q8_0)
+    vision_qwen3_8b: Qwen3-VL-8B-Instruct-GGUF (Q4_K_M)
     vision_7b: Qwen2.5-VL-7B-Instruct-abliterated (Q8_0)
     vision_nsfw_v4: Qwen2.5-VL-7B-NSFW-Caption-V4 (Q8_0)
     vision_nsfw_v3: Qwen2.5-VL-7B-NSFW-Caption-V3-abliterated (Q8_0)

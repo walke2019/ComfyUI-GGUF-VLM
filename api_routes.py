@@ -9,6 +9,9 @@ from server import PromptServer
 from .core.inference.nexa_engine import get_nexa_engine
 from .core.model_loader import ModelLoader
 from .utils.registry import RegistryManager
+from .core.backends import create_backend
+from .core.inference.unified_api_engine import get_unified_api_engine
+from .utils.streaming import sse_event
 
 
 # 注册 API 路由
@@ -148,46 +151,12 @@ async def refresh_local_text_models(request):
         all_local_models = loader.list_models()
         print(f"📦 Found {len(all_local_models)} local GGUF files")
         
-        # 视觉模型关键词列表（用于排除）
-        vision_keywords = [
-            'llava', 'vision', 'multimodal', 'mm', 
-            'clip', 'minicpm-v', 'phi-3-vision', 
-            'internvl', 'cogvlm', 'mmproj'
+        # VL 主模型也可纯文本运行；文本列表只排除 mmproj/clip/projector 辅助文件
+        helper_keywords = ['mmproj', 'clip', 'projector']
+        local_models = [
+            model_file for model_file in all_local_models
+            if not any(keyword in model_file.lower() for keyword in helper_keywords)
         ]
-        
-        # 特定的视觉模型模式
-        vision_patterns = [
-            'qwen-vl', 'qwen2-vl', 'qwen2.5-vl', 'qwen3-vl',
-            '-vl-', '_vl_', '.vl.',
-        ]
-        
-        # 过滤文本模型
-        local_models = []
-        for model_file in all_local_models:
-            model_lower = model_file.lower()
-            
-            # 首先检查registry信息
-            model_info = registry.find_model_by_filename(model_file)
-            if model_info:
-                business_type = model_info.get('business_type')
-                if business_type == 'text_generation':
-                    local_models.append(model_file)
-                    continue
-                elif business_type in ['image_analysis', 'video_analysis']:
-                    continue
-            
-            # 使用关键词过滤
-            is_vision_model = False
-            for pattern in vision_patterns:
-                if pattern in model_lower:
-                    is_vision_model = True
-                    break
-            
-            if not is_vision_model:
-                is_vision_model = any(keyword in model_lower for keyword in vision_keywords)
-            
-            if not is_vision_model:
-                local_models.append(model_file)
         
         # 获取可下载的文本模型
         downloadable = registry.get_downloadable_models(business_type='text_generation', model_loader=loader)
@@ -215,3 +184,53 @@ async def refresh_local_text_models(request):
             "models": [],
             "error": str(e)
         })
+
+
+@PromptServer.instance.routes.post("/gguf-vlm/stream-chat")
+async def stream_chat(request):
+    """
+    Stream an OpenAI-compatible chat response as Server-Sent Events.
+
+    JSON body:
+        base_url, api_type, model, prompt, system_prompt, max_tokens, temperature
+    """
+    try:
+        body = await request.json()
+        base_url = body.get("base_url", "http://127.0.0.1:1234")
+        api_type = body.get("api_type", "openai")
+        model = body.get("model", "")
+        prompt = body.get("prompt", "")
+        system_prompt = body.get("system_prompt", "")
+        max_tokens = int(body.get("max_tokens", 1024))
+        temperature = float(body.get("temperature", 0.2))
+        timeout = int(body.get("timeout", 300))
+
+        response = web.StreamResponse(
+            status=200,
+            reason="OK",
+            headers={
+                "Content-Type": "text/event-stream",
+                "Cache-Control": "no-cache",
+                "Connection": "keep-alive",
+            },
+        )
+        await response.prepare(request)
+
+        engine = get_unified_api_engine(base_url, api_type)
+        backend = create_backend(api_type, engine=engine)
+        for delta in backend.stream_generate(
+            model=model,
+            prompt=prompt,
+            image_urls=[],
+            system_prompt=system_prompt,
+            max_tokens=max_tokens,
+            temperature=temperature,
+            timeout=timeout,
+        ):
+            await response.write(sse_event(delta).encode("utf-8"))
+
+        await response.write(sse_event("[DONE]").encode("utf-8"))
+        await response.write_eof()
+        return response
+    except Exception as e:
+        return web.json_response({"success": False, "error": str(e)}, status=500)

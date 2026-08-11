@@ -1,0 +1,366 @@
+{
+  "RemoteVLMTaskRunner": {
+    "display_name": "远程 VLM 业务任务",
+    "description": "使用远程模型执行 Caption、OCR、提示词反推、JSON 或自定义 VLM 任务。",
+    "inputs": {
+      "model_config": {
+        "name": "模型配置",
+        "tooltip": "远程视觉模型配置。"
+      },
+      "task": {
+        "name": "任务",
+        "tooltip": "业务任务类型。"
+      },
+      "image": {
+        "name": "图像",
+        "tooltip": "可选图像输入。"
+      },
+      "custom_prompt": {
+        "name": "自定义提示词",
+        "tooltip": "可选提示词覆盖。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "结果",
+        "tooltip": "VLM 生成结果。"
+      }
+    }
+  },
+  "BatchRemoteVLMTask": {
+    "display_name": "批量远程 VLM 任务",
+    "description": "对 IMAGE 批次执行远程 VLM 任务。",
+    "inputs": {
+      "model_config": {
+        "name": "模型配置",
+        "tooltip": "远程视觉模型配置。"
+      },
+      "images": {
+        "name": "图像批次",
+        "tooltip": "IMAGE 批次输入。"
+      },
+      "task": {
+        "name": "任务",
+        "tooltip": "批量任务类型。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "结果 JSON",
+        "tooltip": "结构化批量结果。"
+      },
+      "1": {
+        "name": "结果文本",
+        "tooltip": "可读批量结果。"
+      }
+    }
+  },
+  "JSONResultValidator": {
+    "display_name": "JSON 结果校验器",
+    "description": "校验 VLM JSON 输出是否包含必需字段。",
+    "inputs": {
+      "json_text": {
+        "name": "JSON 文本",
+        "tooltip": "来自 VLM 的原始 JSON 文本。"
+      },
+      "required_fields": {
+        "name": "必需字段",
+        "tooltip": "逗号分隔的必需字段。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "是否有效",
+        "tooltip": "校验是否通过。"
+      },
+      "1": {
+        "name": "格式化 JSON",
+        "tooltip": "格式化后的 JSON。"
+      },
+      "2": {
+        "name": "错误",
+        "tooltip": "校验错误信息。"
+      }
+    }
+  },
+  "DynamicMultiImageCollector": {
+    "display_name": "动态多图收集器",
+    "description": "将多个可选 IMAGE 输入收集为一个批次。",
+    "inputs": {
+      "image_1": {
+        "name": "图像 1",
+        "tooltip": "图像输入。"
+      },
+      "image_2": {
+        "name": "图像 2",
+        "tooltip": "图像输入。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "图像批次",
+        "tooltip": "收集后的 IMAGE 批次。"
+      },
+      "1": {
+        "name": "摘要",
+        "tooltip": "批次摘要。"
+      }
+    }
+  },
+  "VLMModelAdvisor": {
+    "display_name": "VLM 模型顾问",
+    "description": "根据任务、显存和本地/远程偏好推荐后端和模型。",
+    "inputs": {
+      "task": {
+        "name": "任务",
+        "tooltip": "目标 VLM 工作流任务。"
+      },
+      "vram_gb": {
+        "name": "显存 GB",
+        "tooltip": "可用 GPU 显存。"
+      },
+      "privacy": {
+        "name": "隐私偏好",
+        "tooltip": "本地或远程偏好。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "推荐",
+        "tooltip": "推荐配置。"
+      }
+    }
+  },
+  "CaptionPromptBuilder": {
+    "display_name": "Caption 提示词构建器",
+    "description": "构建数据集、标签或电商 caption 提示词。",
+    "inputs": {
+      "style": {
+        "name": "风格",
+        "tooltip": "Caption 风格。"
+      },
+      "language": {
+        "name": "语言",
+        "tooltip": "输出语言。"
+      },
+      "domain": {
+        "name": "领域",
+        "tooltip": "图像/领域上下文。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "提示词",
+        "tooltip": "生成的提示词。"
+      }
+    }
+  },
+  "OCRPromptBuilder": {
+    "display_name": "OCR 提示词构建器",
+    "description": "构建 OCR 提示词。",
+    "inputs": {
+      "language": {
+        "name": "语言",
+        "tooltip": "输出语言。"
+      },
+      "output_format": {
+        "name": "输出格式",
+        "tooltip": "OCR 输出格式。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "提示词",
+        "tooltip": "生成的提示词。"
+      }
+    }
+  },
+  "PromptReverseBuilder": {
+    "display_name": "提示词反推构建器",
+    "description": "构建图像反推提示词。",
+    "inputs": {
+      "target": {
+        "name": "目标",
+        "tooltip": "目标生成模型/风格。"
+      },
+      "language": {
+        "name": "语言",
+        "tooltip": "输出语言。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "提示词",
+        "tooltip": "生成的提示词。"
+      }
+    }
+  },
+  "JSONPromptBuilder": {
+    "display_name": "JSON 提取提示词构建器",
+    "description": "构建结构化 JSON 提取提示词。",
+    "inputs": {
+      "task": {
+        "name": "任务",
+        "tooltip": "提取任务。"
+      },
+      "schema": {
+        "name": "字段结构",
+        "tooltip": "必需 JSON 字段。"
+      },
+      "language": {
+        "name": "语言",
+        "tooltip": "输出语言。"
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "提示词",
+        "tooltip": "生成的提示词。"
+      }
+    }
+  },
+  "VisionModelLoader": {
+    "display_name": "本地视觉模型加载器（GGUF）",
+    "description": "加载本地 GGUF 视觉语言模型。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "VisionLanguageNode": {
+    "display_name": "本地图像分析（GGUF）",
+    "description": "使用本地 GGUF VLM 分析图像、视频帧或文本。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "MemoryManagerNode": {
+    "display_name": "内存管理器（GGUF）",
+    "description": "清理或查看 GGUF 模型缓存内存。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "RemoteVisionModelConfig": {
+    "display_name": "远程视觉模型配置",
+    "description": "配置 LM Studio、Ollama 或 llama.cpp server 等 OpenAI-compatible 视觉端点。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "RemoteVisionAnalysis": {
+    "display_name": "远程视觉分析",
+    "description": "使用已配置的远程 VLM 端点分析图像或文本。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "RemoteAPIConfig": {
+    "display_name": "远程文本模型配置",
+    "description": "配置远程文本模型端点。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "NexaServiceStatus": {
+    "display_name": "服务状态检查",
+    "description": "检查已配置远程服务的可用性。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "SystemPromptConfig": {
+    "display_name": "系统提示词配置",
+    "description": "为 VLM/LLM 工作流创建可复用系统提示词。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "TextModelLoader": {
+    "display_name": "本地文本模型加载器（GGUF）",
+    "description": "加载本地 GGUF 文本模型。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "TextGenerationNode": {
+    "display_name": "本地文本生成（GGUF）",
+    "description": "使用本地 GGUF 模型生成文本。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "LocalTextModelLoader": {
+    "display_name": "本地文本模型加载器（GGUF）",
+    "description": "加载本地 GGUF 文本模型。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "RemoteTextModelSelector": {
+    "display_name": "远程文本模型选择器",
+    "description": "选择远程文本模型端点。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "TextGeneration": {
+    "display_name": "文本生成",
+    "description": "使用本地或远程文本模型生成文本。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "MultiImageAnalysis": {
+    "display_name": "图像/视频分析（Transformers）",
+    "description": "使用 Transformers VLM 分析多图或视频帧。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "VisionModelLoaderTransformers": {
+    "display_name": "视觉模型加载器（Transformers）",
+    "description": "加载可选的 Transformers 视觉模型。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "VideoFrameSampler": {
+    "display_name": "视频帧抽样器",
+    "description": "从视频帧批次中抽取代表帧。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2RemoteVisionModelConfig": {
+    "display_name": "V2 远程视觉模型配置",
+    "description": "兼容 v2 的远程 VLM 配置节点。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2RemoteVisionAnalysis": {
+    "display_name": "V2 远程视觉分析",
+    "description": "兼容 v2 的远程 VLM 分析节点。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2LocalVisionModelLoader": {
+    "display_name": "V2 本地视觉模型加载器",
+    "description": "兼容 v2 的本地 GGUF 视觉模型加载器。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2LocalVisionAnalysis": {
+    "display_name": "V2 本地视觉分析",
+    "description": "兼容 v2 的本地 GGUF 图像分析节点。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2LocalTextModelLoader": {
+    "display_name": "V2 本地文本模型加载器",
+    "description": "兼容 v2 的本地 GGUF 文本模型加载器。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2TextGeneration": {
+    "display_name": "V2 文本生成",
+    "description": "兼容 v2 的文本生成节点。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2DynamicMultiImageAnalysis": {
+    "display_name": "V2 动态多图分析",
+    "description": "兼容 v2 的动态多图工作流节点。",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2RemoteVLMTaskRunner": {
+    "display_name": "V2 远程 VLM 任务运行器",
+    "description": "兼容 v2 的远程 VLM 任务运行节点。",
+    "inputs": {},
+    "outputs": {}
+  }
+}

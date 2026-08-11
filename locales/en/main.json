@@ -1,0 +1,11 @@
+{
+  "settingsCategories": {
+    "GGUF-VLM": "GGUF-VLM",
+    "Business": "Business",
+    "Vision Models": "Vision Models",
+    "Remote": "Remote",
+    "Local": "Local",
+    "Text": "Text",
+    "v2": "v2"
+  }
+}

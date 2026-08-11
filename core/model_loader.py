@@ -18,7 +18,6 @@ except (ImportError, ValueError):
         from utils.mmproj_finder import MMProjFinder
     except ImportError:
         MMProjFinder = None
-        print("⚠️  MMProjFinder not available, using basic mmproj search")
 
 
 class ModelLoader:

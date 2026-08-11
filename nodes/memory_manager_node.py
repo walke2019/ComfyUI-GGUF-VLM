@@ -13,10 +13,10 @@ if str(module_path) not in sys.path:
     sys.path.insert(0, str(module_path))
 
 try:
-    from core.inference_engine import InferenceEngine
-except ImportError as e:
+    from ..core.inference_engine import get_global_inference_engine
+except (ImportError, ValueError) as e:
     print(f"[ComfyUI-GGUF-VLM] Import error in memory_manager_node: {e}")
-    from ..core.inference_engine import InferenceEngine
+    from core.inference_engine import get_global_inference_engine
 
 
 class MemoryManagerNode:
@@ -29,7 +29,7 @@ class MemoryManagerNode:
     def _get_engine(cls):
         """获取推理引擎"""
         if cls._inference_engine is None:
-            cls._inference_engine = InferenceEngine()
+            cls._inference_engine = get_global_inference_engine()
         return cls._inference_engine
     
     @classmethod

@@ -1,0 +1,48 @@
+{
+  "last_node_id": 5,
+  "last_link_id": 4,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "RemoteVisionModelConfig",
+      "pos": [120, 120],
+      "size": [420, 260],
+      "widgets_values": ["http://127.0.0.1:1234", "LM Studio", "qwen3-vl", "You are a precise vision assistant."]
+    },
+    {
+      "id": 2,
+      "type": "CaptionPromptBuilder",
+      "pos": [120, 430],
+      "size": [360, 160],
+      "widgets_values": ["详细", "中文", "通用"]
+    },
+    {
+      "id": 3,
+      "type": "RemoteVLMTaskRunner",
+      "pos": [620, 160],
+      "size": [420, 300],
+      "widgets_values": ["Caption", 1024, 0.2, 300, ""]
+    },
+    {
+      "id": 4,
+      "type": "JSONResultValidator",
+      "pos": [620, 520],
+      "size": [420, 180],
+      "widgets_values": ["{}", "subject,tags"]
+    },
+    {
+      "id": 5,
+      "type": "VLMModelAdvisor",
+      "pos": [1120, 160],
+      "size": [360, 180],
+      "widgets_values": ["caption/标注", 8, "本地优先"]
+    }
+  ],
+  "links": [],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "info": "V2 business workflow example: configure remote VLM, build captions, validate JSON, and get model advice."
+  },
+  "version": 0.4
+}

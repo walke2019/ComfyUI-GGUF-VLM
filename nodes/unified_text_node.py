@@ -15,14 +15,32 @@ module_path = Path(__file__).parent.parent
 if str(module_path) not in sys.path:
     sys.path.insert(0, str(module_path))
 
-from core.model_loader import ModelLoader
-from core.inference_engine import InferenceEngine
-from core.inference.unified_api_engine import get_unified_api_engine
+try:
+    from ..core.model_loader import ModelLoader
+    from ..core.inference_engine import get_global_inference_engine
+    from ..core.inference.unified_api_engine import get_unified_api_engine
+except (ImportError, ValueError):
+    from core.model_loader import ModelLoader
+    from core.inference_engine import get_global_inference_engine
+    from core.inference.unified_api_engine import get_unified_api_engine
 import requests
 
 
 class LocalTextModelLoader:
     """本地 GGUF 文本模型加载器"""
+
+    @staticmethod
+    def _filter_text_selectable_models(local_models):
+        """Keep all runnable GGUF models, including VL models in text-only mode.
+
+        Only projection/helper files should be hidden from the text loader.
+        """
+        helper_keywords = ["mmproj", "clip", "projector"]
+        return [
+            model
+            for model in local_models
+            if not any(keyword in model.lower() for keyword in helper_keywords)
+        ]
     
     @classmethod
     def INPUT_TYPES(cls):
@@ -30,9 +48,8 @@ class LocalTextModelLoader:
         loader = ModelLoader()
         local_models = loader.list_models()
         
-        # 过滤文本模型
-        vision_keywords = ['llava', 'vision', 'vl', 'multimodal', 'mm', 'clip', 'qwen-vl', 'qwen2-vl']
-        text_models = [m for m in local_models if not any(kw in m.lower() for kw in vision_keywords)]
+        # 过滤文本可选模型：VL 主模型也能纯文本运行，只排除 mmproj/clip 等辅助文件
+        text_models = cls._filter_text_selectable_models(local_models)
         
         return {
             "required": {
@@ -274,7 +291,7 @@ class TextGeneration:
     def _get_engine(cls):
         """获取推理引擎"""
         if cls._inference_engine is None:
-            cls._inference_engine = InferenceEngine()
+            cls._inference_engine = get_global_inference_engine()
         return cls._inference_engine
     
     @classmethod

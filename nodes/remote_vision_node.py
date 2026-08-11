@@ -11,6 +11,7 @@ from PIL import Image
 from typing import List, Dict, Any, Optional
 from comfy.comfy_types import IO
 
+from ..core.backends import OpenAICompatibleVLMBackend
 from ..core.inference.unified_api_engine import get_unified_api_engine
 import requests
 
@@ -213,34 +214,10 @@ class RemoteVisionAnalysis:
         else:
             print(f"📝 纯文本模式（无图像）")
         
-        # 获取 API 引擎
+        # 获取统一 VLM Backend
         engine = get_unified_api_engine(base_url, api_type)
-        
-        # 构建消息（OpenAI Vision API 格式）
-        messages = []
-        
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        
-        # 构建用户消息
-        if text_only_mode:
-            # 纯文本模式
-            messages.append({"role": "user", "content": prompt})
-        else:
-            # 视觉消息格式
-            user_content = [
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": f"data:image/png;base64,{image_base64}"
-                    }
-                },
-                {
-                    "type": "text",
-                    "text": prompt
-                }
-            ]
-            messages.append({"role": "user", "content": user_content})
+        backend = OpenAICompatibleVLMBackend(engine)
+        image_urls = [] if text_only_mode else [f"data:image/png;base64,{image_base64}"]
         
         if text_only_mode:
             print(f"\n💬 正在生成文本响应...")
@@ -252,19 +229,15 @@ class RemoteVisionAnalysis:
         print(f"   Timeout: {timeout} 秒")
         
         try:
-            # 调用 API（视觉模型需要更长的超时时间）
-            response = engine.chat_completion(
+            result = backend.generate(
                 model=model_name,
-                messages=messages,
+                prompt=prompt,
+                image_urls=image_urls,
+                system_prompt=system_prompt,
                 temperature=temperature,
                 max_tokens=max_tokens if max_tokens > 0 else 4096,
-                stream=False,
                 timeout=timeout  # 使用用户指定的超时时间
             )
-            
-            # 提取结果
-            result = response['choices'][0]['message']['content']
-            result = result.strip()
             
             print(f"\n✅ 分析完成 ({len(result)} 字符)")
             print(f"   预览: {result[:100]}...")

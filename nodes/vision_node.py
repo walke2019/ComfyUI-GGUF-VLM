@@ -3,7 +3,6 @@ Vision Language Node - 视觉语言模型节点
 """
 
 import os
-import platform
 import sys
 import uuid
 import numpy as np
@@ -19,12 +18,13 @@ if str(module_path) not in sys.path:
 
 # 使用相对导入
 from ..core.model_loader import ModelLoader
-from ..core.inference_engine import InferenceEngine
+from ..core.inference_engine import get_global_inference_engine
 from ..core.cache_manager import CacheManager
 from ..utils.registry import RegistryManager
 from ..utils.downloader import FileDownloader
 from ..models.vision_models import VisionModelConfig, VisionModelPresets
 from ..utils.device_optimizer import DeviceOptimizer
+from ..utils.path_utils import path_to_file_url
 
 # 可选导入
 try:
@@ -100,9 +100,10 @@ class VisionModelLoader:
         
         return {
             "required": {
-                # 使用空元组表示动态列表，由前端 JavaScript 控制
-                "model": ((), {
-                    "tooltip": "选择视觉语言模型（点击 🔄 Refresh Models 按钮更新列表）"
+                # 后端提供静态初始列表，前端按钮再动态刷新；兼容旧版 ComfyUI 前端
+                "model": (categorized_models, {
+                    "default": categorized_models[0] if categorized_models else "No models found",
+                    "tooltip": "选择视觉语言模型（可点击 🔄 Refresh Local Models 更新列表）"
                 }),
                 "n_ctx": ("INT", {
                     "default": 8192,
@@ -362,7 +363,7 @@ class VisionLanguageNode:
     def _get_engine(cls):
         """获取推理引擎"""
         if cls._inference_engine is None:
-            cls._inference_engine = InferenceEngine()
+            cls._inference_engine = get_global_inference_engine()
         return cls._inference_engine
     
     @classmethod
@@ -439,7 +440,6 @@ class VisionLanguageNode:
         """生成图像/视频描述，也支持纯文本对话"""
         try:
             from llama_cpp import Llama
-            from llama_cpp.llama_chat_format import Qwen25VLChatHandler
             
             # 允许纯文本模式（无图像/视频）
             if image is not None and video is not None:
@@ -469,7 +469,11 @@ class VisionLanguageNode:
                 print(f"📁 Model: {os.path.basename(model_path)}")
                 print(f"📁 mmproj: {os.path.basename(mmproj_path)}")
                 
-                chat_handler = Qwen25VLChatHandler(clip_model_path=mmproj_path)
+                chat_handler = engine.create_vision_chat_handler(
+                    model_path=model_path,
+                    mmproj_path=mmproj_path,
+                    verbose=model.get('verbose', False)
+                )
                 llm = Llama(
                     model_path=model_path,
                     chat_handler=chat_handler,
@@ -503,16 +507,8 @@ class VisionLanguageNode:
                 if not img_path or not os.path.exists(img_path):
                     raise FileNotFoundError(f"无效的图像路径：{img_path}")
                 
-                # 2. 自动判断系统类型，适配路径格式
-                if platform.system() == "Windows":
-                    # Windows 系统：转换为绝对路径 + 替换为 / 分隔符 + 拼接 file:// 协议
-                    abs_path = os.path.abspath(img_path)
-                    # 处理盘符（如 C:\ → /C:/），避免 file://C:/ 格式错误
-                    img_url = f"file:///{abs_path.replace(os.sep, '/')}"
-                else:
-                    # Linux/Mac 系统：直接使用绝对路径（天然 / 分隔符）
-                    abs_path = os.path.abspath(img_path)
-                    img_url = f"file://{abs_path}"
+                # 2. 自动适配 Windows/Linux/macOS file:// URI
+                img_url = path_to_file_url(img_path)
                 
                 # 3. 构建图像内容（与原有逻辑兼容）
                 content.append({

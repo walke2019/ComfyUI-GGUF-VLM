@@ -1,0 +1,78 @@
+schema_version: 2
+updated: "2026-08-07"
+scope: "GGUF-first workflow capability catalog; not a broad model marketplace."
+models:
+  - id: qwen3-vl-8b-gguf
+    family: Qwen3-VL
+    backend: [llamacpp_server, lmstudio, ollama, local_gguf]
+    modality: [text, image, video]
+    tasks: [caption, ocr, prompt_reverse, json, video]
+    min_vram_gb: 8
+    recommended_backend: llamacpp_server
+    gguf_repo: Qwen/Qwen3-VL-8B-Instruct-GGUF
+    mmproj_repo: Qwen/Qwen3-VL-8B-Instruct-GGUF
+    context: 32768
+    notes: Good default for local/remote GGUF VLM workflows.
+  - id: qwen3.5-vl
+    family: Qwen3.5
+    backend: [openai, transformers]
+    modality: [text, image, video]
+    tasks: [caption, ocr, prompt_reverse, json, video]
+    min_vram_gb: 16
+    recommended_backend: openai
+    context: 131072
+    notes: Optional compatibility target; keep outside the core GGUF path until stable local/server support is practical.
+  - id: gemma-3-vision
+    family: Gemma
+    backend: [lmstudio, llamacpp_server, transformers]
+    modality: [text, image]
+    tasks: [caption, json, prompt_reverse]
+    min_vram_gb: 8
+    recommended_backend: lmstudio
+    context: 32768
+    notes: Lightweight general image understanding.
+  - id: internvl-3.5
+    family: InternVL
+    backend: [transformers, openai]
+    modality: [text, image]
+    tasks: [caption, ocr, json]
+    min_vram_gb: 16
+    recommended_backend: transformers
+    context: 32768
+    notes: Optional reference for OCR-oriented remote/Transformers workflows, not a core bundled target.
+  - id: smolvlm2
+    family: SmolVLM
+    backend: [transformers, openai]
+    modality: [text, image, video]
+    tasks: [caption, video, json]
+    min_vram_gb: 4
+    recommended_backend: transformers
+    context: 16384
+    notes: Optional low-VRAM reference for workflow design when GGUF resources are limited.
+  - id: minicpm-v
+    family: MiniCPM-V
+    backend: [transformers, openai]
+    modality: [text, image]
+    tasks: [caption, ocr, json]
+    min_vram_gb: 6
+    recommended_backend: transformers
+    context: 16384
+    notes: Optional small local/edge reference.
+  - id: moondream
+    family: Moondream
+    backend: [transformers, openai]
+    modality: [text, image]
+    tasks: [caption]
+    min_vram_gb: 4
+    recommended_backend: transformers
+    context: 8192
+    notes: Optional fast lightweight captioning reference.
+  - id: florence-2
+    family: Florence-2
+    backend: [transformers]
+    modality: [image]
+    tasks: [caption, detection, region]
+    min_vram_gb: 4
+    recommended_backend: transformers
+    context: 4096
+    notes: Optional caption/region reference; detection suites are outside the core project scope.

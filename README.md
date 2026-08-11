@@ -1,24 +1,18 @@
 # ComfyUI-GGUF-VLM
 
-ComfyUI 多模态推理插件，支持本地 GGUF 模型和远程 API (Ollama/LM Studio/Nexa SDK)。
+[中文](#中文) | [English](#english)
 
-## 📸 截图
+---
 
-![远程文本模型](workflows/PixPin_2025-12-17_12-51-06.png)
+<a id="中文"></a>
 
-![远程视觉模型](workflows/PixPin_2025-12-17_12-53-03.png)
+## 中文
 
-![本地文本模型](workflows/PixPin_2025-12-17_12-54-42.png)
+ComfyUI-GGUF-VLM 是一个 **GGUF-first** 的 ComfyUI 多模态 VLM/LLM 扩展，聚焦 Qwen/GGUF、本地优先推理、LM Studio / Ollama / llama.cpp server，以及实用的 Caption、OCR、Prompt Reverse、JSON 和批量图像工作流。
 
-![本地视觉模型](workflows/PixPin_2025-12-17_12-56-36.png)
+> 说明：本项目不是云 API 大聚合，也不是模型 marketplace。OpenAI-compatible 是协议层，核心仍是本地/GGUF/VLM 工作流。
 
-![Transformers多图分析](workflows/PixPin_2025-12-17_12-58-05.png)
-
-## 📂 示例工作流
-
-导入 [workflows/Example.json](workflows/Example.json) 查看完整示例。
-
-## 📦 安装
+## 安装
 
 ```bash
 cd ComfyUI/custom_nodes
@@ -27,180 +21,177 @@ cd ComfyUI-GGUF-VLM
 pip install -r requirements.txt
 ```
 
----
+ComfyUI Portable 用户请使用 ComfyUI 自带 Python 安装依赖。
 
-## 🌐 远程模式
+## 快速使用
 
-通过 Ollama、LM Studio、Nexa SDK等服务调用模型。
+### 远程模式（推荐）
 
-### 💡 推荐：LM Studio (Windows)
-
-Windows 用户推荐使用 [LM Studio](https://lmstudio.ai/)：
-- 一键安装，无需配置 Python/CUDA 环境
-- 图形界面下载和管理 GGUF 模型
-- 原生支持 GGUF 量化格式 (Q4_K_M, Q8_0 等)
-- 支持视觉模型 (Qwen-VL, LLaVA 等)
-
-安装后：下载 GGUF 模型 → 启用 "Local Server" → 即可调用
-
-### 支持的服务
-
-| 服务 | 文本生成 | 视觉分析 | 默认端口 |
-|------|---------|---------|---------|
-| Ollama | ✅ | ✅ | 11434 |
-| LM Studio | ✅ | ✅ | 1234 |
-| Nexa SDK | ✅ | ✅ | 8080 |
-
-### 文本生成
-
-```
-🌐 Remote API Config → 🤖 Text Generation
+```text
+Remote Vision Model Config → Remote VLM Business Task ← IMAGE
 ```
 
-1. 启动服务 (`ollama serve` 或 LM Studio)
-2. 添加 **Remote API Config** 节点，选择 api_type，填写 base_url
-3. 点击 **🔄 Refresh Models** 获取模型列表
-4. 连接 **Text Generation** 节点
+推荐服务：
 
-### 视觉分析
+| 服务 | 默认端口 | 用途 |
+|---|---:|---|
+| LM Studio | 1234 | Windows / GGUF 图形化管理 |
+| Ollama | 11434 | 本地模型服务 |
+| llama.cpp server | 自定义 | 最新 GGUF 多模态服务 |
+| OpenAI-compatible | 自定义 | 兼容协议层 |
 
+### 本地 GGUF 模式
+
+```text
+Local Vision Model Loader (GGUF) → Local Image Analysis (GGUF) ← IMAGE
 ```
-🌐 Remote Vision Model Config → 🔍 Remote Vision Analysis ← IMAGE (可选)
+
+推荐模型目录：
+
+```text
+ComfyUI/models/LLM/GGUF/
+ComfyUI/models/text_encoders/
+ComfyUI/models/clip/
+ComfyUI/models/clip/gguf/
 ```
 
-1. 在远程服务中加载视觉模型 (如 LM Studio 加载 Qwen3 VL GGUF)
-2. 添加 **Remote Vision Model Config** 节点，填写 base_url
-3. 点击 **🔄 Refresh Models** 获取远程模型列表
-4. 连接 **Remote Vision Analysis** 节点
-5. 图像输入可选，支持纯文本对话
+## Nodes
 
-> ⏱️ 视觉模型处理较慢，默认超时 300 秒
+### 远程 / Remote
 
----
+| Node | 说明 |
+|---|---|
+| Remote Text Model Config | 远程文本模型配置 |
+| Remote Vision Model Config | 远程视觉模型配置 |
+| Text Generation | 文本生成 |
+| Remote Vision Analysis | 远程视觉/纯文本分析 |
 
-## 💾 本地模式
+### 本地 / Local
 
-使用 llama-cpp-python 加载本地 GGUF 模型。
+| Node | 说明 |
+|---|---|
+| Local Text Model Loader (GGUF) | 本地 GGUF 文本模型加载 |
+| Local Text Generation (GGUF) | 本地文本生成 |
+| Local Vision Model Loader (GGUF) | 本地 GGUF 视觉模型加载 |
+| Local Image Analysis (GGUF) | 本地图像/视频/纯文本分析 |
+| Vision Model Loader (Transformers) | 可选 Transformers 视觉模型 |
+| Multi-Image Analysis | 多图/视频帧分析 |
 
-> ⚠️ **注意**: 本地视觉模型目前仅支持 **Qwen2.5-VL** 系列
+### 业务工作流 / Workflow
 
-### ⚙️ Local Vision Model Loader (GGUF) 安装注意事项
+| Node | 说明 |
+|---|---|
+| Caption Prompt Builder | Caption / tags / dataset 提示词 |
+| OCR Prompt Builder | OCR 提示词 |
+| Prompt Reverse Builder | SDXL / Flux / Midjourney 反推提示词 |
+| JSON Extraction Prompt Builder | 结构化 JSON 提取提示词 |
+| Remote VLM Business Task | 单图 Caption/OCR/Prompt/JSON/Custom |
+| Batch Remote VLM Task | IMAGE 批量 Caption/OCR/JSON/Custom |
+| Dynamic Multi-Image Collector | 多图输入收集为 batch |
+| Video Frame Sampler | 视频帧抽样 |
+| VLM Model Advisor | 根据任务/显存/偏好推荐后端和模型 |
+| JSON Result Validator | 校验 JSON 输出字段 |
 
-使用 **🖼️ Local Vision Model Loader (GGUF)** 和 **🖼️ Local Image Analysis (GGUF)** 节点需要安装 llama-cpp-python（带 CUDA 支持）：
+## 多语言 / i18n
 
-**推荐环境配置：**
-- PyTorch: 2.9.1+cu126
-- CUDA: 12.6
-- llama-cpp-python: 0.3.16
+本项目支持 ComfyUI 官方自定义节点多语言结构：
 
-**安装命令（CUDA 12.6）：**
+```text
+locales/en/nodeDefs.json
+locales/zh/nodeDefs.json
+```
+
+当前提供英文和简体中文节点定义翻译。ComfyUI 会根据界面语言加载对应的 `nodeDefs.json`。
+
+## 示例工作流
+
+- `workflows/Example.json`
+- `workflows/V2_Business_Example.json`
+
+## 开发与测试
+
 ```bash
-pip install llama-cpp-python --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cu126
+python -m unittest discover -s tests -v
+python -m compileall __init__.py api_routes.py core nodes utils models config tests
 ```
 
-**其他 CUDA 版本：**
-- CUDA 12.1: `https://abetlen.github.io/llama-cpp-python/whl/cu121`
-- CUDA 12.2: `https://abetlen.github.io/llama-cpp-python/whl/cu122`
-- CUDA 12.4: `https://abetlen.github.io/llama-cpp-python/whl/cu124`
+CI 配置位于 `.github/workflows/ci.yml`。
 
-> 💡 如果遇到 `llama-cpp-python not installed` 错误，请确保使用上述命令安装带 CUDA 支持的版本
+## License
 
-### 模型目录
-
-```
-ComfyUI/models/
-├── LLM/GGUF/          # 主目录
-├── text_encoders/
-└── clip/
-```
-
-### 视觉分析
-
-```
-🖼️ Local Vision Model Loader (GGUF) → 🖼️ Local Image Analysis (GGUF) ← IMAGE (可选)
-```
-
-1. 下载 GGUF 视觉模型和对应的 mmproj 文件
-2. 放到同一目录，**文件命名示例**：
-   ```
-   Qwen2.5-VL-7B-Instruct-Q8_0.gguf            # 主模型
-   Qwen2.5-VL-7B-Instruct-Q8_0-mmproj-F16.gguf # mmproj 文件
-   ```
-   支持的 mmproj 命名格式（自动匹配）：
-   - `模型名-mmproj.gguf` (如 `Qwen2.5-VL-7B-Instruct-Q8_0-mmproj.gguf`)
-   - `模型名-mmproj-F16.gguf` (如 `Qwen2.5-VL-7B-Instruct-Q8_0-mmproj-F16.gguf`)
-   - `模型名-mmproj-f16.gguf` (小写 f16 也支持)
-   - `去掉量化后缀-mmproj-f16.gguf` (如 `Qwen2.5-VL-7B-Instruct-mmproj-f16.gguf`)
-   
-   支持的模型目录：
-   - `ComfyUI/models/LLM/GGUF/`
-   - `ComfyUI/models/text_encoders/`
-   - `ComfyUI/models/clip/`
-   - `ComfyUI/models/clip/gguf/`
-3. 添加 **Local Vision Model Loader** 节点
-4. 点击 **🔄 Refresh Local Models** 刷新
-5. 连接 **Local Image Analysis** 节点
-6. 图像/视频输入可选，支持纯文本对话
-
-### 多图分析 (Transformers)
-
-```
-🖼️ Vision Model Loader (Transformers) → �️ Image/Vaideo Analysis (Transformers) ← IMAGE (1视频+3图像)
-```
-
-支持 1 个视频输入 + 最多 3 个图像输入进行对比分析，也支持纯文本模式。
+MIT
 
 ---
 
-## 📋 节点列表
+<a id="english"></a>
 
-### 远程模式
-| 节点 | 说明 |
-|------|------|
-| 🌐 Remote Text Model Config | 远程文本模型配置 (Ollama/Nexa/LM Studio) |
-| 🌐 Remote Vision Model Config | 远程视觉模型配置 |
-| 🤖 Text Generation | 文本生成 |
-| 🔍 Remote Vision Analysis | 远程图像分析（图像可选） |
+## English
 
-### 本地模式
-| 节点 | 说明 |
-|------|------|
-| 📋 LLocal Text Model Loader (GGUF) | 本地文本模型加载 |
-| 📋 Local Text Generation (GGUF) | 本地文本生成 |
-| 🖼️ Local Vision Model Loader (GGUF) | 本地视觉模型加载 |
-| 🖼️ Local Image Analysis (GGUF) | 本地图像分析（图像可选） |
-| 🖼️ Vision Model Loader (Transformers) | Transformers 视觉模型 |
-| 📸 Multi-Image Analysis | 多图对比分析（1视频+3图像） |
+ComfyUI-GGUF-VLM is a **GGUF-first** multimodal VLM/LLM extension for ComfyUI. It focuses on Qwen/GGUF, local-first inference, LM Studio / Ollama / llama.cpp server, and practical workflows such as captioning, OCR, prompt reverse, JSON extraction, and image batches.
 
-### 工具
-| 节点 | 说明 |
-|------|------|
-| 📋 System Prompt Config | 系统提示词 |
-| 🧹 Memory Manager | 显存管理 |
+> Note: This project is not a cloud API aggregator or a model marketplace. OpenAI-compatible is only the protocol layer; the core remains local/GGUF/VLM workflows.
 
----
+## Installation
 
-## 🔄 更新日志
+```bash
+cd ComfyUI/custom_nodes
+git clone https://github.com/walke2019/ComfyUI-GGUF-VLM.git
+cd ComfyUI-GGUF-VLM
+pip install -r requirements.txt
+```
 
-### v1.3.0 (2025-12-17)
-- ✅ 增强 mmproj 文件匹配（支持保留量化后缀命名）
-- ✅ 添加 clip/gguf 子目录支持
-- ✅ 重命名本地节点（Local Vision/Text Model Loader）
-- ✅ 本地文本模型支持刷新按钮
-- ✅ 添加 llama-cpp-python CUDA 安装说明
+For ComfyUI Portable, install dependencies with ComfyUI's bundled Python.
 
-### v1.2.0 (2025-12-17)
-- ✅ LM Studio 支持（文本+视觉）
-- ✅ 远程视觉分析节点
-- ✅ 动态模型刷新按钮
-- ✅ VL 模型支持纯文本模式（无图像）
+## Quick Start
 
-### v1.1.0 (2025-11-19)
-- ✅ Windows 路径修复
-- ✅ Memory Manager 节点
-- ✅ 增强错误处理
+### Remote Mode (recommended)
 
+```text
+Remote Vision Model Config → Remote VLM Business Task ← IMAGE
+```
 
-## 📄 License
+Recommended services:
+
+| Service | Default Port | Use |
+|---|---:|---|
+| LM Studio | 1234 | Windows / GUI GGUF management |
+| Ollama | 11434 | Local model service |
+| llama.cpp server | custom | Latest multimodal GGUF service |
+| OpenAI-compatible | custom | Protocol compatibility layer |
+
+### Local GGUF Mode
+
+```text
+Local Vision Model Loader (GGUF) → Local Image Analysis (GGUF) ← IMAGE
+```
+
+Recommended model directories:
+
+```text
+ComfyUI/models/LLM/GGUF/
+ComfyUI/models/text_encoders/
+ComfyUI/models/clip/
+ComfyUI/models/clip/gguf/
+```
+
+## i18n
+
+This project uses ComfyUI's official custom node i18n structure:
+
+```text
+locales/en/nodeDefs.json
+locales/zh/nodeDefs.json
+```
+
+English and Simplified Chinese node definition translations are included.
+
+## Development
+
+```bash
+python -m unittest discover -s tests -v
+python -m compileall __init__.py api_routes.py core nodes utils models config tests
+```
+
+## License
 
 MIT

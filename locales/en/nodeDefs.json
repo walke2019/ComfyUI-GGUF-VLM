@@ -1,0 +1,366 @@
+{
+  "RemoteVLMTaskRunner": {
+    "display_name": "Remote VLM Business Task",
+    "description": "Run caption, OCR, prompt reverse, JSON, or custom VLM tasks with a remote model.",
+    "inputs": {
+      "model_config": {
+        "name": "Model Config",
+        "tooltip": "Remote vision model configuration."
+      },
+      "task": {
+        "name": "Task",
+        "tooltip": "Business task type."
+      },
+      "image": {
+        "name": "Image",
+        "tooltip": "Optional image input."
+      },
+      "custom_prompt": {
+        "name": "Custom Prompt",
+        "tooltip": "Optional prompt override."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Result",
+        "tooltip": "Generated VLM result."
+      }
+    }
+  },
+  "BatchRemoteVLMTask": {
+    "display_name": "Batch Remote VLM Task",
+    "description": "Run a remote VLM task over an IMAGE batch.",
+    "inputs": {
+      "model_config": {
+        "name": "Model Config",
+        "tooltip": "Remote vision model configuration."
+      },
+      "images": {
+        "name": "Images",
+        "tooltip": "IMAGE batch input."
+      },
+      "task": {
+        "name": "Task",
+        "tooltip": "Batch task type."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Results JSON",
+        "tooltip": "Structured batch results."
+      },
+      "1": {
+        "name": "Results Text",
+        "tooltip": "Human-readable batch results."
+      }
+    }
+  },
+  "JSONResultValidator": {
+    "display_name": "JSON Result Validator",
+    "description": "Validate required fields in VLM JSON output.",
+    "inputs": {
+      "json_text": {
+        "name": "JSON Text",
+        "tooltip": "Raw JSON text from a VLM."
+      },
+      "required_fields": {
+        "name": "Required Fields",
+        "tooltip": "Comma-separated required fields."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Valid",
+        "tooltip": "Whether validation passed."
+      },
+      "1": {
+        "name": "Normalized JSON",
+        "tooltip": "Formatted JSON output."
+      },
+      "2": {
+        "name": "Error",
+        "tooltip": "Validation error message."
+      }
+    }
+  },
+  "DynamicMultiImageCollector": {
+    "display_name": "Dynamic Multi-Image Collector",
+    "description": "Collect optional IMAGE inputs into one batch.",
+    "inputs": {
+      "image_1": {
+        "name": "Image 1",
+        "tooltip": "Image input."
+      },
+      "image_2": {
+        "name": "Image 2",
+        "tooltip": "Image input."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Images",
+        "tooltip": "Collected IMAGE batch."
+      },
+      "1": {
+        "name": "Summary",
+        "tooltip": "Batch summary."
+      }
+    }
+  },
+  "VLMModelAdvisor": {
+    "display_name": "VLM Model Advisor",
+    "description": "Recommend backend and model based on task, VRAM, and privacy preference.",
+    "inputs": {
+      "task": {
+        "name": "Task",
+        "tooltip": "Target VLM workflow task."
+      },
+      "vram_gb": {
+        "name": "VRAM GB",
+        "tooltip": "Available GPU memory."
+      },
+      "privacy": {
+        "name": "Privacy",
+        "tooltip": "Local or remote preference."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Recommendation",
+        "tooltip": "Recommended setup."
+      }
+    }
+  },
+  "CaptionPromptBuilder": {
+    "display_name": "Caption Prompt Builder",
+    "description": "Build caption prompts for datasets, tags, or e-commerce.",
+    "inputs": {
+      "style": {
+        "name": "Style",
+        "tooltip": "Caption style."
+      },
+      "language": {
+        "name": "Language",
+        "tooltip": "Output language."
+      },
+      "domain": {
+        "name": "Domain",
+        "tooltip": "Image/domain context."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Prompt",
+        "tooltip": "Generated prompt."
+      }
+    }
+  },
+  "OCRPromptBuilder": {
+    "display_name": "OCR Prompt Builder",
+    "description": "Build OCR prompts.",
+    "inputs": {
+      "language": {
+        "name": "Language",
+        "tooltip": "Output language."
+      },
+      "output_format": {
+        "name": "Output Format",
+        "tooltip": "OCR output format."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Prompt",
+        "tooltip": "Generated prompt."
+      }
+    }
+  },
+  "PromptReverseBuilder": {
+    "display_name": "Prompt Reverse Builder",
+    "description": "Build image-to-prompt reverse engineering prompts.",
+    "inputs": {
+      "target": {
+        "name": "Target",
+        "tooltip": "Target generation model/style."
+      },
+      "language": {
+        "name": "Language",
+        "tooltip": "Output language."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Prompt",
+        "tooltip": "Generated prompt."
+      }
+    }
+  },
+  "JSONPromptBuilder": {
+    "display_name": "JSON Extraction Prompt Builder",
+    "description": "Build structured JSON extraction prompts.",
+    "inputs": {
+      "task": {
+        "name": "Task",
+        "tooltip": "Extraction task."
+      },
+      "schema": {
+        "name": "Schema",
+        "tooltip": "Required JSON fields."
+      },
+      "language": {
+        "name": "Language",
+        "tooltip": "Output language."
+      }
+    },
+    "outputs": {
+      "0": {
+        "name": "Prompt",
+        "tooltip": "Generated prompt."
+      }
+    }
+  },
+  "VisionModelLoader": {
+    "display_name": "Local Vision Model Loader (GGUF)",
+    "description": "Load a local GGUF vision-language model.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "VisionLanguageNode": {
+    "display_name": "Local Image Analysis (GGUF)",
+    "description": "Analyze images, video frames, or text with a local GGUF VLM.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "MemoryManagerNode": {
+    "display_name": "Memory Manager (GGUF)",
+    "description": "Clear or inspect cached GGUF model memory.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "RemoteVisionModelConfig": {
+    "display_name": "Remote Vision Model Config",
+    "description": "Configure a remote OpenAI-compatible vision endpoint such as LM Studio, Ollama, or llama.cpp server.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "RemoteVisionAnalysis": {
+    "display_name": "Remote Vision Analysis",
+    "description": "Analyze images or text with a configured remote VLM endpoint.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "RemoteAPIConfig": {
+    "display_name": "Remote Text Model Config",
+    "description": "Configure a remote text model endpoint.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "NexaServiceStatus": {
+    "display_name": "Service Status Check",
+    "description": "Check availability of a configured remote service.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "SystemPromptConfig": {
+    "display_name": "System Prompt Config",
+    "description": "Create reusable system prompts for VLM/LLM workflows.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "TextModelLoader": {
+    "display_name": "Local Text Model Loader (GGUF)",
+    "description": "Load a local GGUF text model.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "TextGenerationNode": {
+    "display_name": "Local Text Generation (GGUF)",
+    "description": "Generate text with a local GGUF model.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "LocalTextModelLoader": {
+    "display_name": "Local Text Model Loader (GGUF)",
+    "description": "Load a local GGUF text model.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "RemoteTextModelSelector": {
+    "display_name": "Remote Text Model Selector",
+    "description": "Select a remote text model endpoint.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "TextGeneration": {
+    "display_name": "Text Generation",
+    "description": "Generate text from local or remote text models.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "MultiImageAnalysis": {
+    "display_name": "Image/Video Analysis (Transformers)",
+    "description": "Analyze multiple images or video frames with a Transformers VLM.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "VisionModelLoaderTransformers": {
+    "display_name": "Vision Model Loader (Transformers)",
+    "description": "Load an optional Transformers-based vision model.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "VideoFrameSampler": {
+    "display_name": "Video Frame Sampler",
+    "description": "Sample representative frames from a video frame batch.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2RemoteVisionModelConfig": {
+    "display_name": "V2 Remote Vision Model Config",
+    "description": "v2-compatible remote VLM configuration node.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2RemoteVisionAnalysis": {
+    "display_name": "V2 Remote Vision Analysis",
+    "description": "v2-compatible remote VLM analysis node.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2LocalVisionModelLoader": {
+    "display_name": "V2 Local Vision Model Loader",
+    "description": "v2-compatible local GGUF vision model loader.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2LocalVisionAnalysis": {
+    "display_name": "V2 Local Vision Analysis",
+    "description": "v2-compatible local GGUF image analysis node.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2LocalTextModelLoader": {
+    "display_name": "V2 Local Text Model Loader",
+    "description": "v2-compatible local GGUF text model loader.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2TextGeneration": {
+    "display_name": "V2 Text Generation",
+    "description": "v2-compatible text generation node.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2DynamicMultiImageAnalysis": {
+    "display_name": "V2 Dynamic Multi-Image Analysis",
+    "description": "v2-compatible dynamic multi-image workflow node.",
+    "inputs": {},
+    "outputs": {}
+  },
+  "V2RemoteVLMTaskRunner": {
+    "display_name": "V2 Remote VLM Task Runner",
+    "description": "v2-compatible remote VLM task runner.",
+    "inputs": {},
+    "outputs": {}
+  }
+}

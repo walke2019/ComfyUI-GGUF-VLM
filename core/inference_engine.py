@@ -3,6 +3,7 @@ Inference Engine - 负责模型推理和生成
 """
 
 from typing import Dict, List, Optional, Any
+import os
 import numpy as np
 
 
@@ -13,6 +14,37 @@ class InferenceEngine:
         """初始化推理引擎"""
         self.loaded_models: Dict[str, Any] = {}
         self.model_contexts: Dict[str, Any] = {}
+
+    @staticmethod
+    def create_vision_chat_handler(model_path: str, mmproj_path: str, verbose: bool = False):
+        """Create the best llama-cpp-python vision chat handler available."""
+        from llama_cpp import llama_chat_format
+
+        model_name = os.path.basename(model_path).lower()
+        handler_names = []
+
+        if "qwen3" in model_name and "vl" in model_name:
+            handler_names.extend(["Qwen3VLChatHandler", "Qwen25VLChatHandler"])
+        elif "qwen2.5" in model_name and "vl" in model_name:
+            handler_names.append("Qwen25VLChatHandler")
+        elif "qwen2" in model_name and "vl" in model_name:
+            handler_names.extend(["Qwen25VLChatHandler", "Llava15ChatHandler"])
+        elif "gemma" in model_name:
+            handler_names.extend(["Gemma3ChatHandler", "Llava15ChatHandler"])
+
+        handler_names.append("Llava15ChatHandler")
+
+        seen = set()
+        for handler_name in handler_names:
+            if handler_name in seen:
+                continue
+            seen.add(handler_name)
+            handler_cls = getattr(llama_chat_format, handler_name, None)
+            if handler_cls:
+                print(f"🧩 Using llama.cpp vision handler: {handler_name}")
+                return handler_cls(clip_model_path=mmproj_path, verbose=verbose)
+
+        raise ImportError("No supported llama-cpp-python vision chat handler found")
     
     def load_model(self, model_path: str, **kwargs) -> bool:
         """
@@ -68,7 +100,7 @@ class InferenceEngine:
                 
                 # 视觉语言模型
                 print("🔄 Loading vision model with mmproj...")
-                chat_handler = Llava15ChatHandler(clip_model_path=mmproj_path, verbose=verbose)
+                chat_handler = self.create_vision_chat_handler(model_path, mmproj_path, verbose=verbose)
                 llm = Llama(
                     model_path=model_path,
                     chat_handler=chat_handler,
@@ -250,3 +282,18 @@ class InferenceEngine:
                 print("✅ GPU cache cleared")
         except ImportError:
             pass
+
+
+_GLOBAL_INFERENCE_ENGINE: Optional[InferenceEngine] = None
+
+
+def get_global_inference_engine() -> InferenceEngine:
+    """Return the shared GGUF inference engine used by all nodes.
+
+    Memory cleanup nodes must operate on the same engine instance that text and
+    vision nodes use; otherwise loaded llama.cpp models remain resident.
+    """
+    global _GLOBAL_INFERENCE_ENGINE
+    if _GLOBAL_INFERENCE_ENGINE is None:
+        _GLOBAL_INFERENCE_ENGINE = InferenceEngine()
+    return _GLOBAL_INFERENCE_ENGINE

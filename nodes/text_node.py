@@ -14,7 +14,7 @@ if str(module_path) not in sys.path:
 
 try:
     from core.model_loader import ModelLoader
-    from core.inference_engine import InferenceEngine
+    from core.inference_engine import get_global_inference_engine
     from core.cache_manager import CacheManager
     from utils.registry import RegistryManager
     from utils.downloader import FileDownloader
@@ -23,7 +23,7 @@ except ImportError as e:
     print(f"[ComfyUI-GGUF-VLM] Import error in text_node: {e}")
     # 尝试相对导入
     from ..core.model_loader import ModelLoader
-    from ..core.inference_engine import InferenceEngine
+    from ..core.inference_engine import get_global_inference_engine
     from ..core.cache_manager import CacheManager
     from ..utils.registry import RegistryManager
     from ..utils.downloader import FileDownloader
@@ -37,6 +37,15 @@ class TextModelLoader:
     _model_loader = None
     _cache_manager = None
     _registry = None
+
+    @staticmethod
+    def _filter_text_selectable_models(local_models):
+        helper_keywords = ["mmproj", "clip", "projector"]
+        return [
+            model
+            for model in local_models
+            if not any(keyword in model.lower() for keyword in helper_keywords)
+        ]
     
     @classmethod
     def _get_instances(cls):
@@ -56,50 +65,8 @@ class TextModelLoader:
         # 获取本地模型
         all_local_models = loader.list_models()
         
-        # 过滤本地模型：只显示文本生成类型的模型
-        local_models = []
-        
-        # 视觉模型关键词列表（用于排除）- 使用更精确的匹配
-        vision_keywords = [
-            'llava', 'vision', 'multimodal', 'mm', 
-            'clip', 'minicpm-v', 'phi-3-vision', 
-            'internvl', 'cogvlm', 'mmproj'
-        ]
-        
-        # 特定的视觉模型模式（更精确的匹配）
-        vision_patterns = [
-            'qwen-vl', 'qwen2-vl', 'qwen2.5-vl', 'qwen3-vl',  # Qwen VL系列
-            '-vl-', '_vl_', '.vl.',  # 通用VL模式
-        ]
-        
-        for model_file in all_local_models:
-            model_lower = model_file.lower()
-            
-            # 首先检查registry信息（最准确）
-            model_info = registry.find_model_by_filename(model_file)
-            if model_info:
-                business_type = model_info.get('business_type')
-                if business_type == 'text_generation':
-                    local_models.append(model_file)
-                    continue
-                elif business_type in ['image_analysis', 'video_analysis']:
-                    continue  # 跳过视觉模型
-            
-            # 如果registry中没有信息，使用关键词过滤
-            # 检查是否匹配视觉模型模式
-            is_vision_model = False
-            for pattern in vision_patterns:
-                if pattern in model_lower:
-                    is_vision_model = True
-                    break
-            
-            if not is_vision_model:
-                # 检查通用视觉关键词
-                is_vision_model = any(keyword in model_lower for keyword in vision_keywords)
-            
-            if not is_vision_model:
-                # 不是视觉模型，添加到列表
-                local_models.append(model_file)
+        # VL 主模型也可纯文本运行；只隐藏 mmproj/clip 等辅助 GGUF 文件
+        local_models = cls._filter_text_selectable_models(all_local_models)
         
         # 获取可下载的文本模型（传递 loader 以检查下载状态）
         downloadable = registry.get_downloadable_models(business_type='text_generation', model_loader=loader)
@@ -231,7 +198,7 @@ class TextGenerationNode:
     def _get_engine(cls):
         """获取推理引擎"""
         if cls._inference_engine is None:
-            cls._inference_engine = InferenceEngine()
+            cls._inference_engine = get_global_inference_engine()
         return cls._inference_engine
     
     @classmethod
